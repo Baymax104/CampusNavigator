@@ -24,6 +24,7 @@ import com.amap.api.maps.model.TextOptions;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Locations;
 import com.example.campusnavigator.domain.Position;
+import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.PositionProvider;
 
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity{
     private AMap map = null;
 
     private PositionProvider provider = new PositionProvider();
+    private MapManager manager = new MapManager();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,11 +105,13 @@ public class MainActivity extends AppCompatActivity{
             map.addMarker(new MarkerOptions().position(provider.getPosByName("篮球场").getLatLng()));
             map.addMarker(new MarkerOptions().position(provider.getPosByName("天天餐厅").getLatLng()));
 
-//            map.addPolyline(new PolylineOptions().add(provider.getPosById(7).getLatLng(), provider.getPosById(13).getLatLng()));
-//            map.addPolyline(new PolylineOptions().add(provider.getPosById(12).getLatLng(), provider.getPosById(13).getLatLng()));
-//            map.addPolyline(new PolylineOptions().add(provider.getPosById(13).getLatLng(), provider.getPosById(14).getLatLng()));
-//            map.addPolyline(new PolylineOptions().add(provider.getPosById(12).getLatLng(), provider.getPosById(15).getLatLng()));
-//            map.addPolyline(new PolylineOptions().add(provider.getPosById(15).getLatLng(), provider.getPosById(16).getLatLng()));
+            for (int i = 0; i < 100; i++) {
+                for (int j = i + 1; j < 100; j++) {
+                    if (MapManager.mp[i][j] == 1) {
+                        map.addPolyline(new PolylineOptions().add(provider.getPosById(i).getLatLng(),provider.getPosById(j).getLatLng()));
+                    }
+                }
+            }
         });
     }
 

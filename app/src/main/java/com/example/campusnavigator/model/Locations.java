@@ -120,7 +120,7 @@ public class Locations {
     public static final double TURN_24_LNG = 116.477988;
 
     public static final double TURN_25_LAT = 39.876202;
-    public static final double TURN_25_LNG = 116.479683;
+    public static final double TURN_25_LNG = 116.479694;
 
     public static final double TURN_26_LAT = 39.876177;
     public static final double TURN_26_LNG = 116.482022;
@@ -164,8 +164,11 @@ public class Locations {
     public static final double TURN_39_LAT = 39.87798;
     public static final double TURN_39_LNG = 116.482097;
 
-    public static final double TURN_40_LAT = 39.87798;
-    public static final double TURN_41_LNG = 116.482478;
+    public static final double TURN_40_LAT = 39.877988;
+    public static final double TURN_40_LNG = 116.482478;
+
+    public static final double TURN_41_LAT = 39.877964;
+    public static final double TURN_41_LNG = 116.483605;
 
     public static final double TURN_42_LAT = 39.878445;
     public static final double TURN_42_LNG = 116.479732;
@@ -187,4 +190,10 @@ public class Locations {
 
     public static final double TURN_48_LAT = 39.879302;
     public static final double TURN_48_LNG = 116.481759;
+
+    public static final double TURN_49_LAT = 39.87847;
+    public static final double TURN_49_LNG = 116.47802;
+
+    public static final double TURN_50_LAT = 39.87565;
+    public static final double TURN_50_LNG = 116.479656;
 }
