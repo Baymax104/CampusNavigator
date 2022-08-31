@@ -15,29 +15,28 @@ import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapOptions;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.MapsInitializer;
-import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MarkerOptions;
+import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.maps.model.TextOptions;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Locations;
 import com.example.campusnavigator.domain.Position;
-import com.example.campusnavigator.model.PositionOperator;
+import com.example.campusnavigator.model.PositionProvider;
 
 
 public class MainActivity extends AppCompatActivity{
     private MapView mapView;
     private AMap map = null;
 
-    private PositionOperator operator = new PositionOperator();
+    private PositionProvider provider = new PositionProvider();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         privacyCompliance();
-        initData();
         initView();
 
         mapView.onCreate(savedInstanceState);
@@ -80,42 +79,36 @@ public class MainActivity extends AppCompatActivity{
             LatLng southwest = new LatLng(39.871214,116.47701);
             LatLng northeast = new LatLng(39.879621,116.489407);
             map.setMapStatusLimits(new LatLngBounds(southwest, northeast));
-            map.addText(new TextOptions().position(operator.getPosition("奥运餐厅").getLatLng()).text("奥运餐厅").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(operator.getPosition("东门").getLatLng()).text("东门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(operator.getPosition("西门").getLatLng()).text("西门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(operator.getPosition("南门").getLatLng()).text("南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(operator.getPosition("逸夫图书馆").getLatLng()).text("逸夫图书馆").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(operator.getPosition("东南门").getLatLng()).text("东南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(operator.getPosition("美食园").getLatLng()).text("美食园").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(operator.getPosition("北门").getLatLng()).text("北门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("奥运餐厅").getLatLng()).text("奥运餐厅").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("东门").getLatLng()).text("东门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("西门").getLatLng()).text("西门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("南门").getLatLng()).text("南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("逸夫图书馆").getLatLng()).text("逸夫图书馆").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("东南门").getLatLng()).text("东南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("美食园").getLatLng()).text("美食园").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("北门").getLatLng()).text("北门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("天天餐厅").getLatLng()).text("天天餐厅").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("篮球场").getLatLng()).text("篮球场").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("信息楼").getLatLng()).text("信息楼").fontSize(37).backgroundColor(Color.TRANSPARENT));
 
-            map.addMarker(new MarkerOptions().position(operator.getPosition("奥运餐厅").getLatLng()));
-            map.addMarker(new MarkerOptions().position(operator.getPosition("东门").getLatLng()));
-            map.addMarker(new MarkerOptions().position(operator.getPosition("西门").getLatLng()));
-            map.addMarker(new MarkerOptions().position(operator.getPosition("南门").getLatLng()));
-            map.addMarker(new MarkerOptions().position(operator.getPosition("逸夫图书馆").getLatLng()));
-            map.addMarker(new MarkerOptions().position(operator.getPosition("东南门").getLatLng()));
-            map.addMarker(new MarkerOptions().position(operator.getPosition("美食园").getLatLng()));
-            map.addMarker(new MarkerOptions().position(operator.getPosition("北门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("奥运餐厅").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("东门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("西门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("南门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("逸夫图书馆").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("东南门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("美食园").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("北门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("信息楼").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("篮球场").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("天天餐厅").getLatLng()));
 
-
+//            map.addPolyline(new PolylineOptions().add(provider.getPosById(7).getLatLng(), provider.getPosById(13).getLatLng()));
+//            map.addPolyline(new PolylineOptions().add(provider.getPosById(12).getLatLng(), provider.getPosById(13).getLatLng()));
+//            map.addPolyline(new PolylineOptions().add(provider.getPosById(13).getLatLng(), provider.getPosById(14).getLatLng()));
+//            map.addPolyline(new PolylineOptions().add(provider.getPosById(12).getLatLng(), provider.getPosById(15).getLatLng()));
+//            map.addPolyline(new PolylineOptions().add(provider.getPosById(15).getLatLng(), provider.getPosById(16).getLatLng()));
         });
-
-    }
-
-    void initData() {
-        Position[] positions = new Position[]{
-                new Position(1, Locations.XI_MEN_LAT,Locations.XI_MEN_LNG, "西门"),
-                new Position(2, Locations.DONG_MEN_LAT, Locations.DONG_MEN_LNG, "东门"),
-                new Position(3, Locations.DONG_NAN_LAT, Locations.DONG_NAN_LNG, "东南门"),
-                new Position(4, Locations.BEI_MEN_LAT, Locations.BEI_MEN_LNG, "北门"),
-                new Position(5, Locations.AO_YUN_LAT, Locations.AO_YUN_LNG, "奥运餐厅"),
-                new Position(6, Locations.LIBRARY_LAT, Locations.LIBRARY_LNG, "逸夫图书馆"),
-                new Position(7, Locations.NAN_MEN_LAT, Locations.NAN_MEN_LNG, "南门"),
-                new Position(8, Locations.MEI_SHI_YUAN_LAT, Locations.MEI_SHI_YUAN_LNG, "美食园")
-        };
-        operator.setPositions(positions);
-
     }
 
     @Override

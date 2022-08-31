@@ -9,7 +9,7 @@ package com.example.campusnavigator.domain;
  */
 public class Path {
     private double length;
-    private int spend;
+    private double spend;
     private int from;
     private int to;
 
@@ -19,13 +19,13 @@ public class Path {
         this.to = to;
     }
 
-    public Path(double length, int from, int to) {
+    public Path(int from, int to,double length) {
         this.length = length;
         this.from = from;
         this.to = to;
     }
 
-    public Path(int spend, int from, int to) {
+    public Path(double spend, int from, int to) {
         this.spend = spend;
         this.from = from;
         this.to = to;
@@ -39,11 +39,11 @@ public class Path {
         this.length = length;
     }
 
-    public int getSpend() {
+    public double getSpend() {
         return spend;
     }
 
-    public void setSpend(int spend) {
+    public void setSpend(double spend) {
         this.spend = spend;
     }
 
