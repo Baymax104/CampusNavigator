@@ -28,7 +28,7 @@
                 android:name="com.amap.api.v2.apikey"
                 android:value="34a4a13e57174c078f52e09d44b6eb02"/>
         <activity
-                android:name=".MainActivity"
+                android:name=".controller.MainActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
