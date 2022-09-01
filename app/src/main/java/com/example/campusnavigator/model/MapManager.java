@@ -2,6 +2,9 @@ package com.example.campusnavigator.model;
 
 import android.content.Context;
 
+import com.example.campusnavigator.utility.List;
+import com.example.campusnavigator.utility.Queue;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,17 +22,25 @@ import java.nio.charset.StandardCharsets;
  * @Version 1
  */
 public class MapManager {
-    private static double[][] mp;
+
+    private double[][] mp;
+    private static final double INF = 65535;
+    private boolean[] visited;
+    private Position[] positions;
+    private int size;
     private static MapManager manager;
 
     private MapManager(Context context, String filename) {
+        size = PositionProvider.getSize();
         // 初始化图
-        mp = new double[100][100];
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 100; j++) {
-                mp[i][j] = -1;
+        mp = new double[size][size];
+        visited = new boolean[size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                mp[i][j] = INF;
             }
         }
+        positions = PositionProvider.getPositions();
 
         try(InputStreamReader streamReader = new InputStreamReader(context.getAssets().open(filename), StandardCharsets.UTF_8);
             BufferedReader reader = new BufferedReader(streamReader)) {
@@ -62,5 +73,52 @@ public class MapManager {
 
     public double getWeight(int from, int to) {
         return mp[from][to];
+    }
+
+    public List<Position[]> DFS(Position source) {
+        List<Position[]> list = new List<>();
+        int v = source.getId();
+        dfs(list, v);
+        refreshVisited();
+        return list;
+    }
+
+    private void dfs(List<Position[]> list, int v) {
+        visited[v] = true;
+        for (int i = 0; i < size; i++) {
+            if (!visited[i] && mp[v][i] != INF) {
+                Position[] result = new Position[] {positions[v], positions[i]};
+                list.add(result);
+                dfs(list, i);
+            }
+        }
+    }
+
+    public List<Position[]> BFS(Position source) {
+        Queue<Integer> queue = new Queue<>();
+        List<Position[]> list = new List<>();
+        int v = source.getId();
+        visited[v] = true;
+        queue.push(v);
+        while (!queue.isEmpty()) {
+            v = queue.front();
+            queue.pop();
+            for (int i = 0; i < size; i++) {
+                if (!visited[i] && mp[v][i] != INF) {
+                    Position[] result = new Position[] {positions[v], positions[i]};
+                    list.add(result);
+                    visited[i] = true;
+                    queue.push(i);
+                }
+            }
+        }
+        refreshVisited();
+        return list;
+    }
+
+    private void refreshVisited() {
+        for (int i = 0; i < size; i++) {
+            visited[i] = false;
+        }
     }
 }

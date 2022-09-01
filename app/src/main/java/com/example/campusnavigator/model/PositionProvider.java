@@ -2,7 +2,7 @@ package com.example.campusnavigator.model;
 
 import android.content.Context;
 
-import com.example.campusnavigator.domain.Position;
+import com.amap.api.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class PositionProvider {
     private static Position[] positions;
+    private static int size = 0; // 实际地点个数
     private static PositionProvider provider;
 
     private PositionProvider(Context context, String filename) {
@@ -35,17 +36,19 @@ public class PositionProvider {
                 builder.append(line);
             }
 
-            positions = new Position[100];
+            positions = new Position[80];
             // 解析文件
             JSONObject jsonObject = new JSONObject(builder.toString());
             JSONArray positionArray = jsonObject.getJSONArray("positions");
-            for (int i = 0; i < positionArray.length(); i++) {
+            int i;
+            for (i = 0; i < positionArray.length(); i++) {
                 JSONObject pos = positionArray.getJSONObject(i);
                 double lat = pos.getDouble("lat");
                 double lng = pos.getDouble("lng");
                 String name = pos.getString("name");
                 positions[i] = new Position(i, lat, lng, name);
             }
+            size = i;
 
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -59,8 +62,11 @@ public class PositionProvider {
         return provider;
     }
 
-    public Position[] getPositions() {
+    public static Position[] getPositions() {
         return positions;
+    }
+    public static int getSize() {
+        return size;
     }
 
     public Position getPosByName(String name) {
@@ -74,5 +80,14 @@ public class PositionProvider {
 
     public Position getPosById(int id) {
         return positions[id];
+    }
+
+    public Position getPosByLatLng(LatLng latLng) {
+        for (Position pos : positions) {
+            if (pos.getLat() == latLng.latitude && pos.getLng() == latLng.longitude) {
+                return pos;
+            }
+        }
+        return null;
     }
 }

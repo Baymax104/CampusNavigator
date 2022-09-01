@@ -1,4 +1,4 @@
-package com.example.campusnavigator.domain;
+package com.example.campusnavigator.model;
 
 import com.amap.api.maps.model.LatLng;
 

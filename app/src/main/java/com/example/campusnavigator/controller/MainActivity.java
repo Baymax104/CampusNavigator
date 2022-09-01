@@ -23,15 +23,15 @@ import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.maps.model.TextOptions;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Locations;
-import com.example.campusnavigator.domain.Position;
+import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.PositionProvider;
+import com.example.campusnavigator.utility.List;
 
 
 public class MainActivity extends AppCompatActivity{
     private MapView mapView;
     private AMap map = null;
-
     private PositionProvider provider;
     private MapManager manager;
     @Override
@@ -43,10 +43,19 @@ public class MainActivity extends AppCompatActivity{
         manager = MapManager.getInstance(this, "map_data.json");
         privacyCompliance();
         initView();
-
         mapView.onCreate(savedInstanceState);
         setMap();
 
+        map.setOnMarkerClickListener(marker -> {
+            LatLng latLng = marker.getPosition();
+            Position position = provider.getPosByLatLng(latLng);
+            List<Position[]> results = manager.BFS(position);
+            for (int i = 0; i < results.getSize(); i++) {
+                Position[] pos = results.get(i);
+                map.addPolyline(new PolylineOptions().add(pos[0].getLatLng(), pos[1].getLatLng()));
+            }
+            return true;
+        });
     }
 
     private void privacyCompliance() {
@@ -84,38 +93,38 @@ public class MainActivity extends AppCompatActivity{
             LatLng southwest = new LatLng(39.871214,116.47701);
             LatLng northeast = new LatLng(39.879621,116.489407);
             map.setMapStatusLimits(new LatLngBounds(southwest, northeast));
+            map.addText(new TextOptions().position(provider.getPosByName("奥运餐厅").getLatLng()).text("奥运餐厅").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("东门").getLatLng()).text("东门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("西门").getLatLng()).text("西门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("南门").getLatLng()).text("南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("逸夫图书馆").getLatLng()).text("逸夫图书馆").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("东南门").getLatLng()).text("东南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("美食园").getLatLng()).text("美食园").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("北门").getLatLng()).text("北门").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("天天餐厅").getLatLng()).text("天天餐厅").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("篮球场").getLatLng()).text("篮球场").fontSize(37).backgroundColor(Color.TRANSPARENT));
+            map.addText(new TextOptions().position(provider.getPosByName("信息楼").getLatLng()).text("信息楼").fontSize(37).backgroundColor(Color.TRANSPARENT));
+
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("奥运餐厅").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("东门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("西门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("南门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("逸夫图书馆").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("东南门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("美食园").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("北门").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("信息楼").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("篮球场").getLatLng()));
+            map.addMarker(new MarkerOptions().position(provider.getPosByName("天天餐厅").getLatLng()));
+
+//            for (int i = 0; i < PositionProvider.getSize(); i++) {
+//                for (int j = i + 1; j < PositionProvider.getSize(); j++) {
+//                    if (manager.getWeight(i, j) == 1) {
+//                        map.addPolyline(new PolylineOptions().add(provider.getPosById(i).getLatLng(),provider.getPosById(j).getLatLng()));
+//                    }
+//                }
+//            }
         });
-        map.addText(new TextOptions().position(provider.getPosByName("奥运餐厅").getLatLng()).text("奥运餐厅").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("东门").getLatLng()).text("东门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("西门").getLatLng()).text("西门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("南门").getLatLng()).text("南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("逸夫图书馆").getLatLng()).text("逸夫图书馆").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("东南门").getLatLng()).text("东南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("美食园").getLatLng()).text("美食园").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("北门").getLatLng()).text("北门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("天天餐厅").getLatLng()).text("天天餐厅").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("篮球场").getLatLng()).text("篮球场").fontSize(37).backgroundColor(Color.TRANSPARENT));
-        map.addText(new TextOptions().position(provider.getPosByName("信息楼").getLatLng()).text("信息楼").fontSize(37).backgroundColor(Color.TRANSPARENT));
-
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("奥运餐厅").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("东门").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("西门").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("南门").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("逸夫图书馆").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("东南门").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("美食园").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("北门").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("信息楼").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("篮球场").getLatLng()));
-        map.addMarker(new MarkerOptions().position(provider.getPosByName("天天餐厅").getLatLng()));
-
-        for (int i = 0; i < 100; i++) {
-            for (int j = i + 1; j < 100; j++) {
-                if (manager.getWeight(i, j) == 1) {
-                    map.addPolyline(new PolylineOptions().add(provider.getPosById(i).getLatLng(),provider.getPosById(j).getLatLng()));
-                }
-            }
-        }
     }
 
     @Override
