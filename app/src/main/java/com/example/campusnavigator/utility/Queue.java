@@ -22,7 +22,7 @@ public class Queue<T> {
         for (i = 0; i < obj.length; i++) {
             array[i] = obj[i];
         }
-        rear = i - 1;
+        rear = i;
     }
 
     public boolean push(T obj) {

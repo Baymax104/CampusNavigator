@@ -27,6 +27,7 @@ import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.List;
+import com.example.campusnavigator.utility.Stack;
 
 
 public class MainActivity extends AppCompatActivity{
@@ -46,13 +47,28 @@ public class MainActivity extends AppCompatActivity{
         mapView.onCreate(savedInstanceState);
         setMap();
 
+        Stack<Position> buffer = new Stack<>();
         map.setOnMarkerClickListener(marker -> {
+//            LatLng latLng = marker.getPosition();
+//            Position position = provider.getPosByLatLng(latLng);
+//            List<Position[]> results = manager.BFS(position);
+//            for (int i = 0; i < results.getSize(); i++) {
+//                Position[] pos = results.get(i);
+//                map.addPolyline(new PolylineOptions().add(pos[0].getLatLng(), pos[1].getLatLng()));
+//            }
             LatLng latLng = marker.getPosition();
             Position position = provider.getPosByLatLng(latLng);
-            List<Position[]> results = manager.BFS(position);
-            for (int i = 0; i < results.getSize(); i++) {
-                Position[] pos = results.get(i);
-                map.addPolyline(new PolylineOptions().add(pos[0].getLatLng(), pos[1].getLatLng()));
+            buffer.push(position);
+            if (buffer.getSize() == 2) {
+                Position to = buffer.top();
+                buffer.pop();
+                Position from = buffer.top();
+                buffer.pop();
+                List<Position[]> results = manager.getShortPath(from, to);
+                for (int i = 0; i < results.getSize(); i++) {
+                    Position[] p = results.get(i);
+                    map.addPolyline(new PolylineOptions().add(p[0].getLatLng(), p[1].getLatLng()));
+                }
             }
             return true;
         });

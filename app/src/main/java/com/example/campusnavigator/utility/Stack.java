@@ -22,7 +22,7 @@ public class Stack<T> {
         for (i = 0; i < obj.length; i++) {
             array[i] = obj[i];
         }
-        size = i - 1;
+        size = i;
     }
 
     public boolean push(T obj) {
@@ -51,5 +51,9 @@ public class Stack<T> {
 
     public boolean isEmpty() {
         return size == 0;
+    }
+
+    public int getSize() {
+        return size;
     }
 }

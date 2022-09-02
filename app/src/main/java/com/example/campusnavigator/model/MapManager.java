@@ -3,6 +3,7 @@ package com.example.campusnavigator.model;
 import android.content.Context;
 
 import com.example.campusnavigator.utility.List;
+import com.example.campusnavigator.utility.MinHeap;
 import com.example.campusnavigator.utility.Queue;
 
 import org.json.JSONArray;
@@ -37,7 +38,11 @@ public class MapManager {
         visited = new boolean[size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                mp[i][j] = INF;
+                if (i == j) {
+                    mp[i][j] = 0;
+                } else {
+                    mp[i][j] = INF;
+                }
             }
         }
         positions = PositionProvider.getPositions();
@@ -114,6 +119,55 @@ public class MapManager {
         }
         refreshVisited();
         return list;
+    }
+
+    public List<Position[]> getShortPath(Position from, Position to) {
+        List<Position[]> list = new List<>();
+        double[] dist = new double[size];
+        int[] paths = Dijkstra(from, dist);
+        int toId = to.getId();
+        while (paths[toId] != -1) {
+            list.add(new Position[] {positions[toId], positions[paths[toId]]});
+            toId = paths[toId];
+        }
+        list.add(new Position[] {positions[toId], from});
+        return list;
+    }
+
+    public int[] Dijkstra(Position source, double[] dist) {
+        // dist[i]: distance of source --> i;
+        if (dist == null) {
+            return null;
+        }
+        int[] paths = new int[size];
+        int v = source.getId();
+        dist[v] = 0;
+        paths[v] = -1;
+        MinHeap heap = new MinHeap();
+        for (int i = 0; i < size; i++) {
+            if (i != v) {
+                dist[i] = mp[v][i];
+                paths[i] = -1;
+                heap.push(new MinHeap.Entry(i, mp[v][i]));
+            }
+        }
+        while (true) {
+            visited[v] = true;
+            if (heap.isEmpty()) {
+                break;
+            }
+            for (int i = 0; i < size; i++) {
+                if (mp[v][i] != INF && !visited[i] && dist[v] + mp[v][i] < dist[i]) {
+                    dist[i] = dist[v] + mp[v][i];
+                    heap.update(i, dist[i]);
+                    paths[i] = v;
+                }
+            }
+            v = heap.top().v;
+            heap.pop();
+        }
+        refreshVisited();
+        return paths;
     }
 
     private void refreshVisited() {

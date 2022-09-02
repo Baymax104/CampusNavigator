@@ -22,7 +22,7 @@ public class List<T> {
         for (i = 0; i < obj.length; i++) {
             array[i] = obj[i];
         }
-        size = i - 1;
+        size = i;
     }
 
     public boolean add(T obj) {
