@@ -141,30 +141,29 @@ public class MapManager {
         }
         int[] paths = new int[size];
         int v = source.getId();
-        dist[v] = 0;
-        paths[v] = -1;
         MinHeap heap = new MinHeap();
         for (int i = 0; i < size; i++) {
-            if (i != v) {
-                dist[i] = mp[v][i];
-                paths[i] = -1;
-                heap.push(new MinHeap.Entry(i, mp[v][i]));
-            }
+            dist[i] = INF;
+            paths[i] = -1;
         }
-        while (true) {
-            visited[v] = true;
-            if (heap.isEmpty()) {
-                break;
+        dist[v] = 0;
+        paths[v] = -1;
+        heap.push(new MinHeap.Entry(v, 0));
+
+        while (!heap.isEmpty()) {
+            v = heap.top().v;
+            heap.pop();
+            if (visited[v]) {
+                continue;
             }
+            visited[v] = true;
             for (int i = 0; i < size; i++) {
-                if (mp[v][i] != INF && !visited[i] && dist[v] + mp[v][i] < dist[i]) {
+                if (mp[v][i] != INF && dist[v] + mp[v][i] < dist[i]) {
                     dist[i] = dist[v] + mp[v][i];
-                    heap.update(i, dist[i]);
+                    heap.push(new MinHeap.Entry(i, dist[i]));
                     paths[i] = v;
                 }
             }
-            v = heap.top().v;
-            heap.pop();
         }
         refreshVisited();
         return paths;

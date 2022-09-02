@@ -92,15 +92,4 @@ public class MinHeap {
     public boolean isEmpty() {
         return size == 0;
     }
-
-    public void update(int index, double value) {
-        int i;
-        for (i = 0; i < size; i++) {
-            if (array[i].v == index) {
-                array[i].weight = value;
-                break;
-            }
-        }
-        shiftUp(i);
-    }
 }
