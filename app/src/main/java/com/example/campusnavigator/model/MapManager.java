@@ -2,9 +2,11 @@ package com.example.campusnavigator.model;
 
 import android.content.Context;
 
+import com.amap.api.maps.AMapUtils;
 import com.example.campusnavigator.utility.List;
 import com.example.campusnavigator.utility.MinHeap;
 import com.example.campusnavigator.utility.Queue;
+import com.example.campusnavigator.utility.Stack;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,8 +63,9 @@ public class MapManager {
                 JSONObject path = pathArray.getJSONObject(i);
                 int from = path.getInt("from");
                 int to = path.getInt("to");
-                mp[from][to] = 1;
-                mp[to][from] = 1;
+                double length = AMapUtils.calculateLineDistance(positions[from].getLatLng(),positions[to].getLatLng());
+                mp[from][to] = length;
+                mp[to][from] = length;
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -121,16 +124,21 @@ public class MapManager {
         return list;
     }
 
-    public List<Position[]> getShortPath(Position from, Position to) {
+    public List<Position[]> getSingleShortPath(Position from, Position to) {
         List<Position[]> list = new List<>();
         double[] dist = new double[size];
         int[] paths = Dijkstra(from, dist);
         int toId = to.getId();
+        // 生成路径为逆序，使用栈改变顺序
+        Stack<Position[]> stack = new Stack<>();
         while (paths[toId] != -1) {
-            list.add(new Position[] {positions[toId], positions[paths[toId]]});
+            stack.push(new Position[] {positions[paths[toId]], positions[toId]});
             toId = paths[toId];
         }
-        list.add(new Position[] {positions[toId], from});
+        while (!stack.isEmpty()) {
+            list.add(stack.top());
+            stack.pop();
+        }
         return list;
     }
 
@@ -169,9 +177,26 @@ public class MapManager {
         return paths;
     }
 
+    public List<Position[]> getMultiShortPath(Stack<Position> spots) {
+        List<Position[]> list = new List<>();
+        Position from = spots.top();
+        spots.pop();
+        while (!spots.isEmpty()) {
+            Position to = spots.top();
+            spots.pop();
+            List<Position[]> results = getSingleShortPath(from, to);
+            for (int i = 0; i < results.getSize(); i++) {
+                list.add(results.get(i));
+            }
+            from = to;
+        }
+        return list;
+    }
+
     private void refreshVisited() {
         for (int i = 0; i < size; i++) {
             visited[i] = false;
         }
     }
+
 }

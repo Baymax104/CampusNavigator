@@ -3,38 +3,43 @@ package com.example.campusnavigator.controller;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
+import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapOptions;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.MapsInitializer;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
+import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.maps.model.TextOptions;
 import com.example.campusnavigator.R;
-import com.example.campusnavigator.model.Locations;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.List;
+import com.example.campusnavigator.utility.Queue;
 import com.example.campusnavigator.utility.Stack;
+import com.lxj.xpopup.XPopup;
 
 
 public class MainActivity extends AppCompatActivity{
     private MapView mapView;
     private AMap map = null;
+    private Button button;
     private PositionProvider provider;
     private MapManager manager;
+    private Stack<Position> spotBuffer = new Stack<>(); // 地点参数栈
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,62 +47,47 @@ public class MainActivity extends AppCompatActivity{
         // provider需要context，必须延迟初始化
         provider = PositionProvider.getInstance(this, "map_data.json");
         manager = MapManager.getInstance(this, "map_data.json");
+        // 隐私合规
         privacyCompliance();
+        // 初始化
         initView();
         mapView.onCreate(savedInstanceState);
         setMap();
 
-        Stack<Position> buffer = new Stack<>();
         map.setOnMarkerClickListener(marker -> {
-//            LatLng latLng = marker.getPosition();
-//            Position position = provider.getPosByLatLng(latLng);
-//            List<Position[]> results = manager.BFS(position);
-//            for (int i = 0; i < results.getSize(); i++) {
-//                Position[] pos = results.get(i);
-//                map.addPolyline(new PolylineOptions().add(pos[0].getLatLng(), pos[1].getLatLng()));
-//            }
             LatLng latLng = marker.getPosition();
             Position position = provider.getPosByLatLng(latLng);
-            buffer.push(position);
-            if (buffer.getSize() == 2) {
-                Position to = buffer.top();
-                buffer.pop();
-                Position from = buffer.top();
-                buffer.pop();
-                List<Position[]> results = manager.getShortPath(from, to);
-                for (int i = 0; i < results.getSize(); i++) {
-                    Position[] p = results.get(i);
-                    map.addPolyline(new PolylineOptions().add(p[0].getLatLng(), p[1].getLatLng()));
-                }
-            }
+            spotBuffer.push(position);
+            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
             return true;
+        });
+
+        button.setOnClickListener(view -> {
+            if (!spotBuffer.isEmpty()) {
+                 showMultiShortPath();
+            }
         });
     }
 
     private void privacyCompliance() {
         MapsInitializer.updatePrivacyShow(MainActivity.this,true,true);
-        SpannableStringBuilder spannable = new SpannableStringBuilder("\"亲，感谢您对XXX一直以来的信任！我们依据最新的监管要求更新了XXX《隐私权政策》，特向您说明如下\n1.为向您提供交易相关基本功能，我们会收集、使用必要的信息；\n2.基于您的明示授权，我们可能会获取您的位置（为您提供附近的商品、店铺及优惠资讯等）等信息，您有权拒绝或取消授权；\n3.我们会采取业界先进的安全措施保护您的信息安全；\n4.未经您同意，我们不会从第三方处获取、共享或向提供您的信息；\n");
-        spannable.setSpan(new ForegroundColorSpan(Color.BLUE), 35, 42, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        new AlertDialog.Builder(this)
-                .setTitle("温馨提示")
-                .setMessage(spannable)
-                .setPositiveButton("同意", (dialogInterface, i) -> MapsInitializer.updatePrivacyAgree(MainActivity.this,true))
-                .setNegativeButton("不同意", (dialogInterface, i) -> {
-                    MapsInitializer.updatePrivacyAgree(MainActivity.this,false);
-                    finish();
-                })
+        new XPopup.Builder(this)
+                .isDestroyOnDismiss(true)
+                .asCustom(new PrivacyDialog(this))
                 .show();
     }
 
     private void initView() {
         AMapOptions options = new AMapOptions();
         options.tiltGesturesEnabled(false);
-        Position defaultPosition = new Position(Locations.DEFAULT_LAT, Locations.DEFAULT_LNG);
+        Position defaultPosition = new Position(39.8751, 116.48134);
         options.camera(new CameraPosition(defaultPosition.getLatLng(), 18, 0, 0));
         mapView = new MapView(this, options);
-        LinearLayout layout = findViewById(R.id.activity_main);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT);
+        FrameLayout layout = findViewById(R.id.map_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
         layout.addView(mapView, params);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        button = findViewById(R.id.confirm_button);
     }
 
     void setMap() {
@@ -106,41 +96,49 @@ public class MainActivity extends AppCompatActivity{
         }
         map.setOnMapLoadedListener(() -> {
             map.showMapText(false);
-            LatLng southwest = new LatLng(39.871214,116.47701);
-            LatLng northeast = new LatLng(39.879621,116.489407);
+            LatLng southwest = new LatLng(39.870737,116.477072);
+            LatLng northeast = new LatLng(39.87985,116.489752);
             map.setMapStatusLimits(new LatLngBounds(southwest, northeast));
-            map.addText(new TextOptions().position(provider.getPosByName("奥运餐厅").getLatLng()).text("奥运餐厅").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("东门").getLatLng()).text("东门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("西门").getLatLng()).text("西门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("南门").getLatLng()).text("南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("逸夫图书馆").getLatLng()).text("逸夫图书馆").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("东南门").getLatLng()).text("东南门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("美食园").getLatLng()).text("美食园").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("北门").getLatLng()).text("北门").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("天天餐厅").getLatLng()).text("天天餐厅").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("篮球场").getLatLng()).text("篮球场").fontSize(37).backgroundColor(Color.TRANSPARENT));
-            map.addText(new TextOptions().position(provider.getPosByName("信息楼").getLatLng()).text("信息楼").fontSize(37).backgroundColor(Color.TRANSPARENT));
-
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("奥运餐厅").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("东门").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("西门").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("南门").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("逸夫图书馆").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("东南门").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("美食园").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("北门").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("信息楼").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("篮球场").getLatLng()));
-            map.addMarker(new MarkerOptions().position(provider.getPosByName("天天餐厅").getLatLng()));
-
-//            for (int i = 0; i < PositionProvider.getSize(); i++) {
-//                for (int j = i + 1; j < PositionProvider.getSize(); j++) {
-//                    if (manager.getWeight(i, j) == 1) {
-//                        map.addPolyline(new PolylineOptions().add(provider.getPosById(i).getLatLng(),provider.getPosById(j).getLatLng()));
-//                    }
-//                }
-//            }
+            TextOptions textOptions = new TextOptions().fontSize(37).backgroundColor(Color.TRANSPARENT);
+            String[] spotName = new String[] {"奥运餐厅","东门","西门","南门","逸夫图书馆","东南门","美食园","北门","天天餐厅","篮球场","信息楼"};
+            for (String s : spotName) {
+                map.addText(textOptions.position(provider.getPosByName(s).getLatLng()).text(s));
+                map.addMarker(new MarkerOptions().position(provider.getPosByName(s).getLatLng()));
+            }
         });
+    }
+
+    private void showSingleShortPath() {
+        if (spotBuffer.getSize() == 2) {
+            Position to = spotBuffer.top();
+            spotBuffer.pop();
+            Position from = spotBuffer.top();
+            spotBuffer.pop();
+            if (from.getId() == to.getId()) {
+                Toast.makeText(this, "选择重复地点，请重新选择", Toast.LENGTH_SHORT).show();
+            } else {
+                List<Position[]> results = manager.getSingleShortPath(from, to);
+                PolylineOptions lineOptions = new PolylineOptions().color(Color.parseColor("#1e90ff"));
+                for (int i = 0; i < results.getSize(); i++) {
+                    Position[] p = results.get(i);
+                    map.addPolyline(lineOptions.add(p[0].getLatLng(), p[1].getLatLng()));
+                }
+            }
+        }
+    }
+
+    private void showMultiShortPath() {
+        List<Position[]> result = manager.getMultiShortPath(spotBuffer);
+        PolylineOptions lineOptions = new PolylineOptions()
+                .width(40)
+                .lineJoinType(PolylineOptions.LineJoinType.LineJoinRound)
+                .color(Color.parseColor("#1e90ff"))
+                .setUseTexture(true)
+                .setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.line_arrow));
+        for (int i = 0; i < result.getSize(); i++) {
+            Position[] p = result.get(i);
+            map.addPolyline(lineOptions.add(p[0].getLatLng(), p[1].getLatLng()));
+        }
     }
 
     @Override

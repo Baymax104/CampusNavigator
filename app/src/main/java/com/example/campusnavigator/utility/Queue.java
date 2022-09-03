@@ -53,4 +53,8 @@ public class Queue<T> {
     public boolean isFull() {
         return (rear + 1) % MAX_SIZE == front;
     }
+
+    public int getSize() {
+        return (rear - front + MAX_SIZE) % MAX_SIZE;
+    }
 }
