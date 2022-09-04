@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private MapManager manager;
     private Stack<Position> spotBuffer = new Stack<>(); // 地点参数栈
 
+    private TextView searchView;
+
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
 
@@ -79,43 +82,50 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                  showMultiShortPath();
             }
         });
+
+        searchView.setOnClickListener(view -> {
+            Toast.makeText(this, "搜索", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void privacyCompliance() {
         MapsInitializer.updatePrivacyShow(MainActivity.this,true,true);
-        new XPopup.Builder(this)
-                .isDestroyOnDismiss(true)
-                .asCustom(new PrivacyDialog(this))
-                .show();
+        MapsInitializer.updatePrivacyAgree(this, true);
+//        new XPopup.Builder(this)
+//                .isDestroyOnDismiss(true)
+//                .asCustom(new PrivacyDialog(this))
+//                .show();
     }
 
     private void initView() {
         AMapOptions options = new AMapOptions();
-        Position defaultPosition = new Position(39.8751, 116.48134);
-        options.camera(new CameraPosition(defaultPosition.getLatLng(), 18, 0, 0));
+        LatLng defaultPosition = new LatLng(39.8751, 116.48134);
+        options.camera(CameraPosition.fromLatLngZoom(defaultPosition, 18));
         mapView = new MapView(this, options);
         FrameLayout layout = findViewById(R.id.map_view_container);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
         layout.addView(mapView, params);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
         button = findViewById(R.id.confirm_button);
+        searchView = findViewById(R.id.search_position);
     }
 
     void setMap() {
         if (map == null) {
             map = mapView.getMap();
         }
-        LatLng southwest = new LatLng(39.870737,116.477072);
-        LatLng northeast = new LatLng(39.87985,116.489752);
+        LatLng southwest = new LatLng(39.870337,116.477103);
+        LatLng northeast = new LatLng(39.880384,116.488162);
 
         TextOptions textOptions = new TextOptions().fontSize(37).backgroundColor(Color.TRANSPARENT);
         String[] spotName = new String[] {"奥运餐厅","东门","西门","南门","逸夫图书馆","东南门","美食园","北门","天天餐厅","篮球场","信息楼"};
 
-        View markerView = LayoutInflater.from(this).inflate(R.layout.view_marker, mapView, false);
+        View markerView = LayoutInflater.from(this).inflate(R.layout.layout_marker_icon, mapView, false);
         MarkerOptions markerOptions = new MarkerOptions().icon(BitmapDescriptorFactory.fromView(markerView));
 
         MyLocationStyle locationStyle = new MyLocationStyle();
-        locationStyle.interval(2000);
+        locationStyle.interval(1500);
         locationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
         locationStyle.strokeColor(Color.TRANSPARENT);
         locationStyle.radiusFillColor(Color.TRANSPARENT);
@@ -127,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             map.setLocationSource(this);
             map.setMyLocationStyle(locationStyle);
             map.setMyLocationEnabled(true);
+            map.getUiSettings().setZoomControlsEnabled(false);
             for (String s : spotName) {
                 // 设置marker
                 Marker marker = map.addMarker(markerOptions.position(provider.getPosByName(s).getLatLng()));
