@@ -18,69 +18,31 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @Description
+ * @Description 路线规划算法的实现类
  * @Author John
  * @email
  * @Date 2022/8/31 13:30
  * @Version 1
  */
-public class MapManager {
+public class MapManager extends Map {
 
-    private double[][] mp;
-    private static final double INF = 65535;
     private boolean[] visited;
-    private Position[] positions;
-    private int size;
     private static MapManager manager;
 
-    private MapManager(Context context, String filename) {
-        size = PositionProvider.getSize();
-        // 初始化图
-        mp = new double[size][size];
+    private MapManager(Context context) {
+        super(context);
         visited = new boolean[size];
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (i == j) {
-                    mp[i][j] = 0;
-                } else {
-                    mp[i][j] = INF;
-                }
-            }
-        }
-        positions = PositionProvider.getPositions();
-
-        try(InputStreamReader streamReader = new InputStreamReader(context.getAssets().open(filename), StandardCharsets.UTF_8);
-            BufferedReader reader = new BufferedReader(streamReader)) {
-            String line;
-            StringBuilder builder = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-            }
-
-            JSONObject jsonObject = new JSONObject(builder.toString());
-            JSONArray pathArray = jsonObject.getJSONArray("paths");
-            for (int i = 0; i < pathArray.length(); i++) {
-                JSONObject path = pathArray.getJSONObject(i);
-                int from = path.getInt("from");
-                int to = path.getInt("to");
-                double length = AMapUtils.calculateLineDistance(positions[from].getLatLng(),positions[to].getLatLng());
-                mp[from][to] = length;
-                mp[to][from] = length;
-            }
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
     }
 
-    public static MapManager getInstance(Context context, String filename) {
+    public static MapManager getInstance(Context context) {
         if (manager == null) {
-            manager = new MapManager(context, filename);
+            manager = new MapManager(context);
         }
         return manager;
     }
 
     public double getWeight(int from, int to) {
-        return mp[from][to];
+        return map[from][to];
     }
 
     public List<Position[]> DFS(Position source) {
@@ -94,7 +56,7 @@ public class MapManager {
     private void dfs(List<Position[]> list, int v) {
         visited[v] = true;
         for (int i = 0; i < size; i++) {
-            if (!visited[i] && mp[v][i] != INF) {
+            if (!visited[i] && map[v][i] != INF) {
                 Position[] result = new Position[] {positions[v], positions[i]};
                 list.add(result);
                 dfs(list, i);
@@ -112,7 +74,7 @@ public class MapManager {
             v = queue.front();
             queue.pop();
             for (int i = 0; i < size; i++) {
-                if (!visited[i] && mp[v][i] != INF) {
+                if (!visited[i] && map[v][i] != INF) {
                     Position[] result = new Position[] {positions[v], positions[i]};
                     list.add(result);
                     visited[i] = true;
@@ -166,8 +128,8 @@ public class MapManager {
             }
             visited[v] = true;
             for (int i = 0; i < size; i++) {
-                if (mp[v][i] != INF && dist[v] + mp[v][i] < dist[i]) {
-                    dist[i] = dist[v] + mp[v][i];
+                if (map[v][i] != INF && dist[v] + map[v][i] < dist[i]) {
+                    dist[i] = dist[v] + map[v][i];
                     heap.push(new MinHeap.Entry(i, dist[i]));
                     paths[i] = v;
                 }

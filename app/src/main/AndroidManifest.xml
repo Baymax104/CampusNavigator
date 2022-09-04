@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!--允许程序访问CellID或WiFi热点来获取粗略的位置-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
             android:allowBackup="true"
             android:dataExtractionRules="@xml/data_extraction_rules"
@@ -27,6 +28,7 @@
         <meta-data
                 android:name="com.amap.api.v2.apikey"
                 android:value="34a4a13e57174c078f52e09d44b6eb02"/>
+        <service android:name="com.amap.api.location.APSService"/>
         <activity
                 android:name=".controller.MainActivity"
                 android:exported="true">
