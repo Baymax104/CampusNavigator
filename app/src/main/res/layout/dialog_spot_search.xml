@@ -81,7 +81,7 @@
                     android:background="@drawable/selector_route_button"
                     android:text="@string/route"
                     android:textColor="@color/white"
-                    android:id="@+id/button_route"/>
+                    android:id="@+id/route_button"/>
         </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"

@@ -3,6 +3,9 @@ package com.example.campusnavigator.controller;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,19 +47,21 @@ import com.example.campusnavigator.utility.List;
 import com.example.campusnavigator.utility.Stack;
 
 
-public class MainActivity extends AppCompatActivity implements LocationSource, AMapLocationListener,RouteResultCallback {
+public class MainActivity extends AppCompatActivity implements LocationSource, AMapLocationListener,RouteResultCallback,OnSpotSelectListener {
     private MapView mapView;
     private AMap map = null;
     private PositionProvider provider;
     private MapManager manager;
     private Stack<Position> spotBuffer = new Stack<>(); // 地点参数栈
     private Position myLocation;
+    private int modeCode = 0;
 
     private Button button;
     private TextView searchView;
 
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,10 +79,16 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         map.setOnMarkerClickListener(marker -> {
             // 压入数据
+//            LatLng latLng = marker.getPosition();
+//            Position position = provider.getPosByLatLng(latLng);
+//            spotBuffer.push(position);
+
+            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
             LatLng latLng = marker.getPosition();
             Position position = provider.getPosByLatLng(latLng);
-            spotBuffer.push(position);
-            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
+            if (modeCode == 1) {
+                DialogHelper.showSpotSearchDialog(this, position, this);
+            }
             return true;
         });
 
@@ -88,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         searchView.setOnClickListener(view -> {
-            DialogHelper.showSpotSearchDialog(this);
+            DialogHelper.showSpotSearchDialog(this, this);
         });
     }
 
@@ -237,5 +248,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 Log.e("MapLocation",errText);
             }
         }
+    }
+
+    @Override
+    public void onSpotSelect(int modeCode) {
+        this.modeCode = modeCode;
+        Toast.makeText(this, "请选择你想去的地点", Toast.LENGTH_SHORT).show();
     }
 }

@@ -3,21 +3,20 @@ package com.example.campusnavigator.controller;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.List;
+import com.google.android.material.card.MaterialCardView;
 import com.lxj.xpopup.core.BottomPopupView;
-import com.lxj.xpopup.util.XPopupUtils;
 
 /**
  * @Description
@@ -31,10 +30,24 @@ public class SpotSearchDialog extends BottomPopupView {
     private PositionProvider provider;
     private List<String> spotNames;
     private SpotsAdapter adapter;
+    private Button routeButton;
+    private MaterialCardView selectSpotView;
+    private OnSpotSelectListener listener;
+    private String selectResult;
 
-    public SpotSearchDialog(@NonNull Context context) {
+    public SpotSearchDialog(@NonNull Context context, OnSpotSelectListener listener) {
         super(context);
         this.context = context;
+        this.listener = listener;
+        provider = PositionProvider.getInstance(context);
+        spotNames = provider.getAllName();
+    }
+
+    public SpotSearchDialog(@NonNull Context context, Position position, OnSpotSelectListener listener) {
+        super(context);
+        this.context = context;
+        this.listener = listener;
+        this.selectResult = position.getName();
         provider = PositionProvider.getInstance(context);
         spotNames = provider.getAllName();
     }
@@ -50,10 +63,17 @@ public class SpotSearchDialog extends BottomPopupView {
         EditText editText = findViewById(R.id.spot_edit);
         RecyclerView spotsRecyclerView = findViewById(R.id.list_spot);
 
+        routeButton = findViewById(R.id.route_button);
+        selectSpotView = findViewById(R.id.select_spot_view);
+
         adapter = new SpotsAdapter(spotNames);
         spotsRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         spotsRecyclerView.setLayoutManager(layoutManager);
+
+        if (selectResult != null) {
+            editText.setText(selectResult);
+        }
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -79,6 +99,15 @@ public class SpotSearchDialog extends BottomPopupView {
         adapter.setItemClickListener(position -> {
             String name = spotNames.get(position);
             editText.setText(name);
+        });
+
+        selectSpotView.setOnClickListener(view -> {
+            listener.onSpotSelect(1);
+            dismiss();
+        });
+
+        routeButton.setOnClickListener(view -> {
+            Toast.makeText(context, "路线", Toast.LENGTH_SHORT).show();
         });
     }
 
