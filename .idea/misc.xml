@@ -3,12 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/drawable/selector_button_route.xml" value="0.111" />
         <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/drawable/selector_dialog_button.xml" value="0.111" />
         <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/drawable/selector_spot_item.xml" value="0.111" />
+        <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/drawable/shape_button_route.xml" value="0.111" />
+        <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/drawable/shape_route_button_pressed.xml" value="0.111" />
         <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/drawable/shape_spot_search.xml" value="0.111" />
         <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
         <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/layout/dialog_privacy_confirm.xml" value="0.1816123188405797" />
-        <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/layout/dialog_spot_search.xml" value="0.1816123188405797" />
+        <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/layout/dialog_spot_search.xml" value="0.3333333333333333" />
         <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/layout/layout_spot_item.xml" value="0.1369535519125683" />
         <entry key="..\:/Projects/AndroidStudio/CampusNavigator/app/src/main/res/layout/view_marker.xml" value="0.1816123188405797" />
       </map>

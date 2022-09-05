@@ -1,10 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.CampusNavigator" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.CampusNavigator" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/transparent</item>
         <item name="colorOnPrimary">@color/white</item>
+        <item name="colorAccent">@color/main_color</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/main_color</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>

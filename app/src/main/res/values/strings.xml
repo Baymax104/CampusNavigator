@@ -5,4 +5,6 @@
     <string name="cancel">取消</string>
     <string name="confirm">确定</string>
     <string name="search_position">查找地点</string>
+    <string name="route">路线</string>
+    <string name="select_spot">地图选点</string>
 </resources>
