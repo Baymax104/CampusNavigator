@@ -16,10 +16,10 @@ import com.lxj.xpopup.core.CenterPopupView;
  * @Date 2022/9/2 20:59
  * @Version 1
  */
-public class PrivacyDialog extends CenterPopupView {
+public class PrivacyConfirmDialog extends CenterPopupView {
     private Context context;
 
-    public PrivacyDialog(@NonNull Context context) {
+    public PrivacyConfirmDialog(@NonNull Context context) {
         super(context);
         this.context = context;
     }

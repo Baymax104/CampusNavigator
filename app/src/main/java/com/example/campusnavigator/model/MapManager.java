@@ -2,20 +2,12 @@ package com.example.campusnavigator.model;
 
 import android.content.Context;
 
-import com.amap.api.maps.AMapUtils;
+import com.example.campusnavigator.controller.RouteResultCallback;
 import com.example.campusnavigator.utility.List;
 import com.example.campusnavigator.utility.MinHeap;
 import com.example.campusnavigator.utility.Queue;
 import com.example.campusnavigator.utility.Stack;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 /**
  * @Description 路线规划算法的实现类
@@ -86,31 +78,12 @@ public class MapManager extends Map {
         return list;
     }
 
-    public List<Position[]> getSingleShortPath(Position from, Position to) {
-        List<Position[]> list = new List<>();
-        double[] dist = new double[size];
-        int[] paths = Dijkstra(from, dist);
-        int toId = to.getId();
-        // 生成路径为逆序，使用栈改变顺序
-        Stack<Position[]> stack = new Stack<>();
-        while (paths[toId] != -1) {
-            stack.push(new Position[] {positions[paths[toId]], positions[toId]});
-            toId = paths[toId];
-        }
-        while (!stack.isEmpty()) {
-            list.add(stack.top());
-            stack.pop();
-        }
-        return list;
-    }
-
-    public int[] Dijkstra(Position source, double[] dist) {
+    public boolean Dijkstra(int source, double[] dist, int[] paths) {
         // dist[i]: distance of source --> i;
-        if (dist == null) {
-            return null;
+        if (dist == null || paths == null) {
+            return false;
         }
-        int[] paths = new int[size];
-        int v = source.getId();
+        int v = source;
         MinHeap heap = new MinHeap();
         for (int i = 0; i < size; i++) {
             dist[i] = INF;
@@ -136,23 +109,40 @@ public class MapManager extends Map {
             }
         }
         refreshVisited();
-        return paths;
+        return true;
     }
 
-    public List<Position[]> getMultiShortPath(Stack<Position> spots) {
+    public double getSingleDestRoute(Position from, Position to, List<Position[]> results) {
+        double[] dist = new double[size];
+        int[] paths = new int[size];
+        int fromId = from.getId();
+        int toId = to.getId();
+        Dijkstra(fromId, dist, paths);
+        // 生成的路线为逆序
+        while (paths[toId] != -1) {
+            Position[] line = new Position[] {positions[toId], positions[paths[toId]]};
+            results.add(line);
+            toId = paths[toId];
+        }
+        return dist[toId];
+    }
+
+    public void getMultiDestRoute(Stack<Position> spots, RouteResultCallback callback) {
         List<Position[]> list = new List<>();
-        Position from = spots.top();
+        List<Position[]> singleRouteResult = new List<>();
+        Position to = spots.top();
         spots.pop();
         while (!spots.isEmpty()) {
-            Position to = spots.top();
+            Position from = spots.top();
             spots.pop();
-            List<Position[]> results = getSingleShortPath(from, to);
-            for (int i = 0; i < results.getSize(); i++) {
-                list.add(results.get(i));
+            double distance = getSingleDestRoute(from, to, singleRouteResult);
+            for (int i = 0; i < singleRouteResult.getSize(); i++) {
+                list.add(singleRouteResult.get(i));
             }
-            from = to;
+            singleRouteResult.clear();
+            to = from;
         }
-        return list;
+        callback.showMultiDestRoute(list);
     }
 
     private void refreshVisited() {

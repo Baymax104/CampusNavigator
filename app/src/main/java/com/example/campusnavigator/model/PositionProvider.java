@@ -3,6 +3,7 @@ package com.example.campusnavigator.model;
 import android.content.Context;
 
 import com.amap.api.maps.model.LatLng;
+import com.example.campusnavigator.utility.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,10 +22,13 @@ import java.nio.charset.StandardCharsets;
  * @Version 1
  */
 public class PositionProvider extends Map {
+    private Position[] spots;
     private static PositionProvider provider;
 
     private PositionProvider(Context context) {
         super(context);
+        spots = new Position[sizeOfSpot];
+        System.arraycopy(positions, 0, spots, 0, sizeOfSpot);
     }
 
     public static PositionProvider getInstance(Context context) {
@@ -34,28 +38,26 @@ public class PositionProvider extends Map {
         return provider;
     }
 
-    public static Position[] getPositions() {
-        return positions;
-    }
-    public static int getSize() {
-        return size;
+    public List<String> getAllName() {
+        List<String> list = new List<>();
+        for (int i = 0; i < sizeOfSpot; i++) {
+            list.add(spots[i].getName());
+        }
+        return list;
     }
 
-    public Position getPosByName(String name) {
-        for (Position pos : positions) {
+    public List<Position> getPosByName(String name) {
+        List<Position> results = new List<>();
+        for (Position pos : spots) {
             if (pos.getName() != null && pos.getName().equals(name)) {
-                return pos;
+                results.add(pos);
             }
         }
-        return null;
-    }
-
-    public Position getPosById(int id) {
-        return positions[id];
+        return results;
     }
 
     public Position getPosByLatLng(LatLng latLng) {
-        for (Position pos : positions) {
+        for (Position pos : spots) {
             if (pos.getLat() == latLng.latitude && pos.getLng() == latLng.longitude) {
                 return pos;
             }
