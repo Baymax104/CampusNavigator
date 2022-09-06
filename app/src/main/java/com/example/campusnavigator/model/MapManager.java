@@ -84,17 +84,17 @@ public class MapManager extends Map {
             return false;
         }
         int v = source;
-        MinHeap heap = new MinHeap();
+        MinHeap<Integer, Double> heap = new MinHeap<>();
         for (int i = 0; i < size; i++) {
             dist[i] = INF;
             paths[i] = -1;
         }
         dist[v] = 0;
         paths[v] = -1;
-        heap.push(new MinHeap.Entry(v, 0));
+        heap.push(v, 0.0);
 
         while (!heap.isEmpty()) {
-            v = heap.top().v;
+            v = heap.top().getFirst();
             heap.pop();
             if (visited[v]) {
                 continue;
@@ -103,7 +103,7 @@ public class MapManager extends Map {
             for (int i = 0; i < size; i++) {
                 if (map[v][i] != INF && dist[v] + map[v][i] < dist[i]) {
                     dist[i] = dist[v] + map[v][i];
-                    heap.push(new MinHeap.Entry(i, dist[i]));
+                    heap.push(i, dist[i]);
                     paths[i] = v;
                 }
             }

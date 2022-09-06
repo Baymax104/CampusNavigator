@@ -79,16 +79,16 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         map.setOnMarkerClickListener(marker -> {
             // 压入数据
-//            LatLng latLng = marker.getPosition();
-//            Position position = provider.getPosByLatLng(latLng);
-//            spotBuffer.push(position);
-
-            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
             LatLng latLng = marker.getPosition();
             Position position = provider.getPosByLatLng(latLng);
-            if (modeCode == 1) {
-                DialogHelper.showSpotSearchDialog(this, position, this);
-            }
+            spotBuffer.push(position);
+
+            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
+//            LatLng latLng = marker.getPosition();
+//            Position position = provider.getPosByLatLng(latLng);
+//            if (modeCode == 1) {
+//                DialogHelper.showSpotSearchDialog(this, position, this);
+//            }
             return true;
         });
 

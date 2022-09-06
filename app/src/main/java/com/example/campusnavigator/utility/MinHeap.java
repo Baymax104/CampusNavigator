@@ -1,6 +1,8 @@
 package com.example.campusnavigator.utility;
 
 
+import java.lang.reflect.Array;
+
 /**
  * @Description
  * @Author John
@@ -8,23 +10,33 @@ package com.example.campusnavigator.utility;
  * @Date 2022/9/1 19:13
  * @Version 1
  */
-public class MinHeap {
+public class MinHeap<T1, T2 extends Comparable<T2>> {
     private static final int MAX_SIZE = 80;
-    public static class Entry {
-        public int v;
-        public double weight;
-        public Entry(int v, double weight) {
+    public class Entry {
+        private T1 v;
+        private T2 weight;
+        public Entry(T1 v, T2 weight) {
             this.v = v;
             this.weight = weight;
         }
+        public T1 getFirst() {
+            return v;
+        }
+        public T2 getSecond() {
+            return weight;
+        }
     }
-    private Entry[] array = new Entry[MAX_SIZE];
     private int size;
+    private Entry[] array;
 
+    @SuppressWarnings("unchecked")
     public MinHeap() {
+        array = (Entry[]) Array.newInstance(Entry.class, MAX_SIZE);
     }
 
+    @SuppressWarnings("unchecked")
     public MinHeap(Entry[] entries) {
+        array = (Entry[]) Array.newInstance(Entry.class, MAX_SIZE);
         int i;
         for (i = 0; i < entries.length; i++) {
             array[i] = entries[i];
@@ -33,10 +45,11 @@ public class MinHeap {
         size = i;
     }
 
-    public boolean push(Entry entry) {
+    public boolean push(T1 t1, T2 t2) {
         if (size == MAX_SIZE) {
             return false;
         }
+        Entry entry = new Entry(t1, t2);
         array[size] = entry;
         size++;
         shiftUp(size - 1);
@@ -61,10 +74,10 @@ public class MinHeap {
         int index = 0;
         int child = 1;
         while (child < size) {
-            if (child + 1 < size && array[child].weight > array[child + 1].weight) {
+            if (child + 1 < size && array[child].weight.compareTo(array[child + 1].weight) > 0) {
                 child++;
             }
-            if (array[index].weight <= array[child].weight) {
+            if (array[index].weight.compareTo(array[child].weight) <= 0) {
                 break;
             }
             Entry temp = array[index];
@@ -78,7 +91,7 @@ public class MinHeap {
     private void shiftUp(int index) {
         int parent = (index - 1) / 2;
         while (parent >= 0) {
-            if (array[parent].weight <= array[index].weight) {
+            if (array[parent].weight.compareTo(array[index].weight) <= 0) {
                 break;
             }
             Entry temp = array[parent];
