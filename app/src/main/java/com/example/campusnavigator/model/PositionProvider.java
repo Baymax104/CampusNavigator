@@ -38,7 +38,7 @@ public class PositionProvider extends Map {
         return provider;
     }
 
-    public List<String> getAllName() {
+    public List<String> getAllNames() {
         List<String> list = new List<>();
         for (int i = 0; i < sizeOfSpot; i++) {
             list.add(spots[i].getName());
@@ -55,6 +55,7 @@ public class PositionProvider extends Map {
         }
         return results;
     }
+
 
     public Position getPosByLatLng(LatLng latLng) {
         for (Position pos : spots) {

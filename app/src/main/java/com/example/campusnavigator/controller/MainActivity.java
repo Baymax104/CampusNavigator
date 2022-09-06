@@ -44,6 +44,7 @@ import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.List;
+import com.example.campusnavigator.utility.OverlayManager;
 import com.example.campusnavigator.utility.Stack;
 
 
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private AMap map = null;
     private PositionProvider provider;
     private MapManager manager;
+    private OverlayManager overlayManager;
     private Stack<Position> spotBuffer = new Stack<>(); // 地点参数栈
     private Position myLocation;
     private int modeCode = 0;
@@ -76,19 +78,15 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         initView();
         mapView.onCreate(savedInstanceState);
         setMap();
+        overlayManager = OverlayManager.getInstance(map);
 
         map.setOnMarkerClickListener(marker -> {
-            // 压入数据
+            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
             LatLng latLng = marker.getPosition();
             Position position = provider.getPosByLatLng(latLng);
-            spotBuffer.push(position);
-
-            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
-//            LatLng latLng = marker.getPosition();
-//            Position position = provider.getPosByLatLng(latLng);
-//            if (modeCode == 1) {
-//                DialogHelper.showSpotSearchDialog(this, position, this);
-//            }
+            if (modeCode == 1) {
+                DialogHelper.showSpotSearchDialog(this, position, this);
+            }
             return true;
         });
 
@@ -162,15 +160,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void showMultiDestRoute(List<Position[]> results) {
-        PolylineOptions lineOptions = new PolylineOptions()
-                .width(40)
-                .lineJoinType(PolylineOptions.LineJoinType.LineJoinRound)
-                .color(Color.parseColor("#1e90ff"))
-                .setUseTexture(true)
-                .setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.line_arrow));
         for (int i = 0; i < results.getSize(); i++) {
             Position[] p = results.get(i);
-            map.addPolyline(lineOptions.add(p[0].getLatLng(), p[1].getLatLng()));
+            overlayManager.drawLine(p[0], p[1]);
         }
     }
 
@@ -254,5 +246,20 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     public void onSpotSelect(int modeCode) {
         this.modeCode = modeCode;
         Toast.makeText(this, "请选择你想去的地点", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showRoute(int modeCode, String name) {
+        this.modeCode = modeCode;
+        Position destPosition = provider.getPosByName(name).get(0);
+        if (myLocation != null) {
+            Position attachPosition = manager.attachToMap(myLocation);
+            if (attachPosition != null) {
+                spotBuffer.push(attachPosition);
+                spotBuffer.push(destPosition);
+                manager.getMultiDestRoute(spotBuffer, this);
+                overlayManager.drawLine(attachPosition, myLocation);
+            }
+        }
     }
 }

@@ -2,6 +2,8 @@ package com.example.campusnavigator.model;
 
 import android.content.Context;
 
+import com.amap.api.maps.AMapUtils;
+import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.controller.RouteResultCallback;
 import com.example.campusnavigator.utility.List;
 import com.example.campusnavigator.utility.MinHeap;
@@ -23,7 +25,7 @@ public class MapManager extends Map {
 
     private MapManager(Context context) {
         super(context);
-        visited = new boolean[size];
+        visited = new boolean[size + 1];
     }
 
     public static MapManager getInstance(Context context) {
@@ -149,6 +151,20 @@ public class MapManager extends Map {
         for (int i = 0; i < size; i++) {
             visited[i] = false;
         }
+    }
+
+    public Position attachToMap(Position myPosition) {
+        LatLng latLng = myPosition.getLatLng();
+        Position attachPosition = null;
+        double minDistance = INF;
+        for (int i = 0; i < size; i++) {
+            double distance = AMapUtils.calculateLineDistance(latLng, positions[i].getLatLng());
+            if (distance < minDistance) {
+                minDistance = distance;
+                attachPosition = positions[i];
+            }
+        }
+        return attachPosition;
     }
 
 }

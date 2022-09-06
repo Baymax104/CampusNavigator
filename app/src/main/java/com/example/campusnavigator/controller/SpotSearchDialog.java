@@ -5,7 +5,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,7 +39,7 @@ public class SpotSearchDialog extends BottomPopupView {
         this.context = context;
         this.listener = listener;
         provider = PositionProvider.getInstance(context);
-        spotNames = provider.getAllName();
+        spotNames = provider.getAllNames();
     }
 
     public SpotSearchDialog(@NonNull Context context, Position position, OnSpotSelectListener listener) {
@@ -49,7 +48,7 @@ public class SpotSearchDialog extends BottomPopupView {
         this.listener = listener;
         this.selectResult = position.getName();
         provider = PositionProvider.getInstance(context);
-        spotNames = provider.getAllName();
+        spotNames = provider.getAllNames();
     }
 
     @Override
@@ -86,7 +85,7 @@ public class SpotSearchDialog extends BottomPopupView {
             public void afterTextChanged(Editable editable) {
                 String content = editable.toString();
                 if (content.equals("")) { // 输入为空，重新展示所有地名
-                    spotNames = provider.getAllName();
+                    spotNames = provider.getAllNames();
                     adapter.setData(spotNames);
                     adapter.notifyDataSetChanged();
                 } else {
@@ -107,7 +106,9 @@ public class SpotSearchDialog extends BottomPopupView {
         });
 
         routeButton.setOnClickListener(view -> {
-            Toast.makeText(context, "路线", Toast.LENGTH_SHORT).show();
+            String name = editText.getText().toString();
+            listener.showRoute(2, name);
+            dismiss();
         });
     }
 
