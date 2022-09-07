@@ -58,6 +58,6 @@ public class SpotsAdapter extends RecyclerView.Adapter<SpotsAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return data.getSize();
+        return data.length();
     }
 }

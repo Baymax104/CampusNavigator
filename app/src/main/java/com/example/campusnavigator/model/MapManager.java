@@ -138,7 +138,7 @@ public class MapManager extends Map {
             Position from = spots.top();
             spots.pop();
             double distance = getSingleDestRoute(from, to, singleRouteResult);
-            for (int i = 0; i < singleRouteResult.getSize(); i++) {
+            for (int i = 0; i < singleRouteResult.length(); i++) {
                 list.add(singleRouteResult.get(i));
             }
             singleRouteResult.clear();

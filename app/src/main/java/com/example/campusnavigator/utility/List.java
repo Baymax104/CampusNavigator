@@ -1,6 +1,10 @@
 package com.example.campusnavigator.utility;
 
 
+import androidx.annotation.NonNull;
+
+import java.util.Iterator;
+
 /**
  * @Description
  * @Author John
@@ -8,7 +12,7 @@ package com.example.campusnavigator.utility;
  * @Date 2022/9/1 13:45
  * @Version 1
  */
-public class List<T> {
+public class List<T> implements Iterable<T> {
     private static final int MAX_SIZE = 80;
     @SuppressWarnings("unchecked")
     private T[] array = (T[]) new Object[MAX_SIZE];
@@ -41,11 +45,28 @@ public class List<T> {
         return array[i];
     }
 
-    public int getSize() {
+    public int length() {
         return size;
     }
 
     public void clear() {
         size = 0;
+    }
+
+    @NonNull
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            int cur = 0;
+            @Override
+            public boolean hasNext() {
+                return cur < size;
+            }
+
+            @Override
+            public T next() {
+                return array[cur++];
+            }
+        };
     }
 }

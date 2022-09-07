@@ -29,10 +29,13 @@ public class SpotSearchDialog extends BottomPopupView {
     private PositionProvider provider;
     private List<String> spotNames;
     private SpotsAdapter adapter;
-    private Button routeButton;
-    private MaterialCardView selectSpotView;
     private OnSpotSelectListener listener;
     private String selectResult;
+
+    public SpotSearchDialog(@NonNull Context context) {
+        super(context);
+        this.context = context;
+    }
 
     public SpotSearchDialog(@NonNull Context context, OnSpotSelectListener listener) {
         super(context);
@@ -62,8 +65,8 @@ public class SpotSearchDialog extends BottomPopupView {
         EditText editText = findViewById(R.id.spot_edit);
         RecyclerView spotsRecyclerView = findViewById(R.id.list_spot);
 
-        routeButton = findViewById(R.id.route_button);
-        selectSpotView = findViewById(R.id.select_spot_view);
+        Button routeButton = findViewById(R.id.route_button);
+        MaterialCardView selectSpotView = findViewById(R.id.select_spot_view);
 
         adapter = new SpotsAdapter(spotNames);
         spotsRecyclerView.setAdapter(adapter);
@@ -107,14 +110,14 @@ public class SpotSearchDialog extends BottomPopupView {
 
         routeButton.setOnClickListener(view -> {
             String name = editText.getText().toString();
-            listener.showRoute(2, name);
+            listener.showRoute(name);
             dismiss();
         });
     }
 
     private void refreshDataSource(List<Position> positionList) {
         spotNames.clear();
-        for (int i = 0; i < positionList.getSize(); i++) {
+        for (int i = 0; i < positionList.length(); i++) {
             spotNames.add(positionList.get(i).getName());
         }
         adapter.setData(spotNames);

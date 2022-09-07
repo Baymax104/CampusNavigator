@@ -3,18 +3,12 @@ package com.example.campusnavigator.controller;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,16 +22,12 @@ import com.amap.api.maps.AMapOptions;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.MapsInitializer;
-import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
-import com.amap.api.maps.model.Marker;
-import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
-import com.amap.api.maps.model.TextOptions;
-import com.bumptech.glide.Glide;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.DialogHelper;
 import com.example.campusnavigator.model.Position;
@@ -78,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         initView();
         mapView.onCreate(savedInstanceState);
         setMap();
-        overlayManager = OverlayManager.getInstance(map);
+        overlayManager = OverlayManager.getInstance(map, mapView, this);
 
         map.setOnMarkerClickListener(marker -> {
             Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
@@ -91,9 +81,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         button.setOnClickListener(view -> {
-            if (!spotBuffer.isEmpty()) {
-                 manager.getMultiDestRoute(spotBuffer, this);
-            }
+//            if (!spotBuffer.isEmpty()) {
+//                 manager.getMultiDestRoute(spotBuffer, this);
+//            }
         });
 
         searchView.setOnClickListener(view -> {
@@ -128,18 +118,14 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         LatLng southwest = new LatLng(39.870337,116.477103);
         LatLng northeast = new LatLng(39.880384,116.488162);
 
-        TextOptions textOptions = new TextOptions().fontSize(37).backgroundColor(Color.TRANSPARENT);
-        String[] spotName = new String[] {"奥运餐厅","东门","西门","南门","逸夫图书馆","东南门","美食园","北门","天天餐厅","篮球场","信息楼"};
+        MyLocationStyle locationStyle = new MyLocationStyle()
+                .interval(1200)
+                .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER)
+                .strokeColor(Color.TRANSPARENT)
+                .radiusFillColor(Color.TRANSPARENT)
+                .showMyLocation(true);
 
-        View markerView = LayoutInflater.from(this).inflate(R.layout.layout_marker_icon, mapView, false);
-        MarkerOptions markerOptions = new MarkerOptions().icon(BitmapDescriptorFactory.fromView(markerView));
-
-        MyLocationStyle locationStyle = new MyLocationStyle();
-        locationStyle.interval(1200);
-        locationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
-        locationStyle.strokeColor(Color.TRANSPARENT);
-        locationStyle.radiusFillColor(Color.TRANSPARENT);
-        locationStyle.showMyLocation(true);
+        List<String> spotNames = provider.getAllNames();
 
         map.setOnMapLoadedListener(() -> {
             map.showMapText(false);
@@ -148,20 +134,18 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             map.setMyLocationStyle(locationStyle);
             map.setMyLocationEnabled(true);
             map.getUiSettings().setZoomControlsEnabled(false);
-            for (String s : spotName) {
+            for (String s : spotNames) {
                 // 设置marker
-                Marker marker = map.addMarker(markerOptions.position(provider.getPosByName(s).get(0).getLatLng()));
-                marker.setClickable(true);
+                overlayManager.drawMarker(provider.getPosByName(s).get(0));
                 // 设置文字
-                map.addText(textOptions.position(provider.getPosByName(s).get(0).getLatLng()).text(s));
+                overlayManager.drawText(provider.getPosByName(s).get(0), s);
             }
         });
     }
 
     @Override
     public void showMultiDestRoute(List<Position[]> results) {
-        for (int i = 0; i < results.getSize(); i++) {
-            Position[] p = results.get(i);
+        for (Position[] p : results) {
             overlayManager.drawLine(p[0], p[1]);
         }
     }
@@ -249,8 +233,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
-    public void showRoute(int modeCode, String name) {
-        this.modeCode = modeCode;
+    public void showRoute(String name) {
+        overlayManager.removeLines();
         Position destPosition = provider.getPosByName(name).get(0);
         if (myLocation != null) {
             Position attachPosition = manager.attachToMap(myLocation);

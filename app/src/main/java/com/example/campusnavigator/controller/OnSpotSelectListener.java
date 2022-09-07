@@ -13,5 +13,5 @@ public interface OnSpotSelectListener {
      2:单点显示路径
      */
     void onSpotSelect(int modeCode);
-    void showRoute(int modeCode, String name);
+    void showRoute(String name);
 }
