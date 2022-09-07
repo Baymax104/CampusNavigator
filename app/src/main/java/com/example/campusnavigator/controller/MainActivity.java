@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import android.animation.LayoutTransition;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -55,13 +57,13 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private CoordinatorLayout container;
     private View searchBox;
     private View routeBox;
+    private LinearLayout routeContainer;
+    private View routePlanBox;
     private ImageView expendButton;
-    private TextView test2;
 
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
 
-    private int s = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,15 +106,17 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         expendButton.setOnClickListener(view -> {
             if (modeCode == 2) {
-                test2.setVisibility(View.GONE);
-                Glide.with(routeBox).load(R.drawable.expend_arrow_up).into(expendButton);
+                routeContainer.removeView(routePlanBox);
                 modeCode = 3;
+                expendButton.setImageResource(R.drawable.expend_arrow_up);
             } else if (modeCode == 3) {
-                test2.setVisibility(View.VISIBLE);
-                Glide.with(routeBox).load(R.drawable.expend_arrow_down).into(expendButton);
+                routeContainer.addView(routePlanBox);
                 modeCode = 2;
+                expendButton.setImageResource(R.drawable.expend_arrow_down);
             }
         });
+        
+
     }
 
     private void privacyCompliance() {
@@ -139,7 +143,10 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         button = findViewById(R.id.confirm_button);
         searchField = searchBox.findViewById(R.id.search_field);
         expendButton = routeBox.findViewById(R.id.expend_button);
-        test2 = routeBox.findViewById(R.id.route_plan);
+
+        routeContainer = routeBox.findViewById(R.id.route_card);
+        routePlanBox = LayoutInflater.from(this).inflate(R.layout.layout_route_plan, routeContainer, false);
+        routeContainer.addView(routePlanBox);
     }
 
     void setMap() {
@@ -267,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void showRoute(String name) {
-        this.modeCode = modeCode;
         overlayManager.removeLines(); // 清除线段
         Position destPosition = provider.getPosByName(name).get(0);
         if (myLocation != null) {
@@ -288,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onBackPressed() {
-        if (modeCode == 2) {
+        if (modeCode == 2 || modeCode == 3) {
             container.removeView(routeBox);
             container.addView(searchBox);
             overlayManager.removeLines();
