@@ -4,6 +4,56 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/shape_route_info_background">
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_marginStart="10dp">
+        <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:src="@drawable/shape_start_circle"/>
+        <View
+                android:layout_width="0.5dp"
+                android:layout_height="18dp"
+                android:background="#d4d4d4"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"/>
+        <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:src="@drawable/shape_end_circle"/>
+    </LinearLayout>
 
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="25dp">
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textColor="@color/black"
+                android:text="@string/my_position"
+                android:textSize="14sp"
+                android:layout_marginStart="5dp"/>
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#d4d4d4"
+                android:layout_marginTop="7dp"
+                android:layout_marginBottom="7dp"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textColor="@color/black"
+                android:id="@+id/dest_name"
+                android:textSize="14sp"
+                android:layout_marginStart="5dp"/>
+    </LinearLayout>
 
 </LinearLayout>

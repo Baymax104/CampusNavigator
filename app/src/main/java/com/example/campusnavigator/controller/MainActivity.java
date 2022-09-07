@@ -116,7 +116,14 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
         
+        map.setOnMapTouchListener(latLng -> {
+            if (modeCode == 2) {
+                routeContainer.removeView(routePlanBox);
+                modeCode = 3;
+                expendButton.setImageResource(R.drawable.expend_arrow_up);
+            }
 
+        });
     }
 
     private void privacyCompliance() {
@@ -276,6 +283,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     public void showRoute(String name) {
         overlayManager.removeLines(); // 清除线段
         Position destPosition = provider.getPosByName(name).get(0);
+        TextView destName = routeBox.findViewById(R.id.dest_name);
+        destName.setText(name);
         if (myLocation != null) {
             Position attachPosition = manager.attachToMap(myLocation);
             if (attachPosition != null) {
