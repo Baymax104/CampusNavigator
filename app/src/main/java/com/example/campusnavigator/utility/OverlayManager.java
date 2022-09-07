@@ -27,8 +27,6 @@ import com.example.campusnavigator.model.Position;
 public class OverlayManager {
     private AMap map;
     private List<Polyline> lineBuffer;
-    private List<Marker> markerList;
-    private List<Text> textList;
     private PolylineOptions lineStyle;
     private MarkerOptions markerOptions;
     private TextOptions textOptions;
@@ -37,8 +35,6 @@ public class OverlayManager {
     private OverlayManager(AMap map, MapView mapView, Context context) {
         this.map = map;
         lineBuffer = new List<>();
-        markerList = new List<>();
-        textList = new List<>();
         lineStyle = new PolylineOptions()
                 .width(40)
                 .lineJoinType(PolylineOptions.LineJoinType.LineJoinRound)
@@ -66,13 +62,11 @@ public class OverlayManager {
         }
     }
     public void drawMarker(Position position) {
-        Marker marker = map.addMarker(markerOptions.position(position.getLatLng()));
-        markerList.add(marker);
+        map.addMarker(markerOptions.position(position.getLatLng()));
     }
 
     public void drawText(Position position, String text) {
-        Text text1 = map.addText(textOptions.position(position.getLatLng()).text(text));
-        textList.add(text1);
+        map.addText(textOptions.position(position.getLatLng()).text(text));
     }
 
     public void removeLines() {

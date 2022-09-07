@@ -110,15 +110,15 @@ public class SpotSearchDialog extends BottomPopupView {
 
         routeButton.setOnClickListener(view -> {
             String name = editText.getText().toString();
-            listener.showRoute(name);
+            listener.showRoute(2, name);
             dismiss();
         });
     }
 
     private void refreshDataSource(List<Position> positionList) {
         spotNames.clear();
-        for (int i = 0; i < positionList.length(); i++) {
-            spotNames.add(positionList.get(i).getName());
+        for (Position p : positionList) {
+            spotNames.add(p.getName());
         }
         adapter.setData(spotNames);
         adapter.notifyDataSetChanged();

@@ -2,10 +2,12 @@ package com.example.campusnavigator.controller;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -48,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     private Button button;
     private TextView searchView;
+    private CoordinatorLayout container;
+    private View searchBox;
+    private View routeBox;
 
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
@@ -57,16 +62,20 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // provider需要context，必须延迟初始化
-        provider = PositionProvider.getInstance(this);
-        manager = MapManager.getInstance(this);
         // 隐私合规
         privacyCompliance();
         // 初始化
         initView();
         mapView.onCreate(savedInstanceState);
-        setMap();
+        if (map == null) {
+            map = mapView.getMap();
+        }
+        // provider需要context，必须延迟初始化
+        provider = PositionProvider.getInstance(this);
+        manager = MapManager.getInstance(this);
         overlayManager = OverlayManager.getInstance(map, mapView, this);
+        // 设置地图属性
+        setMap();
 
         map.setOnMarkerClickListener(marker -> {
             Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
@@ -105,14 +114,16 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         layout.addView(mapView, params);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
+        container = findViewById(R.id.view_container);
+        searchBox = LayoutInflater.from(this).inflate(R.layout.layout_search_box, container, false);
+        routeBox = LayoutInflater.from(this).inflate(R.layout.layout_route_box, container, false);
+        container.addView(searchBox);
+
         button = findViewById(R.id.confirm_button);
         searchView = findViewById(R.id.search_position);
     }
 
     void setMap() {
-        if (map == null) {
-            map = mapView.getMap();
-        }
         LatLng southwest = new LatLng(39.870337,116.477103);
         LatLng northeast = new LatLng(39.880384,116.488162);
 
@@ -124,21 +135,18 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 .showMyLocation(true);
 
         List<String> spotNames = provider.getAllNames();
-
-        map.setOnMapLoadedListener(() -> {
-            map.showMapText(false);
-            map.setMapStatusLimits(new LatLngBounds(southwest, northeast));
-            map.setLocationSource(this);
-            map.setMyLocationStyle(locationStyle);
-            map.setMyLocationEnabled(true);
-            map.getUiSettings().setZoomControlsEnabled(false);
-            for (String s : spotNames) {
-                // 设置marker
-                overlayManager.drawMarker(provider.getPosByName(s).get(0));
-                // 设置文字
-                overlayManager.drawText(provider.getPosByName(s).get(0), s);
-            }
-        });
+        map.showMapText(false);
+        map.setMapStatusLimits(new LatLngBounds(southwest, northeast));
+        map.setLocationSource(this);
+        map.setMyLocationStyle(locationStyle);
+        map.setMyLocationEnabled(true);
+        map.getUiSettings().setZoomControlsEnabled(false);
+        for (String s : spotNames) {
+            // 设置marker
+            overlayManager.drawMarker(provider.getPosByName(s).get(0));
+            // 设置文字
+            overlayManager.drawText(provider.getPosByName(s).get(0), s);
+        }
     }
 
     @Override
@@ -178,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        // TODO 覆盖物无法恢复的bug
     }
 
     @Override
@@ -236,8 +245,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
-    public void showRoute(String name) {
-        overlayManager.removeLines();
+    public void showRoute(int modeCode, String name) {
+        this.modeCode = modeCode;
+        overlayManager.removeLines(); // 清除线段
         Position destPosition = provider.getPosByName(name).get(0);
         if (myLocation != null) {
             Position attachPosition = manager.attachToMap(myLocation);
@@ -247,6 +257,23 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 manager.getMultiDestRoute(spotBuffer, this);
                 overlayManager.drawLine(attachPosition, myLocation);
             }
+        }
+        // 更换布局
+        if (container != null && searchBox != null) {
+            container.removeView(searchBox);
+            container.addView(routeBox);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (modeCode == 2) {
+            container.removeView(routeBox);
+            container.addView(searchBox);
+            overlayManager.removeLines();
+            modeCode = 0;
+        } else {
+            super.onBackPressed();
         }
     }
 }

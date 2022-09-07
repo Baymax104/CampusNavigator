@@ -30,46 +30,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/search_view"
-            android:layout_above="@+id/nav_view">
-        <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:layout_marginBottom="7dp"
-                app:cardCornerRadius="15dp"
-                app:cardElevation="2dp">
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                <ImageView
-                        android:layout_width="27dp"
-                        android:layout_height="27dp"
-                        android:src="@drawable/search"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="13dp"
-                        android:layout_marginEnd="12dp"/>
-                <View
-                        android:layout_width="0.2dp"
-                        android:layout_height="37dp"
-                        android:background="#d6d6d6"
-                        android:layout_gravity="center_vertical"/>
-                <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:id="@+id/search_position"
-                        android:text="@string/search_position"
-                        android:textSize="15sp"
-                        android:gravity="center_vertical"
-                        android:layout_marginStart="12dp"/>
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+            android:id="@+id/view_container"
+            android:layout_above="@+id/nav_view"
+            android:animateLayoutChanges="true">
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
-
 </RelativeLayout>
