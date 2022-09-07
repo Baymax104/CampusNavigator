@@ -3,6 +3,7 @@ package com.example.campusnavigator.controller;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -31,6 +32,8 @@ public class SpotSearchDialog extends BottomPopupView {
     private SpotsAdapter adapter;
     private OnSpotSelectListener listener;
     private String selectResult;
+    private int mapModeCode = 0;
+    private String content;
 
     public SpotSearchDialog(@NonNull Context context) {
         super(context);
@@ -104,13 +107,14 @@ public class SpotSearchDialog extends BottomPopupView {
         });
 
         selectSpotView.setOnClickListener(view -> {
-            listener.onSpotSelect(1);
+            mapModeCode = 1;
             dismiss();
         });
 
         routeButton.setOnClickListener(view -> {
             String name = editText.getText().toString();
-            listener.showRoute(2, name);
+            mapModeCode = 2;
+            content = name;
             dismiss();
         });
     }
@@ -124,4 +128,12 @@ public class SpotSearchDialog extends BottomPopupView {
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    protected void doAfterDismiss() {
+        listener.setMapState(mapModeCode);
+        if (mapModeCode == 2 && content != null) {
+            listener.showRoute(content);
+        }
+        super.doAfterDismiss();
+    }
 }

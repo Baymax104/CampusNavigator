@@ -28,7 +28,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:id="@+id/search_position"
+                android:id="@+id/search_field"
                 android:text="@string/search_position"
                 android:textSize="15sp"
                 android:gravity="center_vertical"

@@ -12,6 +12,6 @@ public interface OnSpotSelectListener {
      1:单点地图选点
      2:单点显示路径
      */
-    void onSpotSelect(int modeCode);
-    void showRoute(int modeCode, String name);
+    void setMapState(int modeCode);
+    void showRoute(String name);
 }

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.bumptech.glide.Glide;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.DialogHelper;
 import com.example.campusnavigator.model.Position;
@@ -49,14 +51,17 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private int modeCode = 0;
 
     private Button button;
-    private TextView searchView;
+    private TextView searchField;
     private CoordinatorLayout container;
     private View searchBox;
     private View routeBox;
+    private ImageView expendButton;
+    private TextView test2;
 
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
 
+    private int s = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +98,20 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 //            }
         });
 
-        searchView.setOnClickListener(view -> {
+        searchField.setOnClickListener(view -> {
             DialogHelper.showSpotSearchDialog(this, this);
+        });
+
+        expendButton.setOnClickListener(view -> {
+            if (modeCode == 2) {
+                test2.setVisibility(View.GONE);
+                Glide.with(routeBox).load(R.drawable.expend_arrow_up).into(expendButton);
+                modeCode = 3;
+            } else if (modeCode == 3) {
+                test2.setVisibility(View.VISIBLE);
+                Glide.with(routeBox).load(R.drawable.expend_arrow_down).into(expendButton);
+                modeCode = 2;
+            }
         });
     }
 
@@ -120,7 +137,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         container.addView(searchBox);
 
         button = findViewById(R.id.confirm_button);
-        searchView = findViewById(R.id.search_position);
+        searchField = searchBox.findViewById(R.id.search_field);
+        expendButton = routeBox.findViewById(R.id.expend_button);
+        test2 = routeBox.findViewById(R.id.route_plan);
     }
 
     void setMap() {
@@ -239,13 +258,15 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
-    public void onSpotSelect(int modeCode) {
+    public void setMapState(int modeCode) {
         this.modeCode = modeCode;
-        Toast.makeText(this, "请选择你想去的地点", Toast.LENGTH_SHORT).show();
+        if (modeCode == 1) {
+            Toast.makeText(this, "请选择你想去的地点", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
-    public void showRoute(int modeCode, String name) {
+    public void showRoute(String name) {
         this.modeCode = modeCode;
         overlayManager.removeLines(); // 清除线段
         Position destPosition = provider.getPosByName(name).get(0);
