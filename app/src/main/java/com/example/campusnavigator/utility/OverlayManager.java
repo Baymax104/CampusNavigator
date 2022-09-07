@@ -59,11 +59,12 @@ public class OverlayManager {
         return overlayManager;
     }
 
-    public void drawLine(Position from, Position to) {
-        Polyline polyline = map.addPolyline(lineStyle.add(from.getLatLng(), to.getLatLng()));
-        lineBuffer.add(polyline);
+    public void drawLine(Position ...destination) {
+        for (Position p : destination) {
+            Polyline polyline = map.addPolyline(lineStyle.add(p.getLatLng()));
+            lineBuffer.add(polyline);
+        }
     }
-
     public void drawMarker(Position position) {
         Marker marker = map.addMarker(markerOptions.position(position.getLatLng()));
         markerList.add(marker);
@@ -84,9 +85,5 @@ public class OverlayManager {
                 .lineJoinType(PolylineOptions.LineJoinType.LineJoinRound)
                 .setUseTexture(true)
                 .setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.line_arrow));
-    }
-
-    public List<Polyline> getLines() {
-        return lineBuffer;
     }
 }

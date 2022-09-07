@@ -26,8 +26,6 @@ import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MyLocationStyle;
-import com.amap.api.maps.model.Polyline;
-import com.amap.api.maps.model.PolylineOptions;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.DialogHelper;
 import com.example.campusnavigator.model.Position;
@@ -145,8 +143,13 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void showMultiDestRoute(List<Position[]> results) {
-        for (Position[] p : results) {
-            overlayManager.drawLine(p[0], p[1]);
+        for (int i = 0; i < results.length(); i++) {
+            Position[] p = results.get(i);
+            if (i == 0) {
+                overlayManager.drawLine(p[0], p[1]);
+            } else {
+                overlayManager.drawLine(p[1]);
+            }
         }
     }
 
