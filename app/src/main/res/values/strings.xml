@@ -9,4 +9,5 @@
     <string name="select_spot">地图选点</string>
     <string name="input_destination">输入终点</string>
     <string name="my_position">我的位置</string>
+    <string name="multi_spot_select">多地点寻路</string>
 </resources>

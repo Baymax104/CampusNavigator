@@ -3,7 +3,6 @@ package com.example.campusnavigator.controller;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -31,9 +30,9 @@ public class SpotSearchDialog extends BottomPopupView {
     private List<String> spotNames;
     private SpotsAdapter adapter;
     private OnSpotSelectListener listener;
-    private String selectResult;
+    private String mapSelectResult;
     private int mapModeCode = 0;
-    private String content;
+    private String selectSpotResult;
 
     public SpotSearchDialog(@NonNull Context context) {
         super(context);
@@ -52,7 +51,7 @@ public class SpotSearchDialog extends BottomPopupView {
         super(context);
         this.context = context;
         this.listener = listener;
-        this.selectResult = position.getName();
+        this.mapSelectResult = position.getName();
         provider = PositionProvider.getInstance(context);
         spotNames = provider.getAllNames();
     }
@@ -69,15 +68,15 @@ public class SpotSearchDialog extends BottomPopupView {
         RecyclerView spotsRecyclerView = findViewById(R.id.list_spot);
 
         Button routeButton = findViewById(R.id.route_button);
-        MaterialCardView selectSpotView = findViewById(R.id.select_spot_view);
+        MaterialCardView mapSelectCard = findViewById(R.id.select_spot_card);
 
         adapter = new SpotsAdapter(spotNames);
         spotsRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         spotsRecyclerView.setLayoutManager(layoutManager);
 
-        if (selectResult != null) {
-            editText.setText(selectResult);
+        if (mapSelectResult != null) {
+            editText.setText(mapSelectResult);
         }
 
         editText.addTextChangedListener(new TextWatcher() {
@@ -106,7 +105,7 @@ public class SpotSearchDialog extends BottomPopupView {
             editText.setText(name);
         });
 
-        selectSpotView.setOnClickListener(view -> {
+        mapSelectCard.setOnClickListener(view -> {
             mapModeCode = 1;
             dismiss();
         });
@@ -114,7 +113,7 @@ public class SpotSearchDialog extends BottomPopupView {
         routeButton.setOnClickListener(view -> {
             String name = editText.getText().toString();
             mapModeCode = 2;
-            content = name;
+            selectSpotResult = name;
             dismiss();
         });
     }
@@ -131,8 +130,8 @@ public class SpotSearchDialog extends BottomPopupView {
     @Override
     protected void doAfterDismiss() {
         listener.setMapState(mapModeCode);
-        if (mapModeCode == 2 && content != null) {
-            listener.showRoute(content);
+        if (mapModeCode == 2 && selectSpotResult != null) {
+            listener.showRoute(selectSpotResult);
         }
         super.doAfterDismiss();
     }

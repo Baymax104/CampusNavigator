@@ -35,55 +35,10 @@ public class MapManager extends Map {
         return manager;
     }
 
-    public double getWeight(int from, int to) {
-        return map[from][to];
-    }
-
-    public List<Position[]> DFS(Position source) {
-        List<Position[]> list = new List<>();
-        int v = source.getId();
-        dfs(list, v);
-        refreshVisited();
-        return list;
-    }
-
-    private void dfs(List<Position[]> list, int v) {
-        visited[v] = true;
-        for (int i = 0; i < size; i++) {
-            if (!visited[i] && map[v][i] != INF) {
-                Position[] result = new Position[] {positions[v], positions[i]};
-                list.add(result);
-                dfs(list, i);
-            }
-        }
-    }
-
-    public List<Position[]> BFS(Position source) {
-        Queue<Integer> queue = new Queue<>();
-        List<Position[]> list = new List<>();
-        int v = source.getId();
-        visited[v] = true;
-        queue.push(v);
-        while (!queue.isEmpty()) {
-            v = queue.front();
-            queue.pop();
-            for (int i = 0; i < size; i++) {
-                if (!visited[i] && map[v][i] != INF) {
-                    Position[] result = new Position[] {positions[v], positions[i]};
-                    list.add(result);
-                    visited[i] = true;
-                    queue.push(i);
-                }
-            }
-        }
-        refreshVisited();
-        return list;
-    }
-
-    public boolean Dijkstra(int source, double[] dist, int[] paths) {
+    public void Dijkstra(int source, int dest, double[] dist, int[] paths) {
         // dist[i]: distance of source --> i;
         if (dist == null || paths == null) {
-            return false;
+            return;
         }
         int v = source;
         MinHeap<Integer, Double> heap = new MinHeap<>();
@@ -96,34 +51,38 @@ public class MapManager extends Map {
         heap.push(v, 0.0);
 
         while (!heap.isEmpty()) {
-            v = heap.top().getFirst();
+            v = heap.top().first();
             heap.pop();
+            if (v == dest) {
+                break;
+            }
             if (visited[v]) {
                 continue;
             }
             visited[v] = true;
             for (int i = 0; i < size; i++) {
-                if (map[v][i] != INF && dist[v] + map[v][i] < dist[i]) {
-                    dist[i] = dist[v] + map[v][i];
+                if (map[v][i].dist != INF && dist[v] + map[v][i].dist < dist[i]) {
+                    dist[i] = dist[v] + map[v][i].dist;
                     heap.push(i, dist[i]);
                     paths[i] = v;
                 }
             }
         }
         refreshVisited();
-        return true;
     }
 
-    public double getSingleDestRoute(Position from, Position to, List<Position[]> results) {
+
+    public double getSingleDestRoute(Position from, Position to, List<Path> results) {
         double[] dist = new double[size];
         int[] paths = new int[size];
         int fromId = from.getId();
         int toId = to.getId();
-        Dijkstra(fromId, dist, paths);
+        Astar(fromId, toId, dist, paths);
+//        Dijkstra(fromId, toId, dist, paths);
         // 生成的路线为逆序
         while (paths[toId] != -1) {
-            Position[] line = new Position[] {positions[toId], positions[paths[toId]]};
-            results.add(line);
+            Path path = map[toId][paths[toId]];
+            results.add(path);
             toId = paths[toId];
         }
         return dist[toId];
@@ -131,20 +90,59 @@ public class MapManager extends Map {
 
     public void getMultiDestRoute(Stack<Position> spots, RouteResultCallback callback) {
         List<Position[]> list = new List<>();
-        List<Position[]> singleRouteResult = new List<>();
+        List<Path> singleRouteResult = new List<>();
         Position to = spots.top();
         spots.pop();
         while (!spots.isEmpty()) {
             Position from = spots.top();
             spots.pop();
             double distance = getSingleDestRoute(from, to, singleRouteResult);
-            for (int i = 0; i < singleRouteResult.length(); i++) {
-                list.add(singleRouteResult.get(i));
+            for (Path path : singleRouteResult) {
+                Position p1 = positions[path.from];
+                Position p2 = positions[path.to];
+                list.add(new Position[]{p1, p2});
             }
             singleRouteResult.clear();
             to = from;
         }
         callback.showMultiDestRoute(list);
+    }
+
+    public void Astar(int source, int dest, double[] dist, int[] paths) {
+        // dist[i]: distance of source --> i;
+        if (dist == null || paths == null) {
+            return;
+        }
+        int v = source;
+        MinHeap<Integer, Double> heap = new MinHeap<>();
+        for (int i = 0; i < size; i++) {
+            dist[i] = INF;
+            paths[i] = -1;
+        }
+        dist[v] = 0;
+        paths[v] = -1;
+        heap.push(v, 0.0);
+
+        while (!heap.isEmpty()) {
+            v = heap.top().first();
+            heap.pop();
+            if (v == dest) {
+                break;
+            }
+            if (visited[v]) {
+                continue;
+            }
+            visited[v] = true;
+            for (int i = 0; i < size; i++) {
+                if (map[v][i].dist != INF && dist[v] + map[v][i].dist < dist[i]) {
+                    dist[i] = dist[v] + map[v][i].dist;
+                    double priority = dist[v] + map[v][i].dist + map[v][i].eval;
+                    heap.push(i, priority);
+                    paths[i] = v;
+                }
+            }
+        }
+        refreshVisited();
     }
 
     private void refreshVisited() {
@@ -166,5 +164,4 @@ public class MapManager extends Map {
         }
         return attachPosition;
     }
-
 }

@@ -4,14 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import android.animation.LayoutTransition;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,7 +28,6 @@ import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MyLocationStyle;
-import com.bumptech.glide.Glide;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.DialogHelper;
 import com.example.campusnavigator.model.Position;
@@ -40,6 +36,7 @@ import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.List;
 import com.example.campusnavigator.utility.OverlayManager;
 import com.example.campusnavigator.utility.Stack;
+import com.google.android.material.card.MaterialCardView;
 
 
 public class MainActivity extends AppCompatActivity implements LocationSource, AMapLocationListener,RouteResultCallback,OnSpotSelectListener {
@@ -52,10 +49,12 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private Position myLocation;
     private int modeCode = 0;
 
-    private TextView searchField;
     private CoordinatorLayout container;
-    private View searchBox;
-    private View routeBox;
+    private View searchWindow;
+    private TextView searchField;
+    private MaterialCardView multiSelectCard;
+
+    private View routeWindow;
     private LinearLayout routeContainer;
     private View routePlanBox;
     private ImageView expendButton;
@@ -89,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             Position position = provider.getPosByLatLng(latLng);
             if (modeCode == 1) {
                 DialogHelper.showSpotSearchDialog(this, position, this);
+            } else if (modeCode == 4) {
+                spotBuffer.push(position);
             }
             return true;
         });
@@ -115,6 +116,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 modeCode = 3;
                 expendButton.setImageResource(R.drawable.expend_arrow_up);
             }
+        });
+
+        multiSelectCard.setOnClickListener(view -> {
 
         });
     }
@@ -136,15 +140,16 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         container = findViewById(R.id.view_container);
-        searchBox = LayoutInflater.from(this).inflate(R.layout.layout_search_box, container, false);
-        routeBox = LayoutInflater.from(this).inflate(R.layout.layout_route_box, container, false);
-        container.addView(searchBox);
+        searchWindow = LayoutInflater.from(this).inflate(R.layout.layout_search_window, container, false);
+        routeWindow = LayoutInflater.from(this).inflate(R.layout.layout_route_window, container, false);
+        container.addView(searchWindow);
 
-        searchField = searchBox.findViewById(R.id.search_field);
-        expendButton = routeBox.findViewById(R.id.expend_button);
+        searchField = searchWindow.findViewById(R.id.search_field);
+        multiSelectCard = searchWindow.findViewById(R.id.multi_select_spot);
 
-        routeContainer = routeBox.findViewById(R.id.route_card);
-        routePlanBox = LayoutInflater.from(this).inflate(R.layout.layout_route_plan, routeContainer, false);
+        expendButton = routeWindow.findViewById(R.id.expend_button);
+        routeContainer = routeWindow.findViewById(R.id.route_card);
+        routePlanBox = LayoutInflater.from(this).inflate(R.layout.layout_route_plan_box, routeContainer, false);
         routeContainer.addView(routePlanBox);
     }
 
@@ -274,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     public void showRoute(String name) {
         overlayManager.removeLines(); // 清除线段
         Position destPosition = provider.getPosByName(name).get(0);
-        TextView destName = routeBox.findViewById(R.id.dest_name);
+        TextView destName = routeWindow.findViewById(R.id.dest_name);
         destName.setText(name);
         if (myLocation != null) {
             Position attachPosition = manager.attachToMap(myLocation);
@@ -286,8 +291,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         }
         // 更换布局
-        container.removeView(searchBox);
-        container.addView(routeBox);
+        container.removeView(searchWindow);
+        container.addView(routeWindow);
         if (routeContainer.findViewById(R.id.route_plan) == null) {
             routeContainer.addView(routePlanBox);
         }
@@ -296,8 +301,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     @Override
     public void onBackPressed() {
         if (modeCode == 2 || modeCode == 3) {
-            container.removeView(routeBox);
-            container.addView(searchBox);
+            container.removeView(routeWindow);
+            container.addView(searchWindow);
             overlayManager.removeLines();
             modeCode = 0;
         } else {
