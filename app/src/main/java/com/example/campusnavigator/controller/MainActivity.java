@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private Position myLocation;
     private int modeCode = 0;
 
-    private Button button;
     private TextView searchField;
     private CoordinatorLayout container;
     private View searchBox;
@@ -92,12 +91,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 DialogHelper.showSpotSearchDialog(this, position, this);
             }
             return true;
-        });
-
-        button.setOnClickListener(view -> {
-//            if (!spotBuffer.isEmpty()) {
-//                 manager.getMultiDestRoute(spotBuffer, this);
-//            }
         });
 
         searchField.setOnClickListener(view -> {
@@ -147,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         routeBox = LayoutInflater.from(this).inflate(R.layout.layout_route_box, container, false);
         container.addView(searchBox);
 
-        button = findViewById(R.id.confirm_button);
         searchField = searchBox.findViewById(R.id.search_field);
         expendButton = routeBox.findViewById(R.id.expend_button);
 
@@ -157,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     void setMap() {
-        LatLng southwest = new LatLng(39.870337,116.477103);
+        LatLng southwest = new LatLng(39.869922,116.477077);
         LatLng northeast = new LatLng(39.880384,116.488162);
 
         MyLocationStyle locationStyle = new MyLocationStyle()
@@ -219,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-        // TODO 覆盖物无法恢复的bug
     }
 
     @Override
@@ -295,9 +286,10 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         }
         // 更换布局
-        if (container != null && searchBox != null) {
-            container.removeView(searchBox);
-            container.addView(routeBox);
+        container.removeView(searchBox);
+        container.addView(routeBox);
+        if (routeContainer.findViewById(R.id.route_plan) == null) {
+            routeContainer.addView(routePlanBox);
         }
     }
 
