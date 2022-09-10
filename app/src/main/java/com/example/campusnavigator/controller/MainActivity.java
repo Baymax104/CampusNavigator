@@ -5,10 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,7 +32,7 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.example.campusnavigator.R;
-import com.example.campusnavigator.model.DialogHelper;
+import com.example.campusnavigator.utility.DialogHelper;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.PositionProvider;
@@ -53,6 +56,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private View searchWindow;
     private TextView searchField;
     private MaterialCardView multiSelectCard;
+
+    private View multiSelectWindow;
+    private Button test;
+
+    private View multiRouteWindow;
 
     private View routeWindow;
     private LinearLayout routeContainer;
@@ -94,9 +102,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             return true;
         });
 
-        searchField.setOnClickListener(view -> {
-            DialogHelper.showSpotSearchDialog(this, this);
-        });
+        searchField.setOnClickListener(view -> DialogHelper.showSpotSearchDialog(this, this));
 
         expendButton.setOnClickListener(view -> {
             if (modeCode == 2) {
@@ -112,14 +118,40 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         
         map.setOnMapTouchListener(latLng -> {
             if (modeCode == 2) {
-                routeContainer.removeView(routePlanBox);
-                modeCode = 3;
-                expendButton.setImageResource(R.drawable.expend_arrow_up);
+                int[] locationInScreen = new int[2];
+                routeWindow.getLocationOnScreen(locationInScreen);
+                float touchY = latLng.getRawY();
+                if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < locationInScreen[1]) {
+                    routeContainer.removeView(routePlanBox);
+                    modeCode = 3;
+                    expendButton.setImageResource(R.drawable.expend_arrow_up);
+                    map.getUiSettings().setAllGesturesEnabled(true);
+                } else if (touchY >= locationInScreen[1]) {
+                    map.getUiSettings().setAllGesturesEnabled(false);
+                }
+            } else if (modeCode == 3) {
+                int[] locationInScreen = new int[2];
+                routeWindow.getLocationOnScreen(locationInScreen);
+                float touchY = latLng.getRawY();
+                map.getUiSettings().setAllGesturesEnabled(touchY < locationInScreen[1]);
             }
         });
 
         multiSelectCard.setOnClickListener(view -> {
+            if (modeCode == 0) {
+                modeCode = 4;
+                container.removeView(searchWindow);
+                container.addView(multiSelectWindow);
+            }
+        });
 
+        test.setOnClickListener(view -> {
+            if (modeCode == 4) {
+                modeCode = 5;
+                container.removeView(multiSelectWindow);
+                container.addView(multiRouteWindow);
+                manager.getMultiDestRoute(spotBuffer, this);
+            }
         });
     }
 
@@ -142,6 +174,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         container = findViewById(R.id.view_container);
         searchWindow = LayoutInflater.from(this).inflate(R.layout.layout_search_window, container, false);
         routeWindow = LayoutInflater.from(this).inflate(R.layout.layout_route_window, container, false);
+        multiSelectWindow = LayoutInflater.from(this).inflate(R.layout.layout_multi_search_window, container, false);
+        multiRouteWindow = LayoutInflater.from(this).inflate(R.layout.layout_multi_route_window, container, false);
         container.addView(searchWindow);
 
         searchField = searchWindow.findViewById(R.id.search_field);
@@ -151,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         routeContainer = routeWindow.findViewById(R.id.route_card);
         routePlanBox = LayoutInflater.from(this).inflate(R.layout.layout_route_plan_box, routeContainer, false);
         routeContainer.addView(routePlanBox);
+
+        test = multiSelectWindow.findViewById(R.id.test_button);
     }
 
     void setMap() {
@@ -302,6 +338,15 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     public void onBackPressed() {
         if (modeCode == 2 || modeCode == 3) {
             container.removeView(routeWindow);
+            container.addView(searchWindow);
+            overlayManager.removeLines();
+            modeCode = 0;
+        } else if (modeCode == 4) {
+            container.removeView(multiSelectWindow);
+            container.addView(searchWindow);
+            modeCode = 0;
+        } else if (modeCode == 5) {
+            container.removeView(multiRouteWindow);
             container.addView(searchWindow);
             overlayManager.removeLines();
             modeCode = 0;
