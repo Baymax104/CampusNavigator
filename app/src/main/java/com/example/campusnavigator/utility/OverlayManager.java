@@ -39,7 +39,7 @@ public class OverlayManager {
                 .width(40)
                 .lineJoinType(PolylineOptions.LineJoinType.LineJoinRound)
                 .setUseTexture(true)
-                .setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.line_arrow));
+                .setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.line));
         View markerView = LayoutInflater.from(context).inflate(R.layout.layout_marker_icon, mapView, false);
         markerOptions = new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromView(markerView));
@@ -78,6 +78,6 @@ public class OverlayManager {
                 .width(40)
                 .lineJoinType(PolylineOptions.LineJoinType.LineJoinRound)
                 .setUseTexture(true)
-                .setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.line_arrow));
+                .setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.line));
     }
 }
