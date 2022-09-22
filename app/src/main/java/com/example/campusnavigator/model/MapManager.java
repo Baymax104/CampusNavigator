@@ -54,8 +54,7 @@ public class MapManager extends Map {
             }
             List<Tuple<Position, Position>> routeTemp = new List<>();
             if (!isMultiSpot) {
-                for (int i = 0; i < 3; i++) {
-                    PriorityType type = types[i];
+                for (PriorityType type : types) {
                     Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);
                     double distance = distAndTime.first;
                     double time = distAndTime.second;
@@ -64,10 +63,10 @@ public class MapManager extends Map {
                     times.add(time);
                     routeList.add(routes);
                     routeTemp.clear();
-                    callback.onSuccess(routeList, distances, times, false);
                 }
+                callback.onSuccess(routeList, distances, times, false);
             } else {
-                PriorityType type = PriorityType.TOTAL;
+                PriorityType type = PriorityType.DISTANCE;
                 Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);
                 double distance = distAndTime.first;
                 double time = distAndTime.second;
@@ -180,13 +179,6 @@ public class MapManager extends Map {
                         double priority = cost[i] + map[v][i].eval;
                         heap.push(i, priority);
                         paths[i] = v;
-                    } else if (type == PriorityType.TOTAL && cost[v] + map[v][i].dist + map[v][i].time < cost[i]) { // 综合最优
-                        cost[i] = cost[v] + map[v][i].dist + map[v][i].time;
-                        dist[i] = dist[v] + map[v][i].dist;
-                        time[i] = time[v] + map[v][i].time;
-                        double priority = cost[i] + map[v][i].eval;
-                        heap.push(i, priority);
-                        paths[i] = v;
                     }
                 }
             }
@@ -201,17 +193,21 @@ public class MapManager extends Map {
         }
     }
 
-    public Position attachToMap(Position myPosition) {
+    public List<Position> attachToMap(Position myPosition) {
+        List<Position> attachPositions = new List<>();
         LatLng latLng = myPosition.getLatLng();
-        Position attachPosition = null;
-        double minDistance = INF;
+
+        // 使用最小堆取距离最小的两个点
+        MinHeap<Integer, Double> minDist = new MinHeap<>();
         for (int i = 0; i < size; i++) {
             double distance = AMapUtils.calculateLineDistance(latLng, positions[i].getLatLng());
-            if (distance < minDistance) {
-                minDistance = distance;
-                attachPosition = positions[i];
-            }
+            minDist.push(i, distance);
         }
-        return attachPosition;
+        int min1 = minDist.top().first();
+        minDist.pop();
+        int min2 = minDist.top().first();
+        attachPositions.add(positions[min1]);
+        attachPositions.add(positions[min2]);
+        return attachPositions;
     }
 }

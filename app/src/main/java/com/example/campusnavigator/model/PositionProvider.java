@@ -22,13 +22,10 @@ import java.nio.charset.StandardCharsets;
  * @Version 1
  */
 public class PositionProvider extends Map {
-    private Position[] spots;
     private static PositionProvider provider;
 
     private PositionProvider(Context context) {
         super(context);
-        spots = new Position[sizeOfSpot];
-        System.arraycopy(positions, 0, spots, 0, sizeOfSpot);
     }
 
     public static PositionProvider getInstance(Context context) {
@@ -48,7 +45,8 @@ public class PositionProvider extends Map {
 
     public List<Position> getPosByName(String name) {
         List<Position> results = new List<>();
-        for (Position pos : spots) {
+        for (int i = 0; i < sizeOfSpot; i++) {
+            Position pos = spots[i];
             if (pos.getName() != null && pos.getName().equals(name)) {
                 results.add(pos);
             }
@@ -58,7 +56,8 @@ public class PositionProvider extends Map {
 
 
     public Position getPosByLatLng(LatLng latLng) {
-        for (Position pos : spots) {
+        for (int i = 0; i < sizeOfSpot; i++) {
+            Position pos = spots[i];
             if (pos.getLat() == latLng.latitude && pos.getLng() == latLng.longitude) {
                 return pos;
             }

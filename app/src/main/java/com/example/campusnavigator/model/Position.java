@@ -1,5 +1,7 @@
 package com.example.campusnavigator.model;
 
+import androidx.annotation.Nullable;
+
 import com.amap.api.maps.model.LatLng;
 
 /**
@@ -70,5 +72,14 @@ public class Position {
 
     public LatLng getLatLng() {
         return new LatLng(lat, lng);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof Position) {
+            Position other = (Position) obj;
+            return id == other.id && lat == other.lat && lng == other.lng && name.equals(other.name);
+        }
+        return false;
     }
 }
