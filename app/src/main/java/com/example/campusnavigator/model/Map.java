@@ -36,8 +36,8 @@ public class Map {
     }
 
     public static class Path {
-        protected final int from;
-        protected final int to;
+        public final int from;
+        public final int to;
         protected double dist;
         protected double time;
         protected double eval;
@@ -48,14 +48,9 @@ public class Map {
         protected Path(int from, int to, double dist, double time, double eval) {
             this.from = from;
             this.to = to;
+            this.time = time;
             this.dist = dist;
             this.eval = eval;
-        }
-        public int from() {
-            return from;
-        }
-        public int to() {
-            return to;
         }
         public double getDist() {
             return dist;

@@ -13,5 +13,5 @@ import com.example.campusnavigator.utility.Tuple;
  */
 public interface RouteResultCallback {
     void onSuccess(List<List<Tuple<Position, Position>>> results, List<Double> distances, List<Double> times);
-    void onError();
+    void onError(Exception e);
 }

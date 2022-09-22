@@ -32,7 +32,7 @@ public class SpotSearchDialog extends BottomPopupView {
     private OnSpotSelectListener listener;
     private String mapSelectResult;
     private int mapModeCode = 0;
-    private String selectSpotResult;
+    private String selectSpotName;
 
     public SpotSearchDialog(@NonNull Context context) {
         super(context);
@@ -113,7 +113,7 @@ public class SpotSearchDialog extends BottomPopupView {
         routeButton.setOnClickListener(view -> {
             String name = editText.getText().toString();
             mapModeCode = 2;
-            selectSpotResult = name;
+            selectSpotName = name;
             dismiss();
         });
     }
@@ -129,9 +129,19 @@ public class SpotSearchDialog extends BottomPopupView {
 
     @Override
     protected void doAfterDismiss() {
-        listener.setMapState(mapModeCode);
-        if (mapModeCode == 2 && selectSpotResult != null) {
-            listener.onDestReceive(selectSpotResult);
+        listener.onMapStateChange(mapModeCode);
+        if (mapModeCode == 2 && selectSpotName != null) {
+            try {
+                Position selectSpot = provider.getPosByName(selectSpotName).get(0);
+                if (selectSpot == null) {
+                    throw new Exception("找不到该地点");
+                }
+                listener.onDestReceiveSuccess(selectSpotName);
+            } catch (Exception e) {
+                listener.onDestReceiveError(e);
+            } finally {
+                super.doAfterDismiss();
+            }
         }
         super.doAfterDismiss();
     }

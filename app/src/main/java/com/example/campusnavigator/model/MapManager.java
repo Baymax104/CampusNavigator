@@ -38,33 +38,36 @@ public class MapManager extends Map {
     }
 
     public void getRoutePlan(Stack<Position> spots, RouteResultCallback callback) {
-        if (spots.getSize() < 2) {
-            callback.onError();
-            return;
+        try {
+            if (spots.getSize() < 2) {
+                throw new Exception("地点数不足");
+            }
+            List<Double> distances = new List<>();
+            List<Double> times = new List<>();
+            List<List<Tuple<Position, Position>>> routeList = new List<>();
+            PriorityType[] types = PriorityType.values();
+            List<Position> spotsList = new List<>();
+            while (!spots.isEmpty()) {
+                Position pos = spots.top();
+                spots.pop();
+                spotsList.add(pos);
+            }
+            List<Tuple<Position, Position>> routeTemp = new List<>();
+            for (int i = 0; i < 3; i++) {
+                PriorityType type = types[i];
+                Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);
+                double distance = distAndTime.first;
+                double time = distAndTime.second;
+                List<Tuple<Position, Position>> routes = new List<>(routeTemp);
+                distances.add(distance);
+                times.add(time);
+                routeList.add(routes);
+                routeTemp.clear();
+            }
+            callback.onSuccess(routeList, distances, times);
+        } catch (Exception e) {
+            callback.onError(e);
         }
-        List<Double> distances = new List<>();
-        List<Double> times = new List<>();
-        List<List<Tuple<Position, Position>>> routeList = new List<>();
-        PriorityType[] types = PriorityType.values();
-        List<Position> spotsList = new List<>();
-        while (!spots.isEmpty()) {
-            Position pos = spots.top();
-            spots.pop();
-            spotsList.add(pos);
-        }
-        List<Tuple<Position, Position>> routeTemp = new List<>();
-        for (int i = 0; i < 3; i++) {
-            PriorityType type = types[i];
-            Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);
-            double distance = distAndTime.first;
-            double time = distAndTime.second;
-            List<Tuple<Position, Position>> routes = new List<>(routeTemp);
-            distances.add(distance);
-            times.add(time);
-            routeList.add(routes);
-            routeTemp.clear();
-        }
-        callback.onSuccess(routeList, distances, times);
     }
 
     public Tuple<Double, Double> getMultiDestRoute(List<Position> spotsList, PriorityType type, @ NonNull List<Tuple<Position, Position>> routes) {

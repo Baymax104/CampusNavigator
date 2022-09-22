@@ -103,9 +103,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
             LatLng latLng = marker.getPosition();
             Position position = provider.getPosByLatLng(latLng);
-            if (modeCode == 1) {
+            if (modeCode == 1) { // 处于单点选点状态
                 DialogHelper.showSpotSearchDialog(this, position, this);
-            } else if (modeCode == 4) {
+            } else if (modeCode == 4) { // 处于多点选点状态
                 spotBuffer.push(position);
             }
             return true;
@@ -114,31 +114,33 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         searchField.setOnClickListener(view -> DialogHelper.showSpotSearchDialog(this, this));
 
         expendButton.setOnClickListener(view -> {
-            if (modeCode == 2) {
+            if (modeCode == 2) { // 处于打开状态，关闭planBox
                 routeContainer.removeView(routePlanBox);
                 modeCode = 3;
                 expendButton.setImageResource(R.drawable.expend_arrow_up);
-            } else if (modeCode == 3) {
+            } else if (modeCode == 3) { // 处于关闭状态，打开planBox
                 routeContainer.addView(routePlanBox);
                 modeCode = 2;
                 expendButton.setImageResource(R.drawable.expend_arrow_down);
             }
         });
-        
+
         map.setOnMapTouchListener(latLng -> {
-            if (modeCode == 2) {
+            if (modeCode == 2) { // 弹窗处于打开状态
                 int[] locationInScreen = new int[2];
                 routeWindow.getLocationOnScreen(locationInScreen);
                 float touchY = latLng.getRawY();
+                // 触摸起始点位于弹窗外侧
                 if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < locationInScreen[1]) {
                     routeContainer.removeView(routePlanBox);
                     modeCode = 3;
                     expendButton.setImageResource(R.drawable.expend_arrow_up);
                     map.getUiSettings().setAllGesturesEnabled(true);
-                } else if (touchY >= locationInScreen[1]) {
+                } else if (touchY >= locationInScreen[1]) { // 触摸点位于弹窗内侧
+                    // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
                     map.getUiSettings().setAllGesturesEnabled(false);
                 }
-            } else if (modeCode == 3) {
+            } else if (modeCode == 3) { // 弹窗处于关闭状态，触摸点位于外侧开启手势，位于内侧关闭手势
                 int[] locationInScreen = new int[2];
                 routeWindow.getLocationOnScreen(locationInScreen);
                 float touchY = latLng.getRawY();
@@ -147,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         multiSelectCard.setOnClickListener(view -> {
-            if (modeCode == 0) {
+            if (modeCode == 0) { // 由初始状态切换到多点选择状态
                 modeCode = 4;
                 container.removeView(searchWindow);
                 container.addView(multiSelectWindow);
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         planGroup.setOnCheckedChangeListener((radioGroup, i) -> {
-            if (modeCode == 2) {
+            if (modeCode == 2) { // 当前处于路径结果弹窗打开状态
                 RadioButton button = radioGroup.findViewById(i);
                 int index = radioGroup.indexOfChild(button);
                 showRoutes(index);
@@ -225,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         map.setMyLocationStyle(locationStyle);
         map.setMyLocationEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(false);
+        map.getUiSettings().setMyLocationButtonEnabled(true);
         for (String s : spotNames) {
             // 设置marker
             overlayManager.drawMarker(provider.getPosByName(s).get(0));
@@ -235,15 +238,18 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onSuccess(List<List<Tuple<Position, Position>>> results, List<Double> distances, List<Double> times) {
+        // 设置路径计算结果
         this.routes = results;
         this.distances = distances;
         this.times = times;
-        showRoutes(0); // 展示第一个方案
+        showRoutes(0); // 首先展示第一个方案
     }
 
     @Override
-    public void onError() {
-
+    public void onError(Exception e) {
+        modeCode = 0;
+        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        Log.e("MainActivity", e.toString());
     }
 
     private void showRoutes(int planIndex) {
@@ -338,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
-    public void setMapState(int modeCode) {
+    public void onMapStateChange(int modeCode) {
         this.modeCode = modeCode;
         if (modeCode == 1) {
             Toast.makeText(this, "请选择你想去的地点", Toast.LENGTH_SHORT).show();
@@ -346,41 +352,57 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
-    public void onDestReceive(String name) {
+    public void onDestReceiveSuccess(String name) {
         overlayManager.removeLines(); // 清除线段
         Position destPosition = provider.getPosByName(name).get(0);
         TextView destName = routeWindow.findViewById(R.id.dest_name);
         destName.setText(name);
-        if (myLocation != null) {
+
+        try {
+            // 判断当前定位点是否存在
+            if (myLocation == null) {
+                throw new Exception("定位点未找到");
+            }
+            // 计算距定位点最近的连接点
             attachPosition = manager.attachToMap(myLocation);
             if (attachPosition != null) {
+                // 计算连接点到目的地的路径方案
                 spotBuffer.push(attachPosition);
                 spotBuffer.push(destPosition);
                 manager.getRoutePlan(spotBuffer, this);
             }
-        }
-        // 更换布局
-        container.removeView(searchWindow);
-        container.addView(routeWindow);
-        if (routeContainer.findViewById(R.id.route_plan) == null) {
-            routeContainer.addView(routePlanBox);
+            // 更换布局
+            container.removeView(searchWindow);
+            container.addView(routeWindow);
+            if (routeContainer.findViewById(R.id.route_plan) == null) {
+                routeContainer.addView(routePlanBox);
+            }
+        } catch (Exception e) {
+            onDestReceiveError(e);
         }
     }
 
     @Override
+    public void onDestReceiveError(Exception e) {
+        modeCode = 0; // 恢复到初始状态
+        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        Log.e("MainActivity", e.toString());
+    }
+
+    @Override
     public void onBackPressed() {
-        if (modeCode == 2 || modeCode == 3) {
+        if (modeCode == 2 || modeCode == 3) { // 若当前处于单点路径结果弹窗
             modeCode = 0;
             View plan1 = planGroup.getChildAt(0);
             planGroup.check(plan1.getId());
             container.removeView(routeWindow);
             container.addView(searchWindow);
             overlayManager.removeLines();
-        } else if (modeCode == 4) {
+        } else if (modeCode == 4) { // 若当前处于多点路径选择状态
             modeCode = 0;
             container.removeView(multiSelectWindow);
             container.addView(searchWindow);
-        } else if (modeCode == 5) {
+        } else if (modeCode == 5) { // 若当前处于多点路径结果弹窗
             modeCode = 0;
             container.removeView(multiRouteWindow);
             container.addView(searchWindow);
