@@ -37,7 +37,7 @@ public class MapManager extends Map {
         return manager;
     }
 
-    public void getRoutePlan(Stack<Position> spots, RouteResultCallback callback) {
+    public void getRoutePlan(Stack<Position> spots, boolean isMultiSpot, RouteResultCallback callback) {
         try {
             if (spots.getSize() < 2) {
                 throw new Exception("地点数不足");
@@ -53,8 +53,21 @@ public class MapManager extends Map {
                 spotsList.add(pos);
             }
             List<Tuple<Position, Position>> routeTemp = new List<>();
-            for (int i = 0; i < 3; i++) {
-                PriorityType type = types[i];
+            if (!isMultiSpot) {
+                for (int i = 0; i < 3; i++) {
+                    PriorityType type = types[i];
+                    Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);
+                    double distance = distAndTime.first;
+                    double time = distAndTime.second;
+                    List<Tuple<Position, Position>> routes = new List<>(routeTemp);
+                    distances.add(distance);
+                    times.add(time);
+                    routeList.add(routes);
+                    routeTemp.clear();
+                    callback.onSuccess(routeList, distances, times, false);
+                }
+            } else {
+                PriorityType type = PriorityType.TOTAL;
                 Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);
                 double distance = distAndTime.first;
                 double time = distAndTime.second;
@@ -63,8 +76,8 @@ public class MapManager extends Map {
                 times.add(time);
                 routeList.add(routes);
                 routeTemp.clear();
+                callback.onSuccess(routeList, distances, times, true);
             }
-            callback.onSuccess(routeList, distances, times);
         } catch (Exception e) {
             callback.onError(e);
         }

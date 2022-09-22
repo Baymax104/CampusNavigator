@@ -12,6 +12,6 @@ import com.example.campusnavigator.utility.Tuple;
  * @Version 1
  */
 public interface RouteResultCallback {
-    void onSuccess(List<List<Tuple<Position, Position>>> results, List<Double> distances, List<Double> times);
+    void onSuccess(List<List<Tuple<Position, Position>>> results, List<Double> distances, List<Double> times, boolean isMultiSpot);
     void onError(Exception e);
 }
