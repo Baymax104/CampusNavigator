@@ -10,8 +10,11 @@ package com.example.campusnavigator.controller;
 public interface OnSpotSelectListener {
     /**
      1:单点地图选点
-     2:单点显示路径
+     2:单点显示路径，路径结果弹窗打开
+     3:单点显示路径，路径结果弹窗关闭
+     4:多点地图选点
+     5:多点显示路径
      */
     void setMapState(int modeCode);
-    void showRoute(String name);
+    void onDestReceive(String name);
 }

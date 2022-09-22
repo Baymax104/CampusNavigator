@@ -25,16 +25,27 @@ public class Map {
     protected static int size;
     protected static int sizeOfSpot;
     protected static final int INF = 65535;
+
+    protected static final double SPEED_WALK = 5; // 4km/h
+    protected static final double SPEED_CYCLING = 18; // 18km/h
+    protected static final double SPEED_DRIVE = 20; // 20km/h
+    public enum PriorityType {
+        DISTANCE,
+        TIME,
+        TOTAL
+    }
+
     public static class Path {
-        protected int from;
-        protected int to;
+        protected final int from;
+        protected final int to;
         protected double dist;
+        protected double time;
         protected double eval;
         protected Path(int from, int to) {
             this.from = from;
             this.to = to;
         }
-        protected Path(int from, int to, double dist, double eval) {
+        protected Path(int from, int to, double dist, double time, double eval) {
             this.from = from;
             this.to = to;
             this.dist = dist;
@@ -48,6 +59,9 @@ public class Map {
         }
         public double getDist() {
             return dist;
+        }
+        public double getTime() {
+            return time;
         }
         public double getEval() {
             return eval;
@@ -99,7 +113,7 @@ public class Map {
                         if (i == j) {
                             map[i][j] = new Path(i, j);
                         } else {
-                            map[i][j] = new Path(i, j, INF, 0);
+                            map[i][j] = new Path(i, j, INF, INF, INF);
                         }
                     }
                 }
@@ -112,6 +126,13 @@ public class Map {
                     double distance = AMapUtils.calculateLineDistance(positions[from].getLatLng(), positions[to].getLatLng());
                     map[from][to].dist = distance;
                     map[to][from].dist = distance;
+
+                    int randomFactor = (int) (Math.random() * 5 - 2); // uniform(-2,2)
+                    // 初始为步行
+                    double speed = (SPEED_WALK + randomFactor) * 50 / 3; // km/h -> m/min
+                    double time = distance / speed;
+                    map[from][to].time = time;
+                    map[to][from].time = time;
                 }
 
                 // 获取paths
@@ -123,6 +144,13 @@ public class Map {
                     double distance = AMapUtils.calculateLineDistance(positions[from].getLatLng(),positions[to].getLatLng());
                     map[from][to].dist = distance;
                     map[to][from].dist = distance;
+
+                    int randomFactor = (int) (Math.random() * 5 - 2); // uniform(-2,2)
+                    // 初始为步行
+                    double speed = (SPEED_WALK + randomFactor) * 50 / 3; // km/h -> m/min
+                    double time = distance / speed;
+                    map[from][to].time = time;
+                    map[to][from].time = time;
                 }
             } catch (IOException | JSONException e) {
                 e.printStackTrace();

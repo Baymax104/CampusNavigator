@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +14,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.List;
 import com.example.campusnavigator.utility.OverlayManager;
 import com.example.campusnavigator.utility.Stack;
+import com.example.campusnavigator.utility.Tuple;
 import com.google.android.material.card.MaterialCardView;
 
 
@@ -65,10 +67,17 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private View routeWindow;
     private LinearLayout routeContainer;
     private View routePlanBox;
+    private RadioGroup planGroup;
     private ImageView expendButton;
 
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
+
+    // 路径计算结果
+    private Position attachPosition;
+    private List<List<Tuple<Position, Position>>> routes;
+    private List<Double> distances;
+    private List<Double> times;
 
 
     @Override
@@ -146,11 +155,19 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         test.setOnClickListener(view -> {
-            if (modeCode == 4) {
-                modeCode = 5;
-                container.removeView(multiSelectWindow);
-                container.addView(multiRouteWindow);
-                manager.getMultiDestRoute(spotBuffer, this);
+//            if (modeCode == 4) {
+//                modeCode = 5;
+//                container.removeView(multiSelectWindow);
+//                container.addView(multiRouteWindow);
+//                manager.getRoutePlan(spotBuffer, this);
+//            }
+        });
+
+        planGroup.setOnCheckedChangeListener((radioGroup, i) -> {
+            if (modeCode == 2) {
+                RadioButton button = radioGroup.findViewById(i);
+                int index = radioGroup.indexOfChild(button);
+                showRoutes(index);
             }
         });
     }
@@ -184,12 +201,13 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         expendButton = routeWindow.findViewById(R.id.expend_button);
         routeContainer = routeWindow.findViewById(R.id.route_card);
         routePlanBox = LayoutInflater.from(this).inflate(R.layout.layout_route_plan_box, routeContainer, false);
+        planGroup = routePlanBox.findViewById(R.id.plan_group);
         routeContainer.addView(routePlanBox);
 
         test = multiSelectWindow.findViewById(R.id.test_button);
     }
 
-    void setMap() {
+    private void setMap() {
         LatLng southwest = new LatLng(39.869922,116.477077);
         LatLng northeast = new LatLng(39.880384,116.488162);
 
@@ -216,15 +234,31 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
-    public void showMultiDestRoute(List<Position[]> results) {
-        for (int i = 0; i < results.length(); i++) {
-            Position[] p = results.get(i);
+    public void onSuccess(List<List<Tuple<Position, Position>>> results, List<Double> distances, List<Double> times) {
+        this.routes = results;
+        this.distances = distances;
+        this.times = times;
+        showRoutes(0); // 展示第一个方案
+    }
+
+    @Override
+    public void onError() {
+
+    }
+
+    private void showRoutes(int planIndex) {
+        overlayManager.removeLines();
+        List<Tuple<Position, Position>> route = routes.get(planIndex);
+        for (int i = 0; i < route.length(); i++) {
+            Tuple<Position, Position> p = route.get(i);
             if (i == 0) {
-                overlayManager.drawLine(p[0], p[1]);
+                overlayManager.drawLine(p.first, p.second);
             } else {
-                overlayManager.drawLine(p[1]);
+                overlayManager.drawLine(p.second);
             }
         }
+        overlayManager.drawLine(attachPosition, myLocation);
+        Toast.makeText(this, "距离为"+ distances.get(planIndex) +"\n时间为"+ times.get(planIndex), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -312,18 +346,17 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
-    public void showRoute(String name) {
+    public void onDestReceive(String name) {
         overlayManager.removeLines(); // 清除线段
         Position destPosition = provider.getPosByName(name).get(0);
         TextView destName = routeWindow.findViewById(R.id.dest_name);
         destName.setText(name);
         if (myLocation != null) {
-            Position attachPosition = manager.attachToMap(myLocation);
+            attachPosition = manager.attachToMap(myLocation);
             if (attachPosition != null) {
                 spotBuffer.push(attachPosition);
                 spotBuffer.push(destPosition);
-                manager.getMultiDestRoute(spotBuffer, this);
-                overlayManager.drawLine(attachPosition, myLocation);
+                manager.getRoutePlan(spotBuffer, this);
             }
         }
         // 更换布局
@@ -337,19 +370,21 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     @Override
     public void onBackPressed() {
         if (modeCode == 2 || modeCode == 3) {
+            modeCode = 0;
+            View plan1 = planGroup.getChildAt(0);
+            planGroup.check(plan1.getId());
             container.removeView(routeWindow);
             container.addView(searchWindow);
             overlayManager.removeLines();
-            modeCode = 0;
         } else if (modeCode == 4) {
+            modeCode = 0;
             container.removeView(multiSelectWindow);
             container.addView(searchWindow);
-            modeCode = 0;
         } else if (modeCode == 5) {
+            modeCode = 0;
             container.removeView(multiRouteWindow);
             container.addView(searchWindow);
             overlayManager.removeLines();
-            modeCode = 0;
         } else {
             super.onBackPressed();
         }

@@ -131,7 +131,7 @@ public class SpotSearchDialog extends BottomPopupView {
     protected void doAfterDismiss() {
         listener.setMapState(mapModeCode);
         if (mapModeCode == 2 && selectSpotResult != null) {
-            listener.showRoute(selectSpotResult);
+            listener.onDestReceive(selectSpotResult);
         }
         super.doAfterDismiss();
     }

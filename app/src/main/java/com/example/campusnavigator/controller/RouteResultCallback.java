@@ -2,6 +2,7 @@ package com.example.campusnavigator.controller;
 
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.List;
+import com.example.campusnavigator.utility.Tuple;
 
 /**
  * @Description
@@ -11,5 +12,6 @@ import com.example.campusnavigator.utility.List;
  * @Version 1
  */
 public interface RouteResultCallback {
-    void showMultiDestRoute(List<Position[]> results);
+    void onSuccess(List<List<Tuple<Position, Position>>> results, List<Double> distances, List<Double> times);
+    void onError();
 }

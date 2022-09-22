@@ -29,6 +29,11 @@ public class List<T> implements Iterable<T> {
         size = i;
     }
 
+    public List(List<T> other) {
+        System.arraycopy(other.array, 0, this.array, 0, other.size);
+        size = other.size;
+    }
+
     public boolean add(T obj) {
         if (size == MAX_SIZE) {
             return false;
