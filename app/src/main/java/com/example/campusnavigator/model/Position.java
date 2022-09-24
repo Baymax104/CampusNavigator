@@ -76,6 +76,9 @@ public class Position {
 
     @Override
     public boolean equals(@Nullable Object obj) {
+        if (obj == this) {
+            return true;
+        }
         if (obj instanceof Position) {
             Position other = (Position) obj;
             /*
@@ -93,6 +96,12 @@ public class Position {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int code = 17;
+        long lat = Double.doubleToLongBits(this.lat);
+        long lng = Double.doubleToLongBits(this.lng);
+        code = 31 * code + id;
+        code = 31 * code + (int) (lat ^ (lat >>> 32));
+        code = 31 * code + (int) (lng ^ (lng >>> 32));
+        return code;
     }
 }

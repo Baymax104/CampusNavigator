@@ -3,6 +3,7 @@ package com.example.campusnavigator.model;
 import android.content.Context;
 
 import com.amap.api.maps.AMapUtils;
+import com.example.campusnavigator.utility.HashMap;
 import com.example.campusnavigator.utility.List;
 
 import org.json.JSONArray;
@@ -13,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 
 /**
  * @Description
