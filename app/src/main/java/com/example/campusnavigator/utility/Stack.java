@@ -2,42 +2,44 @@ package com.example.campusnavigator.utility;
 
 
 /**
- * @Description
+ * @Description 栈的双向链表实现类
  * @Author John
  * @email
  * @Date 2022/9/1 14:15
  * @Version 1
  */
 public class Stack<T> {
-    private static final int MAX_SIZE = 80;
-    @SuppressWarnings("unchecked")
-    private T[] array = (T[]) new Object[MAX_SIZE];
+    private static class Node<T> {
+        private T value;
+        private Node<T> pre;
+        private Node<T> next;
+        private Node() {
+        }
+        private Node(T value) {
+            this.value = value;
+        }
+    }
+
+    private Node<T> head = new Node<>();
+    private Node<T> tail = head;
     private int size = 0;
 
     public Stack() {
     }
 
-    public Stack(T[] obj) {
-        int i;
-        for (i = 0; i < obj.length; i++) {
-            array[i] = obj[i];
-        }
-        size = i;
-    }
-
-    public boolean push(T obj) {
-        if (size == MAX_SIZE) {
-            return false;
-        }
-        array[size] = obj;
+    public void push(T value) {
+        Node<T> node = new Node<>(value);
+        tail.next = node;
+        node.pre = tail;
+        tail = tail.next;
         size++;
-        return true;
     }
 
     public boolean pop() {
         if (size == 0) {
             return false;
         }
+        tail = tail.pre;
         size--;
         return true;
     }
@@ -46,14 +48,14 @@ public class Stack<T> {
         if (size == 0) {
             return null;
         }
-        return array[size - 1];
+        return tail.value;
     }
 
-    public boolean isEmpty() {
-        return size == 0;
+    public boolean isNotEmpty() {
+        return size != 0;
     }
 
-    public int getSize() {
+    public int size() {
         return size;
     }
 }
