@@ -102,18 +102,23 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         setMap();
 
         map.setOnMarkerClickListener(marker -> {
-            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
             LatLng latLng = marker.getPosition();
             Position position = provider.getPosByLatLng(latLng);
             if (modeCode == 1) { // 处于单点选点状态
                 DialogHelper.showSpotSearchDialog(this, position, this);
             } else if (modeCode == 4) { // 处于多点选点状态
                 try {
-                    List<Position> spotAttach = Map.spotAttached.get(position);
-                    if (spotAttach == null) {
+                    List<Position> spotAttachList = Map.spotAttached.get(position);
+                    if (spotAttachList == null) {
                         throw new Exception("地点连接点错误");
                     }
-                    spotBuffer.push(spotAttach.get(0));
+                    Position spotAttach = spotAttachList.get(0);
+                    if (spotBuffer.isNotEmpty() && spotAttach.equals(spotBuffer.top())) {
+                        Toast.makeText(this, "选择重复", Toast.LENGTH_SHORT).show();
+                    } else {
+                        spotBuffer.push(spotAttach);
+                        Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (Exception e) {
                     onError(e);
                 }
@@ -171,10 +176,23 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         test.setOnClickListener(view -> {
             if (modeCode == 4) {
-                modeCode = 5;
-                container.removeView(multiSelectWindow);
-                container.addView(multiRouteWindow);
-                manager.getRoutePlan(spotBuffer, true, this);
+                try {
+                    if (spotBuffer.size() < 2) {
+                        // 恢复原状态
+                        container.removeView(multiSelectWindow);
+                        container.addView(searchWindow);
+                        while (spotBuffer.isNotEmpty()) {
+                            spotBuffer.pop();
+                        }
+                        throw new Exception("地点数不足");
+                    }
+                    modeCode = 5;
+                    container.removeView(multiSelectWindow);
+                    container.addView(multiRouteWindow);
+                    manager.getRoutePlan(spotBuffer, true, this);
+                } catch (Exception e) {
+                    onError(e);
+                }
             }
         });
 
