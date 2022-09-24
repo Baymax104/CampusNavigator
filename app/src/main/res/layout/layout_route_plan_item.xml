@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/shape_plan_item_bg_normal"
+        android:id="@+id/plan_item_view">
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/plan_time"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:gravity="center"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/plan_distance"
+            android:textSize="15sp"
+            android:textColor="@color/black"
+            android:gravity="center"/>
+</LinearLayout>

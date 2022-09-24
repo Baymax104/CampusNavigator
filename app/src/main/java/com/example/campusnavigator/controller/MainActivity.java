@@ -1,9 +1,5 @@
 package com.example.campusnavigator.controller;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,12 +8,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -34,10 +33,10 @@ import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Map;
-import com.example.campusnavigator.utility.DialogHelper;
-import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.MapManager;
+import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
+import com.example.campusnavigator.utility.DialogHelper;
 import com.example.campusnavigator.utility.List;
 import com.example.campusnavigator.utility.OverlayManager;
 import com.example.campusnavigator.utility.Stack;
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private View routeWindow;
     private LinearLayout routeContainer;
     private View routePlanBox;
-    private RadioGroup planGroup;
+    private GridLayout planGroup;
 
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
@@ -179,13 +178,14 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
 
-        planGroup.setOnCheckedChangeListener((radioGroup, i) -> {
-            if (modeCode == 2) { // 当前处于路径结果弹窗打开状态
-                RadioButton button = radioGroup.findViewById(i);
-                int index = radioGroup.indexOfChild(button);
+        for (int i = 0; i < planGroup.getChildCount(); i++) {
+            View planView = planGroup.getChildAt(i);
+            final int index = i;
+            planView.setOnClickListener(view -> {
                 showRoutes(index, false);
-            }
-        });
+                changePlanSelect(index);
+            });
+        }
     }
 
     private void privacyCompliance() {
@@ -246,6 +246,65 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
+    public void onMapStateChange(int modeCode) {
+        this.modeCode = modeCode;
+        if (modeCode == 1) {
+            Toast.makeText(this, "请选择你想去的地点", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onDestReceiveSuccess(String name) {
+        overlayManager.removeLines(); // 清除线段
+        Position destPosition = provider.getPosByName(name).get(0);
+        TextView destName = routeWindow.findViewById(R.id.dest_name);
+        destName.setText(name);
+
+        try {
+            // 判断当前定位点是否存在
+            if (myLocation == null) {
+                throw new Exception("定位点未找到");
+            }
+            // 计算距定位点最近的连接点
+            attachPositions = manager.attachToMap(myLocation);
+            List<Position> spotAttached = Map.spotAttached.get(destPosition);
+            if (attachPositions != null && attachPositions.length() != 0 && spotAttached != null) {
+                routesPlan.clear();
+                allDistance.clear();
+                allTimes.clear();
+                // 计算连接点到目的地的路径方案，共有2nm种方案
+                for (Position attach : attachPositions) {
+                    for (Position dest : spotAttached) {
+                        spotBuffer.push(attach);
+                        spotBuffer.push(dest);
+                        // 对于每一对起点和终点有2种方案
+                        manager.getRoutePlan(spotBuffer, false, this);
+                    }
+                }
+                // 在循环中生成规划结果数据，之后进行绘制
+                showDistAndTime(); // 设置planBox内容
+                showRoutes(0, false); // 首先展示第一种方案路线
+                changePlanSelect(0); // 选中第一个方案View
+            }
+            // 更换布局
+            container.removeView(searchWindow);
+            container.addView(routeWindow);
+            if (routeContainer.findViewById(R.id.route_plan) == null) {
+                routeContainer.addView(routePlanBox);
+            }
+        } catch (Exception e) {
+            onDestReceiveError(e);
+        }
+    }
+
+    @Override
+    public void onDestReceiveError(Exception e) {
+        modeCode = 0; // 恢复到初始状态
+        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        Log.e("MainActivity", e.toString());
+    }
+
+    @Override
     public void onSuccess(List<List<Tuple<Position, Position>>> results, List<Double> distances, List<Double> times, boolean isMultiSpot) {
         if (!isMultiSpot) {
             // 每一对起点和终点返回2种方案，向容器中添加方案
@@ -273,6 +332,18 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         Log.e("MainActivity", e.toString());
     }
 
+    private void showDistAndTime() {
+        for (int i = 0; i < planGroup.getChildCount(); i++) {
+            View planView = planGroup.getChildAt(i);
+            TextView timeTxt = planView.findViewById(R.id.plan_time);
+            TextView distanceTxt = planView.findViewById(R.id.plan_distance);
+            int time = allTimes.get(i).intValue();
+            int distance = allDistance.get(i).intValue();
+            timeTxt.setText(String.format(Locale.CHINA, "%d分钟", time));
+            distanceTxt.setText(String.format(Locale.CHINA, "%d米", distance));
+        }
+    }
+
     private void showRoutes(int planIndex, boolean isMultiSpot) {
         overlayManager.removeLines();
         List<Tuple<Position, Position>> route = routesPlan.get(planIndex);
@@ -286,7 +357,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         }
         if (!isMultiSpot) {
             overlayManager.drawLine(attachPositions.get(0), myLocation);
-            Toast.makeText(this, "距离为"+ allDistance.get(planIndex) +"\n时间为"+ allTimes.get(planIndex), Toast.LENGTH_SHORT).show();
         } else {
             TextView distanceInfo = multiRouteWindow.findViewById(R.id.distance_info);
             TextView timeInfo = multiRouteWindow.findViewById(R.id.time_info);
@@ -294,6 +364,38 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             int time = allTimes.get(planIndex).intValue();
             distanceInfo.setText(String.format(Locale.CHINA, "距离：%d米", distance));
             timeInfo.setText(String.format(Locale.CHINA, "时间：%d分钟", time));
+        }
+    }
+
+    private void changePlanSelect(int index) {
+        for (int i = 0; i < planGroup.getChildCount(); i++) {
+            View child = planGroup.getChildAt(i);
+            if (index == i) { // 选中状态
+                child.setBackgroundResource(R.drawable.shape_plan_item_bg_selected);
+            } else { // 未选中状态
+                child.setBackgroundResource(R.drawable.shape_plan_item_bg_normal);
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (modeCode == 2 || modeCode == 3) { // 若当前处于单点路径结果弹窗
+            modeCode = 0;
+            container.removeView(routeWindow);
+            container.addView(searchWindow);
+            overlayManager.removeLines();
+        } else if (modeCode == 4) { // 若当前处于多点路径选择状态
+            modeCode = 0;
+            container.removeView(multiSelectWindow);
+            container.addView(searchWindow);
+        } else if (modeCode == 5) { // 若当前处于多点路径结果弹窗
+            modeCode = 0;
+            container.removeView(multiRouteWindow);
+            container.addView(searchWindow);
+            overlayManager.removeLines();
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -370,85 +472,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 String errText = "定位失败," + aMapLocation.getErrorCode()+ ": " + aMapLocation.getErrorInfo();
                 Log.e("MapLocation",errText);
             }
-        }
-    }
-
-    @Override
-    public void onMapStateChange(int modeCode) {
-        this.modeCode = modeCode;
-        if (modeCode == 1) {
-            Toast.makeText(this, "请选择你想去的地点", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onDestReceiveSuccess(String name) {
-        overlayManager.removeLines(); // 清除线段
-        Position destPosition = provider.getPosByName(name).get(0);
-        TextView destName = routeWindow.findViewById(R.id.dest_name);
-        destName.setText(name);
-
-        try {
-            // 判断当前定位点是否存在
-            if (myLocation == null) {
-                throw new Exception("定位点未找到");
-            }
-            // 计算距定位点最近的连接点
-            attachPositions = manager.attachToMap(myLocation);
-            List<Position> spotAttached = Map.spotAttached.get(destPosition);
-            if (attachPositions != null && attachPositions.length() != 0 && spotAttached != null) {
-                routesPlan.clear();
-                allDistance.clear();
-                allTimes.clear();
-                // 计算连接点到目的地的路径方案，共有2nm种方案
-                for (Position attach : attachPositions) {
-                    for (Position dest : spotAttached) {
-                        spotBuffer.push(attach);
-                        spotBuffer.push(dest);
-                        // 对于每一对起点和终点有2种方案
-                        manager.getRoutePlan(spotBuffer, false, this);
-                    }
-                }
-                showRoutes(0, false); // 首先展示第一种方案
-            }
-            // 更换布局
-            container.removeView(searchWindow);
-            container.addView(routeWindow);
-            if (routeContainer.findViewById(R.id.route_plan) == null) {
-                routeContainer.addView(routePlanBox);
-            }
-        } catch (Exception e) {
-            onDestReceiveError(e);
-        }
-    }
-
-    @Override
-    public void onDestReceiveError(Exception e) {
-        modeCode = 0; // 恢复到初始状态
-        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        Log.e("MainActivity", e.toString());
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (modeCode == 2 || modeCode == 3) { // 若当前处于单点路径结果弹窗
-            modeCode = 0;
-            View plan1 = planGroup.getChildAt(0);
-            planGroup.check(plan1.getId());
-            container.removeView(routeWindow);
-            container.addView(searchWindow);
-            overlayManager.removeLines();
-        } else if (modeCode == 4) { // 若当前处于多点路径选择状态
-            modeCode = 0;
-            container.removeView(multiSelectWindow);
-            container.addView(searchWindow);
-        } else if (modeCode == 5) { // 若当前处于多点路径结果弹窗
-            modeCode = 0;
-            container.removeView(multiRouteWindow);
-            container.addView(searchWindow);
-            overlayManager.removeLines();
-        } else {
-            super.onBackPressed();
         }
     }
 }

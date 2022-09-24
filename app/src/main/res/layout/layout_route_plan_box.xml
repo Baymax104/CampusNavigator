@@ -3,29 +3,36 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:id="@+id/route_plan">
-    <RadioGroup
+    <GridLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
+            android:columnCount="3"
+            android:rowCount="1"
             android:id="@+id/plan_group"
-            android:checkedButton="@id/plan1">
-        <RadioButton
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp">
+        <include
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_columnWeight="1"
                 android:id="@+id/plan1"
-                android:text="第一种方案"/>
-        <RadioButton
+                layout="@layout/layout_route_plan_item"
+                android:layout_marginEnd="5dp"/>
+        <include
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_columnWeight="1"
                 android:id="@+id/plan2"
-                android:text="第二种方案"/>
-        <RadioButton
+                layout="@layout/layout_route_plan_item"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"/>
+        <include
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_columnWeight="1"
                 android:id="@+id/plan3"
-                android:text="第三种方案"/>
-    </RadioGroup>
+                layout="@layout/layout_route_plan_item"
+                android:layout_marginStart="5dp"/>
+    </GridLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

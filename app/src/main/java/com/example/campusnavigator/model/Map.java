@@ -63,8 +63,8 @@ public class Map {
     protected static final double SPEED_CYCLING = 18; // 18km/h
     protected static final double SPEED_DRIVE = 20; // 20km/h
     public enum PriorityType {
-        DISTANCE,
-        TIME
+        TIME,
+        DISTANCE
     }
 
     protected Map(Context context) {
