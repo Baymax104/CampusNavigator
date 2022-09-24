@@ -3,6 +3,7 @@ package com.example.campusnavigator.utility;
 
 import androidx.annotation.NonNull;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -21,26 +22,18 @@ public class List<T> implements Iterable<T> {
     public List() {
     }
 
-    public List(T[] obj) {
-        int i;
-        for (i = 0; i < obj.length; i++) {
-            array[i] = obj[i];
-        }
-        size = i;
-    }
-
     public List(List<T> other) {
+        // 只需要复制数组内对象的引用
         System.arraycopy(other.array, 0, this.array, 0, other.size);
         size = other.size;
     }
 
-    public boolean add(T obj) {
+    public void add(T value) {
         if (size == MAX_SIZE) {
-            return false;
+            grow(); // 当存满时进行扩容
         }
-        array[size] = obj;
+        array[size] = value;
         size++;
-        return true;
     }
 
     public T get(int i) {
@@ -56,6 +49,11 @@ public class List<T> implements Iterable<T> {
 
     public void clear() {
         size = 0;
+    }
+
+    private void grow() {
+        int newCapacity = size + (size >> 1); // 扩容为1.5倍
+        array = Arrays.copyOf(array, newCapacity);
     }
 
     @NonNull
