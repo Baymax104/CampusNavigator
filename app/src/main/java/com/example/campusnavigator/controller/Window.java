@@ -6,22 +6,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * @Description
+ * @Description 弹窗对象父类
  * @Author John
  * @email
  * @Date 2022/9/26 10:36
  * @Version 1
  */
-public abstract class WindowManager {
+public abstract class Window {
     protected Context context;
     protected ViewGroup parent;
     protected View rootView;
-    protected int rootViewId;
 
-    public WindowManager(int rootViewId, Context context, ViewGroup parent) {
+    public Window(int rootViewId, Context context, ViewGroup parent) {
         this.context = context;
         this.parent = parent;
-        this.rootViewId = rootViewId;
         rootView = LayoutInflater.from(context).inflate(rootViewId, parent, false);
     }
 
