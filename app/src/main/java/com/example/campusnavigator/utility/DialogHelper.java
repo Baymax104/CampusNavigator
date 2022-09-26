@@ -2,10 +2,10 @@ package com.example.campusnavigator.utility;
 
 import android.content.Context;
 
-import com.example.campusnavigator.controller.OnSpotSelectListener;
 import com.example.campusnavigator.controller.PrivacyConfirmDialog;
 import com.example.campusnavigator.controller.SpotSearchDialog;
 import com.example.campusnavigator.model.Position;
+import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
 import com.lxj.xpopup.XPopup;
 
 /**

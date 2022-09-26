@@ -14,6 +14,7 @@ import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.List;
+import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
 import com.google.android.material.card.MaterialCardView;
 import com.lxj.xpopup.core.BottomPopupView;
 
@@ -31,7 +32,7 @@ public class SpotSearchDialog extends BottomPopupView {
     private SpotsAdapter adapter;
     private OnSpotSelectListener listener;
     private String mapSelectResult;
-    private int mapModeCode = 0;
+    private Mode mapMode = Mode.DEFAULT;
     private String selectSpotName;
 
     public SpotSearchDialog(@NonNull Context context) {
@@ -106,13 +107,15 @@ public class SpotSearchDialog extends BottomPopupView {
         });
 
         mapSelectCard.setOnClickListener(view -> {
-            mapModeCode = 1;
+//            mapModeCode = 1;
+            mapMode = Mode.SINGLE_SELECT;
             dismiss();
         });
 
         routeButton.setOnClickListener(view -> {
             String name = editText.getText().toString();
-            mapModeCode = 2;
+//            mapModeCode = 2;
+            mapMode = Mode.SINGLE_ROUTE_OPEN;
             selectSpotName = name;
             dismiss();
         });
@@ -129,8 +132,8 @@ public class SpotSearchDialog extends BottomPopupView {
 
     @Override
     protected void doAfterDismiss() {
-        listener.onMapStateChange(mapModeCode);
-        if (mapModeCode == 2 && selectSpotName != null) {
+        listener.onMapStateChange(mapMode);
+        if (mapMode == Mode.SINGLE_ROUTE_OPEN && selectSpotName != null) {
             try {
                 Position selectSpot = provider.getPosByName(selectSpotName).get(0);
                 if (selectSpot == null) {

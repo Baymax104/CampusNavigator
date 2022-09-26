@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
-import com.example.campusnavigator.controller.RouteResultCallback;
+import com.example.campusnavigator.utility.callbacks.RouteResultCallback;
 import com.example.campusnavigator.utility.List;
 import com.example.campusnavigator.utility.MinHeap;
 import com.example.campusnavigator.utility.Stack;

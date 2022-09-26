@@ -1,4 +1,4 @@
-package com.example.campusnavigator.controller;
+package com.example.campusnavigator.utility.callbacks;
 
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.List;
