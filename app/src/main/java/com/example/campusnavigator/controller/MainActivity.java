@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         map.setOnMapTouchListener(latLng -> {
             int routeWindowY = routeWindow.getWindowY();
             int multiRouteWindowY = multiRouteWindow.getWindowY();
+            int multiSelectWindowY = multiSelectWindow.getWindowY();
             float touchY = latLng.getRawY();
             switch (mode) {
                 case SINGLE_ROUTE_OPEN: // 单点路径弹窗处于打开状态
@@ -146,6 +147,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     break;
                 case MULTI_ROUTE: // 多点路径弹窗显示状态，触摸点位于外侧开启手势，位于内侧关闭手势
                     map.getUiSettings().setAllGesturesEnabled(touchY < multiRouteWindowY);
+                    break;
+                case MULTI_SELECT:
+                    map.getUiSettings().setAllGesturesEnabled(touchY < multiSelectWindowY);
                     break;
                 default:
                     break;
@@ -236,8 +240,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     private void setMap() {
-        LatLng southwest = new LatLng(39.869922,116.477077);
         LatLng northeast = new LatLng(39.880384,116.488162);
+        LatLng southwest = new LatLng(39.869582,116.477077);
 
         MyLocationStyle locationStyle = new MyLocationStyle()
                 .interval(1200)

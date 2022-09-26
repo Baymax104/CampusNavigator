@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -21,14 +22,16 @@
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    tools:ignore="UseCompoundDrawables">
                 <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center_vertical"
                         android:src="@drawable/select_spot"
                         android:layout_marginStart="7dp"
-                        android:layout_marginEnd="5dp"/>
+                        android:layout_marginEnd="5dp"
+                        tools:ignore="ContentDescription" />
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -54,7 +57,8 @@
                     android:src="@drawable/search_fill"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="13dp"
-                    android:layout_marginEnd="12dp"/>
+                    android:layout_marginEnd="12dp"
+                    tools:ignore="ContentDescription" />
             <View
                     android:layout_width="0.2dp"
                     android:layout_height="37dp"
@@ -81,7 +85,7 @@
                     android:background="@drawable/selector_route_button"
                     android:text="@string/route"
                     android:textColor="@color/white"
-                    android:id="@+id/route_button"/>
+                    android:id="@+id/single_route_button"/>
         </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"

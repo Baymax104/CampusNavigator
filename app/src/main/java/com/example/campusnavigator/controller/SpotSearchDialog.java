@@ -1,5 +1,6 @@
 package com.example.campusnavigator.controller;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -68,7 +69,7 @@ public class SpotSearchDialog extends BottomPopupView {
         EditText editText = findViewById(R.id.spot_edit);
         RecyclerView spotsRecyclerView = findViewById(R.id.list_spot);
 
-        Button routeButton = findViewById(R.id.route_button);
+        Button routeButton = findViewById(R.id.single_route_button);
         MaterialCardView mapSelectCard = findViewById(R.id.select_spot_card);
 
         adapter = new SpotsAdapter(spotNames);
@@ -87,6 +88,7 @@ public class SpotSearchDialog extends BottomPopupView {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void afterTextChanged(Editable editable) {
                 String content = editable.toString();
@@ -121,6 +123,7 @@ public class SpotSearchDialog extends BottomPopupView {
         });
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void refreshDataSource(List<Position> positionList) {
         spotNames.clear();
         for (Position p : positionList) {

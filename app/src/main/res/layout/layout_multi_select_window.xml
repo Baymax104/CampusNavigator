@@ -1,12 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="150dp">
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="确定"
-            android:id="@+id/test_button"/>
+        android:layout_height="130dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="10dp"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="2dp">
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:orientation="horizontal">
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:id="@+id/select_tip"
+                    android:text="当前选择地点数："
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="15dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:id="@+id/select_number"
+                    android:layout_toEndOf="@id/select_tip"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    tools:ignore="RelativeOverlap" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <Button
+                    android:layout_width="75dp"
+                    android:layout_height="36dp"
+                    android:id="@+id/multi_route_button"
+                    android:layout_marginEnd="10dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/selector_route_button"
+                    android:text="@string/route"
+                    android:textColor="@color/white"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#d6d6d6"/>
+        <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/spot_list"/>
+
+    </LinearLayout>
+
+
+</com.google.android.material.card.MaterialCardView>
