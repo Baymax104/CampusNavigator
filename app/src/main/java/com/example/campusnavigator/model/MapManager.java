@@ -49,20 +49,7 @@ public class MapManager extends Map {
             spotsList.add(pos);
         }
         List<Tuple<Position, Position>> routeTemp = new List<>();
-        if (!isMultiSpot) {
-            for (PriorityType type : types) {
-                Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);
-                double distance = distAndTime.first;
-                double time = distAndTime.second;
-                List<Tuple<Position, Position>> routes = new List<>(routeTemp);
-                distances.add(distance);
-                times.add(time);
-                routeList.add(routes);
-                routeTemp.clear();
-            }
-            callback.onSuccess(routeList, distances, times, false);
-        } else {
-            PriorityType type = PriorityType.DISTANCE;
+        for (PriorityType type : types) {
             Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);
             double distance = distAndTime.first;
             double time = distAndTime.second;
@@ -71,8 +58,11 @@ public class MapManager extends Map {
             times.add(time);
             routeList.add(routes);
             routeTemp.clear();
-            callback.onSuccess(routeList, distances, times, true);
+            if (type == PriorityType.DISTANCE && isMultiSpot) {
+                break; // 若当前计算为距离优先且isMultiSpot = true，直接跳出循环
+            }
         }
+        callback.onSuccess(routeList, distances, times, isMultiSpot);
     }
 
     public Tuple<Double, Double> getMultiDestRoute(List<Position> spotsList, PriorityType type, @ NonNull List<Tuple<Position, Position>> routes) {

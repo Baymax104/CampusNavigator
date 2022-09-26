@@ -12,7 +12,7 @@
         <com.google.android.material.card.MaterialCardView
                 android:layout_width="126dp"
                 android:layout_height="48dp"
-                android:id="@+id/multi_select_spot"
+                android:id="@+id/multi_select_card"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="7dp"

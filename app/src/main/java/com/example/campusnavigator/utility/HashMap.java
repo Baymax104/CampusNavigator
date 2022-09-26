@@ -1,9 +1,5 @@
 package com.example.campusnavigator.utility;
 
-import androidx.annotation.Nullable;
-
-import java.util.Objects;
-
 /**
  * @Description
  * @Author John

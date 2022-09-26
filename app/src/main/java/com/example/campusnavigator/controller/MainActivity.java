@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     // 弹窗布局对象
     private CoordinatorLayout container;
-    private View searchWindow;
+    private SearchWindowManager searchWindowManager;
 
     private View multiSelectWindow;
     private Button test;
@@ -126,8 +126,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             return true;
         });
 
-        TextView searchField = searchWindow.findViewById(R.id.search_field);
-        searchField.setOnClickListener(view -> DialogHelper.showSpotSearchDialog(this, this));
+        searchWindowManager.setSearchFieldListener(view -> DialogHelper.showSpotSearchDialog(this, this));
 
         ImageView expendButton = routeWindow.findViewById(R.id.expend_button);
         expendButton.setOnClickListener(view -> {
@@ -165,11 +164,10 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
 
-        MaterialCardView multiSelectCard = searchWindow.findViewById(R.id.multi_select_spot);
-        multiSelectCard.setOnClickListener(view -> {
+        searchWindowManager.setMultiSelectCardListener(view -> {
             if (modeCode == 0) { // 由初始状态切换到多点选择状态
                 modeCode = 4;
-                container.removeView(searchWindow);
+                searchWindowManager.removeFromParent();
                 container.addView(multiSelectWindow);
             }
         });
@@ -180,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     if (spotBuffer.size() < 2) {
                         // 恢复原状态
                         container.removeView(multiSelectWindow);
-                        container.addView(searchWindow);
+                        searchWindowManager.addToParent();
                         while (spotBuffer.isNotEmpty()) {
                             spotBuffer.pop();
                         }
@@ -223,11 +221,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         container = findViewById(R.id.view_container);
-        searchWindow = LayoutInflater.from(this).inflate(R.layout.layout_search_window, container, false);
+        searchWindowManager = new SearchWindowManager(this, container);
         routeWindow = LayoutInflater.from(this).inflate(R.layout.layout_route_window, container, false);
         multiSelectWindow = LayoutInflater.from(this).inflate(R.layout.layout_multi_search_window, container, false);
         multiRouteWindow = LayoutInflater.from(this).inflate(R.layout.layout_multi_route_window, container, false);
-        container.addView(searchWindow);
+        searchWindowManager.addToParent();
 
         routeContainer = routeWindow.findViewById(R.id.route_card);
         routePlanBox = LayoutInflater.from(this).inflate(R.layout.layout_route_plan_box, routeContainer, false);
@@ -305,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 changePlanSelect(0); // 选中第一个方案View
             }
             // 更换布局
-            container.removeView(searchWindow);
+            searchWindowManager.removeFromParent();
             container.addView(routeWindow);
             if (routeContainer.findViewById(R.id.route_plan) == null) {
                 routeContainer.addView(routePlanBox);
@@ -401,16 +399,16 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         if (modeCode == 2 || modeCode == 3) { // 若当前处于单点路径结果弹窗
             modeCode = 0;
             container.removeView(routeWindow);
-            container.addView(searchWindow);
+            searchWindowManager.addToParent();
             overlayManager.removeLines();
         } else if (modeCode == 4) { // 若当前处于多点路径选择状态
             modeCode = 0;
             container.removeView(multiSelectWindow);
-            container.addView(searchWindow);
+            searchWindowManager.addToParent();
         } else if (modeCode == 5) { // 若当前处于多点路径结果弹窗
             modeCode = 0;
             container.removeView(multiRouteWindow);
-            container.addView(searchWindow);
+            searchWindowManager.addToParent();
             overlayManager.removeLines();
         } else {
             super.onBackPressed();
