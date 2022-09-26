@@ -24,7 +24,7 @@ import com.example.campusnavigator.model.Position;
 public class MultiSelectWindow extends Window {
     private Button routeButton;
     private TextView selectNumber;
-    private ImageView selectRemove;
+    private ImageView selectRemoveButton;
     private RecyclerView spotRecyclerView;
     private SpotSelectAdapter adapter;
 
@@ -33,7 +33,7 @@ public class MultiSelectWindow extends Window {
         routeButton = rootView.findViewById(R.id.multi_route_button);
         selectNumber = rootView.findViewById(R.id.select_number);
         spotRecyclerView = rootView.findViewById(R.id.spot_list);
-        selectRemove = rootView.findViewById(R.id.select_remove);
+        selectRemoveButton = rootView.findViewById(R.id.select_remove);
 
         selectNumber.setText("0");
 
@@ -55,7 +55,7 @@ public class MultiSelectWindow extends Window {
     }
 
     public void setSelectRemoveListener(View.OnClickListener listener) {
-        selectRemove.setOnClickListener(listener);
+        selectRemoveButton.setOnClickListener(listener);
     }
 
     public void addPosition(Position position) {
@@ -78,5 +78,6 @@ public class MultiSelectWindow extends Window {
         while (adapter.getItemCount() != 0) {
             adapter.removeItem();
         }
+        selectNumber.setText("0");
     }
 }

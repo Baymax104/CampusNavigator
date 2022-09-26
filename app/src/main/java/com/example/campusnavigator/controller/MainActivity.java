@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                         multiSelectWindow.close();
                         searchWindow.open();
                         spotBuffer.popAll();
-                        throw new Exception("地点数不足");
+                        throw new Exception("地点数不足2个");
                     }
                     mode = Mode.MULTI_ROUTE;
                     multiSelectWindow.close();
@@ -190,8 +190,10 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         multiSelectWindow.setSelectRemoveListener(v -> {
-            boolean isRemove = multiSelectWindow.removePosition();
-            if (!isRemove) {
+            boolean isCompleted = multiSelectWindow.removePosition();
+            if (isCompleted) {
+                spotBuffer.pop();
+            } else {
                 Toast.makeText(this, "无选中顶点", Toast.LENGTH_SHORT).show();
             }
         });
@@ -347,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             Double time = times.get(0);
             multiRouteWindow.setRouteInfo(time, dist);
             multiRouteWindow.displayRoute(route, overlayManager);
+            multiSelectWindow.removeAllPosition(); // 清空上层UI列表
         }
     }
 
