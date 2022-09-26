@@ -24,7 +24,7 @@
                     android:text="当前选择地点数："
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="15dp"
+                    android:layout_marginStart="12dp"
                     android:gravity="center_vertical"
                     android:textColor="@color/black"
                     android:textSize="16sp"
@@ -39,7 +39,6 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     tools:ignore="RelativeOverlap" />
-
             <Button
                     android:layout_width="75dp"
                     android:layout_height="36dp"
@@ -56,10 +55,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"
                 android:background="#d6d6d6"/>
-        <androidx.recyclerview.widget.RecyclerView
+
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/spot_list"/>
+                android:orientation="horizontal">
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/spot_list"
+                    android:layout_marginStart="10dp"
+                    tools:listitem="@layout/layout_spot_select_item" />
+
+            <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:id="@+id/select_remove"
+                    android:src="@drawable/remove_spot"
+                    android:layout_marginEnd="15dp"
+                    tools:ignore="ContentDescription"
+                    android:layout_gravity="center_vertical" />
+        </LinearLayout>
 
     </LinearLayout>
 

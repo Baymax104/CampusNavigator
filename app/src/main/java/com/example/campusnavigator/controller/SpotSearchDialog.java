@@ -30,7 +30,7 @@ public class SpotSearchDialog extends BottomPopupView {
     private Context context;
     private PositionProvider provider;
     private List<String> spotNames;
-    private SpotsAdapter adapter;
+    private SpotSearchAdapter adapter;
     private OnSpotSelectListener listener;
     private String mapSelectResult;
     private Mode mapMode = Mode.DEFAULT;
@@ -72,7 +72,7 @@ public class SpotSearchDialog extends BottomPopupView {
         Button routeButton = findViewById(R.id.single_route_button);
         MaterialCardView mapSelectCard = findViewById(R.id.select_spot_card);
 
-        adapter = new SpotsAdapter(spotNames);
+        adapter = new SpotSearchAdapter(spotNames);
         spotsRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         spotsRecyclerView.setLayoutManager(layoutManager);
@@ -109,14 +109,12 @@ public class SpotSearchDialog extends BottomPopupView {
         });
 
         mapSelectCard.setOnClickListener(view -> {
-//            mapModeCode = 1;
             mapMode = Mode.SINGLE_SELECT;
             dismiss();
         });
 
         routeButton.setOnClickListener(view -> {
             String name = editText.getText().toString();
-//            mapModeCode = 2;
             mapMode = Mode.SINGLE_ROUTE_OPEN;
             selectSpotName = name;
             dismiss();

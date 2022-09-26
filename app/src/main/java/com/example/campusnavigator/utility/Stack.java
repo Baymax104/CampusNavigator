@@ -51,6 +51,12 @@ public class Stack<T> {
         return tail.value;
     }
 
+    public void popAll() {
+        while (isNotEmpty()) {
+            pop();
+        }
+    }
+
     public boolean isNotEmpty() {
         return size != 0;
     }

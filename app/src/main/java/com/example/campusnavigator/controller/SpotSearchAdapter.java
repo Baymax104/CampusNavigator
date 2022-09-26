@@ -19,7 +19,7 @@ import com.example.campusnavigator.utility.callbacks.OnItemClickedListener;
  * @Date 2022/9/5 15:25
  * @Version 1
  */
-public class SpotsAdapter extends RecyclerView.Adapter<SpotsAdapter.ViewHolder> {
+public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.ViewHolder> {
     private List<String> data;
     private OnItemClickedListener itemClickListener;
 
@@ -31,7 +31,7 @@ public class SpotsAdapter extends RecyclerView.Adapter<SpotsAdapter.ViewHolder> 
         }
     }
 
-    public SpotsAdapter(List<String> data) {
+    public SpotSearchAdapter(List<String> data) {
         this.data = data;
     }
 
@@ -46,7 +46,7 @@ public class SpotsAdapter extends RecyclerView.Adapter<SpotsAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_spot_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_spot_search_item, parent, false);
         return new ViewHolder(view);
     }
 

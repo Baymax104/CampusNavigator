@@ -90,7 +90,8 @@
         <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="280dp"
-                android:id="@+id/list_spot"/>
+                android:id="@+id/list_spot"
+                tools:listitem="@layout/layout_spot_search_item"/>
     </LinearLayout>
 
 </LinearLayout>

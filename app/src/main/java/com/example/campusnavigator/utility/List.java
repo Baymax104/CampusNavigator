@@ -43,6 +43,16 @@ public class List<T> implements Iterable<T> {
         return array[i];
     }
 
+    public T back() {
+        return (size > 0) ? array[size - 1] : null;
+    }
+
+    public void popBack() {
+        if (size > 0) {
+            size--;
+        }
+    }
+
     public int length() {
         return size;
     }
