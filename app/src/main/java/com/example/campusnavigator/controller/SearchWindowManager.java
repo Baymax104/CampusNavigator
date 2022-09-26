@@ -18,29 +18,14 @@ import com.google.android.material.card.MaterialCardView;
  * @Date 2022/9/26 10:09
  * @Version 1
  */
-public class SearchWindowManager {
-    private Context context;
-    private ViewGroup parent;
-    private View rootView;
+public class SearchWindowManager extends WindowManager {
     private TextView searchField;
     private MaterialCardView multiSelectCard;
 
     public SearchWindowManager(@NonNull Context context, @NonNull ViewGroup parent) {
-        if (this.parent == null && this.context == null) {
-            this.context = context;
-            this.parent = parent;
-            rootView = LayoutInflater.from(context).inflate(R.layout.layout_search_window, parent, false);
-            searchField = rootView.findViewById(R.id.search_field);
-            multiSelectCard = rootView.findViewById(R.id.multi_select_card);
-        }
-    }
-
-    public void addToParent() {
-        parent.addView(rootView);
-    }
-
-    public void removeFromParent() {
-        parent.removeView(rootView);
+        super(R.layout.layout_search_window, context, parent);
+        searchField = rootView.findViewById(R.id.search_field);
+        multiSelectCard = rootView.findViewById(R.id.multi_select_card);
     }
 
     public void setSearchFieldListener(View.OnClickListener listener) {

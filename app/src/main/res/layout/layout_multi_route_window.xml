@@ -16,8 +16,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:background="@color/white"
-                android:id="@+id/distance_info"
+                android:id="@+id/time_info"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 android:gravity="center"/>
@@ -25,7 +24,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:id="@+id/time_info"
+                android:background="@color/white"
+                android:id="@+id/distance_info"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 android:gravity="center"/>
