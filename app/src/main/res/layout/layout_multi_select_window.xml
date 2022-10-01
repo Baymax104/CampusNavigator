@@ -66,16 +66,15 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:id="@+id/spot_list"
-                    android:layout_marginStart="10dp"
                     tools:listitem="@layout/layout_spot_select_item" />
 
             <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="23dp"
+                    android:layout_height="23dp"
                     android:id="@+id/select_remove"
                     android:src="@drawable/remove_spot"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="15dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="20dp"
                     tools:ignore="ContentDescription"
                     android:layout_gravity="center_vertical" />
         </LinearLayout>

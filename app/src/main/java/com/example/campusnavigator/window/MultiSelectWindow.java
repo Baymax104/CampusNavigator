@@ -14,6 +14,9 @@ import com.example.campusnavigator.R;
 import com.example.campusnavigator.controller.SpotSelectAdapter;
 import com.example.campusnavigator.model.Position;
 
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
+import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
+
 /**
  * @Description 多点选择弹窗对象
  * @Author John
@@ -42,6 +45,7 @@ public class MultiSelectWindow extends Window {
         LinearLayoutManager manager = new LinearLayoutManager(context);
         manager.setOrientation(RecyclerView.HORIZONTAL);
         spotRecyclerView.setLayoutManager(manager);
+        spotRecyclerView.setItemAnimator(new SlideInRightAnimator());
     }
 
     public int getWindowY() {
