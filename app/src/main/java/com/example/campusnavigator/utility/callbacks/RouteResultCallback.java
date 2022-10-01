@@ -1,8 +1,8 @@
 package com.example.campusnavigator.utility.callbacks;
 
 import com.example.campusnavigator.model.Position;
-import com.example.campusnavigator.utility.List;
-import com.example.campusnavigator.utility.Tuple;
+import com.example.campusnavigator.utility.structures.List;
+import com.example.campusnavigator.utility.structures.Tuple;
 
 /**
  * @Description

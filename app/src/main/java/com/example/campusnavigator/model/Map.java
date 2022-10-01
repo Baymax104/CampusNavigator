@@ -4,8 +4,8 @@ import android.content.Context;
 
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
-import com.example.campusnavigator.utility.HashMap;
-import com.example.campusnavigator.utility.List;
+import com.example.campusnavigator.utility.structures.HashMap;
+import com.example.campusnavigator.utility.structures.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;

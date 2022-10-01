@@ -1,4 +1,4 @@
-package com.example.campusnavigator.utility;
+package com.example.campusnavigator.utility.structures;
 
 
 import androidx.annotation.NonNull;

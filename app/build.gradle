@@ -26,6 +26,20 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     namespace 'com.example.campusnavigator'
+
+    sourceSets {
+        main {
+            res.srcDirs = [
+                    'src/main/res/layout/dialog',
+                    'src/main/res/layout/search_window',
+                    'src/main/res/layout/route_window',
+                    'src/main/res/layout/multi_select_window',
+                    'src/main/res/layout/multi_route_window',
+                    'src/main/res/layout',
+                    'src/main/res'
+            ]
+        }
+    }
 }
 
 dependencies {

@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
-import com.example.campusnavigator.controller.SpotSelectAdapter;
 import com.example.campusnavigator.model.Position;
+import com.example.campusnavigator.utility.adapters.SpotSelectAdapter;
 
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
 

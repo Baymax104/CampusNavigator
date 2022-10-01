@@ -13,9 +13,9 @@ import androidx.annotation.NonNull;
 
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
-import com.example.campusnavigator.utility.List;
-import com.example.campusnavigator.utility.OverlayManager;
-import com.example.campusnavigator.utility.Tuple;
+import com.example.campusnavigator.utility.helpers.OverlayHelper;
+import com.example.campusnavigator.utility.structures.List;
+import com.example.campusnavigator.utility.structures.Tuple;
 
 import java.util.Locale;
 
@@ -51,8 +51,7 @@ public class RouteWindow extends Window {
         planGroup = routePlanBox.findViewById(R.id.plan_group);
         routeContainer.addView(routePlanBox);
 
-        // 设置默认选中方案View样式
-        selected = 0;
+        selected = -1;
         selectedPlanView = planGroup.getChildAt(0);
         selectedPlanView.setBackgroundResource(R.drawable.shape_plan_item_bg_selected);
     }
@@ -97,6 +96,10 @@ public class RouteWindow extends Window {
         return planGroup.getChildCount();
     }
 
+    public void refreshSelected() {
+        this.selected = -1;
+    }
+
     public void setPlanListener(int i, View.OnClickListener listener) {
         View child = planGroup.getChildAt(i);
         child.setOnClickListener(listener);
@@ -120,7 +123,7 @@ public class RouteWindow extends Window {
     public void displayPlan(@NonNull List<List<Tuple<Position, Position>>> plans,
                             int selected,
                             @NonNull Position myLocation,
-                            @NonNull OverlayManager operator) {
+                            @NonNull OverlayHelper operator) {
         if (this.selected != selected) { // 若新选中的方案与当前选中不相同，则更新
             this.selected = selected;
             // 设置选中按钮
@@ -133,8 +136,7 @@ public class RouteWindow extends Window {
     }
 
     private void setSelectedPlan(int i) {
-        int last = planGroup.indexOfChild(selectedPlanView);
-        if (i >= 0 && i < planGroup.getChildCount() && last != i) {
+        if (i >= 0 && i < planGroup.getChildCount()) {
             selectedPlanView.setBackgroundResource(R.drawable.shape_plan_item_bg_normal);
             selectedPlanView = planGroup.getChildAt(i);
             selectedPlanView.setBackgroundResource(R.drawable.shape_plan_item_bg_selected);
@@ -143,7 +145,7 @@ public class RouteWindow extends Window {
 
     private void showRoutes(@NonNull List<Tuple<Position, Position>> route,
                            @NonNull Position myLocation,
-                           @NonNull OverlayManager operator) {
+                           @NonNull OverlayHelper operator) {
         operator.removeLines();
         for (int i = 0; i < route.length(); i++) {
             Tuple<Position, Position> p = route.get(i);

@@ -3,16 +3,7 @@ package com.example.campusnavigator.model;
 import android.content.Context;
 
 import com.amap.api.maps.model.LatLng;
-import com.example.campusnavigator.utility.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import com.example.campusnavigator.utility.structures.List;
 
 /**
  * @Description 提供外部查找Position的方法类

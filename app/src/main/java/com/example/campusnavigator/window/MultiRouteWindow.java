@@ -8,9 +8,9 @@ import androidx.annotation.NonNull;
 
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
-import com.example.campusnavigator.utility.List;
-import com.example.campusnavigator.utility.OverlayManager;
-import com.example.campusnavigator.utility.Tuple;
+import com.example.campusnavigator.utility.helpers.OverlayHelper;
+import com.example.campusnavigator.utility.structures.List;
+import com.example.campusnavigator.utility.structures.Tuple;
 
 import java.util.Locale;
 
@@ -46,7 +46,7 @@ public class MultiRouteWindow extends Window {
         }
     }
 
-    public void displayRoute(@NonNull List<Tuple<Position, Position>> route, OverlayManager operator) {
+    public void displayRoute(@NonNull List<Tuple<Position, Position>> route, OverlayHelper operator) {
         operator.removeLines();
         for (int i = 0; i < route.length(); i++) {
             Tuple<Position, Position> p = route.get(i);

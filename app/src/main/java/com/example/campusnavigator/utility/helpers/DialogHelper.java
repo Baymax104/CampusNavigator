@@ -1,4 +1,4 @@
-package com.example.campusnavigator.utility;
+package com.example.campusnavigator.utility.helpers;
 
 import android.content.Context;
 
@@ -9,7 +9,7 @@ import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
 import com.lxj.xpopup.XPopup;
 
 /**
- * @Description
+ * @Description 对话框帮助类
  * @Author John
  * @email
  * @Date 2022/9/5 14:37

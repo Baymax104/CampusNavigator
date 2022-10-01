@@ -1,4 +1,4 @@
-package com.example.campusnavigator.controller;
+package com.example.campusnavigator.utility.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
-import com.example.campusnavigator.utility.List;
+import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.callbacks.OnItemClickedListener;
 
 /**

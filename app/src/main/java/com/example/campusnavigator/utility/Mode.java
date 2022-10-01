@@ -1,4 +1,4 @@
-package com.example.campusnavigator.controller;
+package com.example.campusnavigator.utility;
 
 /**
  * @Description

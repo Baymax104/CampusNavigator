@@ -31,13 +31,14 @@ import com.example.campusnavigator.model.Map;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
-import com.example.campusnavigator.utility.DialogHelper;
-import com.example.campusnavigator.utility.List;
-import com.example.campusnavigator.utility.OverlayManager;
-import com.example.campusnavigator.utility.Stack;
-import com.example.campusnavigator.utility.Tuple;
+import com.example.campusnavigator.utility.Mode;
 import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
 import com.example.campusnavigator.utility.callbacks.RouteResultCallback;
+import com.example.campusnavigator.utility.helpers.DialogHelper;
+import com.example.campusnavigator.utility.helpers.OverlayHelper;
+import com.example.campusnavigator.utility.structures.List;
+import com.example.campusnavigator.utility.structures.Stack;
+import com.example.campusnavigator.utility.structures.Tuple;
 import com.example.campusnavigator.window.MultiRouteWindow;
 import com.example.campusnavigator.window.MultiSelectWindow;
 import com.example.campusnavigator.window.RouteWindow;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     // 主要数据管理对象
     private PositionProvider provider;
     private MapManager manager;
-    private OverlayManager overlayManager;
+    private OverlayHelper overlayHelper;
     private Stack<Position> spotBuffer = new Stack<>(); // 地点参数栈
     private Position myLocation;
     private Mode mode = Mode.DEFAULT;
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // provider需要context，必须延迟初始化
         provider = PositionProvider.getInstance(this);
         manager = MapManager.getInstance(this);
-        overlayManager = OverlayManager.getInstance(map, mapView, this);
+        overlayHelper = OverlayHelper.getInstance(map, mapView, this);
         // 设置地图属性
         setMap();
 
@@ -204,7 +205,10 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         int count = routeWindow.getPlanCount();
         for (int i = 0; i < count; i++) {
             final int selected = i;
-            routeWindow.setPlanListener(i, v -> routeWindow.displayPlan(routeOfPlans, selected, myLocation, overlayManager));
+            routeWindow.setPlanListener(i, v -> {
+                routeWindow.refreshSelected();
+                routeWindow.displayPlan(routeOfPlans, selected, myLocation, overlayHelper);
+            });
         }
     }
 
@@ -252,9 +256,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         map.getUiSettings().setZoomControlsEnabled(false);
         for (String s : spotNames) {
             // 设置marker
-            overlayManager.drawMarker(provider.getPosByName(s).get(0));
+            overlayHelper.drawMarker(provider.getPosByName(s).get(0));
             // 设置文字
-            overlayManager.drawText(provider.getPosByName(s).get(0), s);
+            overlayHelper.drawText(provider.getPosByName(s).get(0), s);
         }
     }
 
@@ -268,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onDestReceiveSuccess(String name) {
-        overlayManager.removeLines(); // 清除线段
+        overlayHelper.removeLines(); // 清除线段
         routeWindow.setDestName(name);
 
         Position destPosition = provider.getPosByName(name).get(0);
@@ -301,7 +305,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
                 // 在循环中经过onSuccess()生成规划结果数据，之后展示方案
                 routeWindow.setPlansInfo(timeOfPlans, distanceOfPlans); // 设置planBox内容
-                routeWindow.displayPlan(routeOfPlans, 0, myLocation, overlayManager);
+                routeWindow.refreshSelected();
+                routeWindow.displayPlan(routeOfPlans, 0, myLocation, overlayHelper);
             }
 
             // 更换布局
@@ -339,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             Double dist = distances.get(0);
             Double time = times.get(0);
             multiRouteWindow.setRouteInfo(time, dist);
-            multiRouteWindow.displayRoute(route, overlayManager);
+            multiRouteWindow.displayRoute(route, overlayHelper);
             multiSelectWindow.removeAllPosition(); // 清空上层UI列表
         }
     }
@@ -357,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             mode = Mode.DEFAULT;
             routeWindow.close();
             searchWindow.open();
-            overlayManager.removeLines();
+            overlayHelper.removeLines();
         } else if (mode == Mode.MULTI_SELECT) { // 若当前处于多点路径选择状态
             mode = Mode.DEFAULT;
             spotBuffer.popAll();
@@ -368,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             mode = Mode.DEFAULT;
             multiRouteWindow.close();
             searchWindow.open();
-            overlayManager.removeLines();
+            overlayHelper.removeLines();
         } else {
             super.onBackPressed();
         }

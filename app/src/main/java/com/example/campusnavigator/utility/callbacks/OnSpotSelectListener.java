@@ -1,6 +1,6 @@
 package com.example.campusnavigator.utility.callbacks;
 
-import com.example.campusnavigator.controller.Mode;
+import com.example.campusnavigator.utility.Mode;
 
 /**
  * @Description
