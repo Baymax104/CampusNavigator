@@ -74,6 +74,7 @@
                     android:layout_height="20dp"
                     android:id="@+id/select_remove"
                     android:src="@drawable/remove_spot"
+                    android:layout_marginStart="5dp"
                     android:layout_marginEnd="15dp"
                     tools:ignore="ContentDescription"
                     android:layout_gravity="center_vertical" />

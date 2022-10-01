@@ -139,27 +139,26 @@ public class MapManager extends Map {
         while (!heap.isEmpty()) {
             v = heap.top().first();
             heap.pop();
-            if (v == dest) {
+            if (v == dest) { // 查找到目的地直接退出
                 break;
-            }
-            if (visited[v]) {
-                continue;
             }
             visited[v] = true;
             for (int i = 0; i < size; i++) {
-                if (map[v][i].dist != INF) {
+                if (map[v][i].dist != INF && !visited[i]) { // 若v到i有路径并且i未访问过
                     if (type == PriorityType.DISTANCE && cost[v] + map[v][i].dist < cost[i]) { // 距离最小
                         cost[i] = cost[v] + map[v][i].dist;
                         dist[i] = dist[v] + map[v][i].dist;
                         time[i] = time[v] + map[v][i].time;
-                        double priority = cost[i] + map[v][i].eval;
+                        double h = getDistanceById(i, dest); // 启发式信息为i到dest的直线距离
+                        double priority = cost[i] + h; // f(i) = g(i) + h(i)
                         heap.push(i, priority);
                         paths[i] = v;
                     } else if (type == PriorityType.TIME && cost[v] + map[v][i].time < cost[i]) { // 时间最短
                         cost[i] = cost[v] + map[v][i].time;
                         dist[i] = dist[v] + map[v][i].dist;
                         time[i] = time[v] + map[v][i].time;
-                        double priority = cost[i] + map[v][i].eval;
+                        double h = getDistanceById(i, dest);
+                        double priority = cost[i] + h;
                         heap.push(i, priority);
                         paths[i] = v;
                     }

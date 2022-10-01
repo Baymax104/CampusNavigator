@@ -3,6 +3,7 @@ package com.example.campusnavigator.model;
 import android.content.Context;
 
 import com.amap.api.maps.AMapUtils;
+import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.utility.HashMap;
 import com.example.campusnavigator.utility.List;
 
@@ -35,26 +36,15 @@ public class Map {
         public final int to;
         protected double dist;
         protected double time;
-        protected double eval;
         protected Path(int from, int to) {
             this.from = from;
             this.to = to;
         }
-        protected Path(int from, int to, double dist, double time, double eval) {
+        protected Path(int from, int to, double dist, double time) {
             this.from = from;
             this.to = to;
             this.time = time;
             this.dist = dist;
-            this.eval = eval;
-        }
-        public double getDist() {
-            return dist;
-        }
-        public double getTime() {
-            return time;
-        }
-        public double getEval() {
-            return eval;
         }
     }
     protected static Path[][] map;
@@ -110,7 +100,7 @@ public class Map {
                         if (i == j) {
                             map[i][j] = new Path(i, j);
                         } else {
-                            map[i][j] = new Path(i, j, INF, INF, 0);
+                            map[i][j] = new Path(i, j, INF, INF);
                         }
                     }
                 }
@@ -154,5 +144,11 @@ public class Map {
                 e.printStackTrace();
             }
         }
+    }
+
+    protected static double getDistanceById(int p1, int p2) {
+        LatLng l1 = positions[p1].getLatLng();
+        LatLng l2 = positions[p2].getLatLng();
+        return AMapUtils.calculateLineDistance(l1, l2);
     }
 }
