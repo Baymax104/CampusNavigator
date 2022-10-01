@@ -30,13 +30,14 @@ public class RouteWindow extends Window {
     private LinearLayout routeContainer;
 
     // 上方信息窗口
-    private ImageView expendButton;
-    private TextView destTxt;
+    private ImageView expendButton; // 窗口展开/关闭按钮
+    private TextView destTxt; // 目的地名TextView
 
     // 下方方案窗口
-    private View routePlanBox;
-    private GridLayout planGroup;
-    private View selectedPlanView;
+    private View routePlanBox; // 方案外层布局
+    private GridLayout planGroup; // 方案容器
+    private int selected; // 当前选中的方案索引
+    private View selectedPlanView; // 当前选中的方案布局
 
 
     public RouteWindow(Context context, ViewGroup parent) {
@@ -51,6 +52,7 @@ public class RouteWindow extends Window {
         routeContainer.addView(routePlanBox);
 
         // 设置默认选中方案View样式
+        selected = 0;
         selectedPlanView = planGroup.getChildAt(0);
         selectedPlanView.setBackgroundResource(R.drawable.shape_plan_item_bg_selected);
     }
@@ -117,14 +119,17 @@ public class RouteWindow extends Window {
 
     public void displayPlan(@NonNull List<List<Tuple<Position, Position>>> plans,
                             int selected,
-                            @NonNull Tuple<Position, Position> attachToMe,
+                            @NonNull Position myLocation,
                             @NonNull OverlayManager operator) {
-        // 设置选中按钮
-        setSelectedPlan(selected);
+        if (this.selected != selected) { // 若新选中的方案与当前选中不相同，则更新
+            this.selected = selected;
+            // 设置选中按钮
+            setSelectedPlan(selected);
 
-        // 绘制路线
-        List<Tuple<Position, Position>> route = plans.get(selected);
-        showRoutes(route, attachToMe, operator);
+            // 绘制路线
+            List<Tuple<Position, Position>> route = plans.get(selected);
+            showRoutes(route, myLocation, operator);
+        }
     }
 
     private void setSelectedPlan(int i) {
@@ -137,7 +142,7 @@ public class RouteWindow extends Window {
     }
 
     private void showRoutes(@NonNull List<Tuple<Position, Position>> route,
-                           @NonNull Tuple<Position, Position> attachToMe,
+                           @NonNull Position myLocation,
                            @NonNull OverlayManager operator) {
         operator.removeLines();
         for (int i = 0; i < route.length(); i++) {
@@ -148,6 +153,6 @@ public class RouteWindow extends Window {
                 operator.drawLine(p.second);
             }
         }
-        operator.drawLine(attachToMe.first, attachToMe.second);
+        operator.drawLine(myLocation);
     }
 }

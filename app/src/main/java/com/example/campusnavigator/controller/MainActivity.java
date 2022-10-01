@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private AMapLocationClient locationClient; // 定位启动和销毁类
 
     // 路径计算结果
-    private List<Position> attachPos;
     private List<List<Tuple<Position, Position>>> routeOfPlans = new List<>();
     private List<Double> distanceOfPlans = new List<>();
     private List<Double> timeOfPlans = new List<>();
@@ -214,12 +213,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         int count = routeWindow.getPlanCount();
         for (int i = 0; i < count; i++) {
             final int selected = i;
-            final int indexOfAttach = i / 2;
-            routeWindow.setPlanListener(i, v -> {
-                Position attach = attachPos.get(indexOfAttach);
-                Tuple<Position, Position> attachToMe = new Tuple<>(attach, myLocation);
-                routeWindow.displayPlan(routeOfPlans, selected, attachToMe, overlayManager);
-            });
+            routeWindow.setPlanListener(i, v -> routeWindow.displayPlan(routeOfPlans, selected, myLocation, overlayManager));
         }
     }
 
@@ -292,13 +286,18 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             if (myLocation == null) {
                 throw new Exception("定位点未找到");
             }
-            // 计算距定位点最近的连接点
-            attachPos = manager.attachToMap(myLocation);
+
+            // 计算距定位点最近的连接点，定位点邻接点表attachPos
+            List<Position> attachPos = manager.attachToMap(myLocation);
+            // 获取目的地邻接点，目的地邻接点表spotAttached
             List<Position> spotAttached = Map.spotAttached.get(destPosition);
+
             if (attachPos != null && attachPos.length() != 0 && spotAttached != null) {
+                // 清空先前的结果
                 routeOfPlans.clear();
                 distanceOfPlans.clear();
                 timeOfPlans.clear();
+
                 // 计算连接点到目的地的路径方案，共有2nm种方案
                 for (Position attach : attachPos) {
                     for (Position dest : spotAttached) {
@@ -308,11 +307,12 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                         manager.getRoutePlan(spotBuffer, false, this);
                     }
                 }
+
                 // 在循环中经过onSuccess()生成规划结果数据，之后展示方案
                 routeWindow.setPlansInfo(timeOfPlans, distanceOfPlans); // 设置planBox内容
-                Tuple<Position, Position> attachToMe = new Tuple<>(attachPos.get(0), myLocation);
-                routeWindow.displayPlan(routeOfPlans, 0, attachToMe, overlayManager);
+                routeWindow.displayPlan(routeOfPlans, 0, myLocation, overlayManager);
             }
+
             // 更换布局
             searchWindow.close();
             routeWindow.open();
