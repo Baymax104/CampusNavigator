@@ -33,11 +33,11 @@ import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.DialogHelper;
 import com.example.campusnavigator.utility.List;
-import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
 import com.example.campusnavigator.utility.OverlayManager;
-import com.example.campusnavigator.utility.callbacks.RouteResultCallback;
 import com.example.campusnavigator.utility.Stack;
 import com.example.campusnavigator.utility.Tuple;
+import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
+import com.example.campusnavigator.utility.callbacks.RouteResultCallback;
 import com.example.campusnavigator.window.MultiRouteWindow;
 import com.example.campusnavigator.window.MultiSelectWindow;
 import com.example.campusnavigator.window.RouteWindow;
@@ -100,21 +100,19 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     DialogHelper.showSpotSearchDialog(this, spot, this);
                     break;
                 case MULTI_SELECT:
-                    try {
-                        List<Position> spotAttachList = Map.spotAttached.get(spot);
-                        if (spotAttachList == null) {
-                            throw new Exception("地点连接点错误");
-                        }
+                    List<Position> spotAttachList = Map.spotAttached.get(spot);
+                    // 检查地点连接点空指针
+                    if (spotAttachList == null) {
+                        Toast.makeText(this, "地点选择错误，请重新选择", Toast.LENGTH_SHORT).show();
+                    } else {
                         Position spotAttach = spotAttachList.get(0);
+                        // 检查重复输入
                         if (spotBuffer.isNotEmpty() && spotAttach.equals(spotBuffer.top())) {
                             Toast.makeText(this, "选择重复", Toast.LENGTH_SHORT).show();
                         } else { // 检查通过，将顶点压入栈中
                             spotBuffer.push(spotAttach);
                             multiSelectWindow.addPosition(spot);
-                            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
                         }
-                    } catch (Exception e) {
-                        onError(e);
                     }
                     break;
                 default:
@@ -170,20 +168,13 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // 多点选择地点监听
         multiSelectWindow.setRouteButtonListener(view -> {
             if (mode == Mode.MULTI_SELECT) {
-                try {
-                    if (spotBuffer.size() < 2) {
-                        // 恢复原状态
-                        multiSelectWindow.close();
-                        searchWindow.open();
-                        spotBuffer.popAll();
-                        throw new Exception("地点数不足2个");
-                    }
+                if (spotBuffer.size() < 2) {
+                    Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
+                } else {
                     mode = Mode.MULTI_ROUTE;
                     multiSelectWindow.close();
                     multiRouteWindow.open();
                     manager.getRoutePlan(spotBuffer, true, this);
-                } catch (Exception e) {
-                    onError(e);
                 }
             }
         });
