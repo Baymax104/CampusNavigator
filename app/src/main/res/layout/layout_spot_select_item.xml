@@ -9,7 +9,7 @@
             android:layout_width="20dp"
             android:layout_height="match_parent"
             android:src="@drawable/spot_location"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="10dp"
             tools:ignore="ContentDescription" />
     <TextView
             android:layout_width="wrap_content"

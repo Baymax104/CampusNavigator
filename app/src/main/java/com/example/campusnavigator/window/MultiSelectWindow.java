@@ -64,14 +64,13 @@ public class MultiSelectWindow extends Window {
         spotRecyclerView.scrollToPosition(adapter.getItemCount() - 1);
     }
 
-    public boolean removePosition() {
+    public void removePosition() throws Exception {
         if (adapter.getItemCount() == 0) {
-            return false;
+            throw new Exception("无选中地点");
         }
         adapter.removeItem();
         selectNumber.setText(String.valueOf(adapter.getItemCount()));
         spotRecyclerView.scrollToPosition(adapter.getItemCount() - 1);
-        return true;
     }
 
     public void removeAllPosition() {

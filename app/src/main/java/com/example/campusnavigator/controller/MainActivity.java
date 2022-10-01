@@ -33,11 +33,11 @@ import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.DialogHelper;
 import com.example.campusnavigator.utility.List;
-import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
 import com.example.campusnavigator.utility.OverlayManager;
-import com.example.campusnavigator.utility.callbacks.RouteResultCallback;
 import com.example.campusnavigator.utility.Stack;
 import com.example.campusnavigator.utility.Tuple;
+import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
+import com.example.campusnavigator.utility.callbacks.RouteResultCallback;
 import com.example.campusnavigator.window.MultiRouteWindow;
 import com.example.campusnavigator.window.MultiSelectWindow;
 import com.example.campusnavigator.window.RouteWindow;
@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                         } else { // 检查通过，将顶点压入栈中
                             spotBuffer.push(spotAttach);
                             multiSelectWindow.addPosition(spot);
-                            Toast.makeText(this, "已选中", Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
                         onError(e);
@@ -170,29 +169,22 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // 多点选择地点监听
         multiSelectWindow.setRouteButtonListener(view -> {
             if (mode == Mode.MULTI_SELECT) {
-                try {
-                    if (spotBuffer.size() < 2) {
-                        // 恢复原状态
-                        multiSelectWindow.close();
-                        searchWindow.open();
-                        spotBuffer.popAll();
-                        throw new Exception("地点数不足2个");
-                    }
+                if (spotBuffer.size() < 2) {
+                    Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
+                } else {
                     mode = Mode.MULTI_ROUTE;
                     multiSelectWindow.close();
                     multiRouteWindow.open();
                     manager.getRoutePlan(spotBuffer, true, this);
-                } catch (Exception e) {
-                    onError(e);
                 }
             }
         });
 
         multiSelectWindow.setSelectRemoveListener(v -> {
-            boolean isCompleted = multiSelectWindow.removePosition();
-            if (isCompleted) {
+            try {
+                multiSelectWindow.removePosition();
                 spotBuffer.pop();
-            } else {
+            } catch (Exception e) {
                 Toast.makeText(this, "无选中顶点", Toast.LENGTH_SHORT).show();
             }
         });
