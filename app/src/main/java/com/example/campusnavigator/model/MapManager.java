@@ -42,12 +42,9 @@ public class MapManager extends Map {
         List<Double> times = new List<>();
         List<List<Tuple<Position, Position>>> routeList = new List<>();
         PriorityType[] types = PriorityType.values();
-        List<Position> spotsList = new List<>();
-        while (spots.isNotEmpty()) {
-            Position pos = spots.top();
-            spots.pop();
-            spotsList.add(pos);
-        }
+        List<Position> spotsList = spots.toList(false); // 转换为List
+        spots.popAll();
+
         List<Tuple<Position, Position>> routeTemp = new List<>();
         for (PriorityType type : types) {
             Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);

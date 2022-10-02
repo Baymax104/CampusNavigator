@@ -13,5 +13,6 @@ public enum Mode {
     SINGLE_ROUTE_OPEN, // 单点显示路径，结果弹窗打开
     SINGLE_ROUTE_CLOSE, // 单点显示路径，结果弹窗关闭
     MULTI_SELECT, // 多点地图选点
-    MULTI_ROUTE // 多点显示路径
+    MULTI_ROUTE_OPEN, // 多点显示路径
+    MULTI_ROUTE_CLOSE
 }

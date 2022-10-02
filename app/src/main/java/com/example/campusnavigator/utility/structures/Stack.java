@@ -64,4 +64,14 @@ public class Stack<T> {
     public int size() {
         return size;
     }
+
+    public List<T> toList(boolean reverse) {
+        List<T> list = new List<>();
+        Node<T> cur = reverse ? head.next : tail;
+        for (int l = size; l > 0; l--) {
+            list.add(cur.value);
+            cur = reverse ? cur.next : cur.pre;
+        }
+        return list;
+    }
 }
