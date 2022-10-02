@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:id="@+id/multi_spot_box"
+        android:layout_height="130dp"
+        android:id="@+id/multi_route_spot_box"
         xmlns:tools="http://schemas.android.com/tools"
         android:background="#eeeeee">
 
     <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/multi_spot_list"
+            android:id="@+id/multi_route_spot_list"
             tools:listitem="@layout/layout_multi_spot_item"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

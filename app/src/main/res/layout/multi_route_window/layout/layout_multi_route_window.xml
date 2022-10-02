@@ -18,11 +18,11 @@
             android:background="#eeeeee">
         <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="70dp"
                 android:orientation="horizontal"
                 tools:ignore="UselessParent"
                 android:background="@drawable/shape_multi_route_info_bg"
-                android:elevation="5dp">
+                android:elevation="3dp">
             <LinearLayout
                     android:layout_width="250dp"
                     android:layout_height="match_parent"
@@ -33,7 +33,7 @@
                 <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/time_info"
+                        android:id="@+id/multi_route_time_info"
                         android:textColor="@color/black"
                         android:textSize="17sp"
                         android:gravity="center"/>
@@ -41,7 +41,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/white"
-                        android:id="@+id/distance_info"
+                        android:id="@+id/multi_route_distance_info"
                         android:textColor="@color/black"
                         android:textSize="17sp"
                         android:gravity="center"/>

@@ -27,7 +27,7 @@ public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.Vi
         TextView spotName;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            spotName = itemView.findViewById(R.id.spot_name);
+            spotName = itemView.findViewById(R.id.search_spot_name);
         }
     }
 
@@ -46,7 +46,7 @@ public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_spot_search_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_search_spot_item, parent, false);
         return new ViewHolder(view);
     }
 

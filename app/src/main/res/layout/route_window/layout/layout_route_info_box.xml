@@ -54,7 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:textColor="@color/black"
-                android:id="@+id/dest_name"
+                android:id="@+id/route_info_dest_name"
                 android:textSize="14sp"
                 android:layout_marginStart="5dp"/>
     </LinearLayout>

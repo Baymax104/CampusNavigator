@@ -24,7 +24,7 @@ public class SearchWindow extends Window {
     public SearchWindow(@NonNull Context context, @NonNull ViewGroup parent) {
         super(R.layout.layout_search_window, context, parent);
         searchField = rootView.findViewById(R.id.search_field);
-        multiSelectEntry = rootView.findViewById(R.id.multi_select_card);
+        multiSelectEntry = rootView.findViewById(R.id.multi_select_entry);
     }
 
     public void setSearchFieldListener(View.OnClickListener listener) {

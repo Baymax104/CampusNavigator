@@ -26,7 +26,7 @@ public class SpotSelectAdapter extends RecyclerView.Adapter<SpotSelectAdapter.Vi
         TextView spotName;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            spotName = itemView.findViewById(R.id.spot_name);
+            spotName = itemView.findViewById(R.id.multi_select_spot_name);
         }
     }
 
@@ -36,7 +36,7 @@ public class SpotSelectAdapter extends RecyclerView.Adapter<SpotSelectAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_spot_select_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_multi_select_spot_item, parent, false);
         return new ViewHolder(view);
     }
 

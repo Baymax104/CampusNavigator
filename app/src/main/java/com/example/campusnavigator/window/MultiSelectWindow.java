@@ -32,10 +32,10 @@ public class MultiSelectWindow extends Window {
 
     public MultiSelectWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_multi_select_window, context, parent);
-        routeButton = rootView.findViewById(R.id.multi_route_button);
-        selectNumber = rootView.findViewById(R.id.select_number);
-        spotRecyclerView = rootView.findViewById(R.id.spot_list);
-        selectRemoveButton = rootView.findViewById(R.id.select_remove);
+        routeButton = rootView.findViewById(R.id.multi_select_button);
+        selectNumber = rootView.findViewById(R.id.multi_select_number);
+        spotRecyclerView = rootView.findViewById(R.id.multi_select_list);
+        selectRemoveButton = rootView.findViewById(R.id.multi_select_remove);
 
         selectNumber.setText("0");
 

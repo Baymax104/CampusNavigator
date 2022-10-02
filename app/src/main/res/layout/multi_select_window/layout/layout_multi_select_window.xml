@@ -20,7 +20,7 @@
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:id="@+id/select_tip"
+                    android:id="@+id/multi_select_tip"
                     android:text="当前选择地点数："
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
@@ -32,8 +32,8 @@
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:id="@+id/select_number"
-                    android:layout_toEndOf="@id/select_tip"
+                    android:id="@+id/multi_select_number"
+                    android:layout_toEndOf="@id/multi_select_tip"
                     android:layout_centerVertical="true"
                     android:gravity="center_vertical"
                     android:textColor="@color/black"
@@ -42,7 +42,7 @@
             <Button
                     android:layout_width="75dp"
                     android:layout_height="36dp"
-                    android:id="@+id/multi_route_button"
+                    android:id="@+id/multi_select_button"
                     android:layout_marginEnd="10dp"
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/selector_route_button"
@@ -65,13 +65,13 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:id="@+id/spot_list"
-                    tools:listitem="@layout/layout_spot_select_item" />
+                    android:id="@+id/multi_select_list"
+                    tools:listitem="@layout/layout_multi_select_spot_item" />
 
             <ImageView
                     android:layout_width="23dp"
                     android:layout_height="23dp"
-                    android:id="@+id/select_remove"
+                    android:id="@+id/multi_select_remove"
                     android:src="@drawable/remove_spot"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="20dp"

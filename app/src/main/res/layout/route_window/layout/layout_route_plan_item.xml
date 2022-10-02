@@ -4,12 +4,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@drawable/shape_plan_item_bg_normal"
-        android:id="@+id/plan_item_view">
+        android:id="@+id/route_plan_item">
     <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:id="@+id/plan_time"
+            android:id="@+id/route_plan_time_info"
             android:textSize="20sp"
             android:textColor="@color/black"
             android:gravity="bottom|center_horizontal"
@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:id="@+id/plan_distance"
+            android:id="@+id/route_plan_distance_info"
             android:textSize="15sp"
             android:textColor="@color/black"
             android:gravity="top|center_horizontal"

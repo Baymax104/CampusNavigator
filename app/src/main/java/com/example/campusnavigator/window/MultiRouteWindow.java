@@ -46,12 +46,12 @@ public class MultiRouteWindow extends Window {
         super(R.layout.layout_multi_route_window, context, parent);
         multiRouteContainer = rootView.findViewById(R.id.multi_route_container);
 
-        timeInfo = multiRouteContainer.findViewById(R.id.time_info);
-        distanceInfo = multiRouteContainer.findViewById(R.id.distance_info);
+        timeInfo = multiRouteContainer.findViewById(R.id.multi_route_time_info);
+        distanceInfo = multiRouteContainer.findViewById(R.id.multi_route_distance_info);
         expendButton = multiRouteContainer.findViewById(R.id.expend_button);
 
         multiSpotBox = LayoutInflater.from(context).inflate(R.layout.layout_multi_spot_box, parent, false);
-        multiSpotList = multiSpotBox.findViewById(R.id.multi_spot_list);
+        multiSpotList = multiSpotBox.findViewById(R.id.multi_route_spot_list);
     }
 
     public int getWindowY() {
@@ -82,13 +82,13 @@ public class MultiRouteWindow extends Window {
     }
 
     public void openSpotBox() {
-        if (multiSpotBox != null && multiRouteContainer.findViewById(R.id.multi_spot_box) == null) {
+        if (multiSpotBox != null && multiRouteContainer.findViewById(R.id.multi_route_spot_box) == null) {
             multiRouteContainer.addView(multiSpotBox);
         }
     }
 
     public void closeSpotBox() {
-        if (multiSpotBox != null && multiRouteContainer.findViewById(R.id.multi_spot_box) != null) {
+        if (multiSpotBox != null && multiRouteContainer.findViewById(R.id.multi_route_spot_box) != null) {
             multiRouteContainer.removeView(multiSpotBox);
         }
     }

@@ -45,10 +45,10 @@ public class RouteWindow extends Window {
         routeContainer = rootView.findViewById(R.id.route_container);
         // 获取布局对象
         expendButton = routeContainer.findViewById(R.id.expend_button);
-        destTxt = routeContainer.findViewById(R.id.dest_name);
+        destTxt = routeContainer.findViewById(R.id.route_info_dest_name);
 
         routePlanBox = LayoutInflater.from(context).inflate(R.layout.layout_route_plan_box, routeContainer, false);
-        planGroup = routePlanBox.findViewById(R.id.plan_group);
+        planGroup = routePlanBox.findViewById(R.id.route_plan_group);
         routeContainer.addView(routePlanBox);
 
         selected = -1;
@@ -111,8 +111,8 @@ public class RouteWindow extends Window {
         }
         for (int i = 0; i < planGroup.getChildCount(); i++) {
             View child = planGroup.getChildAt(i);
-            TextView timeTxt = child.findViewById(R.id.plan_time);
-            TextView distanceTxt = child.findViewById(R.id.plan_distance);
+            TextView timeTxt = child.findViewById(R.id.route_plan_time_info);
+            TextView distanceTxt = child.findViewById(R.id.route_plan_distance_info);
             int time = allTimes.get(i).intValue();
             int distance = allDistances.get(i).intValue();
             timeTxt.setText(String.format(Locale.CHINA, "%d分钟", time));
