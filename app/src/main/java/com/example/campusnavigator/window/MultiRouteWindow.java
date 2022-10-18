@@ -50,7 +50,7 @@ public class MultiRouteWindow extends Window {
         distanceInfo = multiRouteContainer.findViewById(R.id.multi_route_distance_info);
         expendButton = multiRouteContainer.findViewById(R.id.expend_button);
 
-        multiSpotBox = LayoutInflater.from(context).inflate(R.layout.layout_multi_spot_box, parent, false);
+        multiSpotBox = LayoutInflater.from(context).inflate(R.layout.layout_multi_route_spot_box, parent, false);
         multiSpotList = multiSpotBox.findViewById(R.id.multi_route_spot_list);
     }
 

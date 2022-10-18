@@ -39,7 +39,7 @@ public class OverlayHelper {
                 .lineJoinType(PolylineOptions.LineJoinType.LineJoinRound)
                 .setUseTexture(true)
                 .setCustomTexture(BitmapDescriptorFactory.fromResource(R.drawable.line));
-        View markerView = LayoutInflater.from(context).inflate(R.layout.layout_marker_icon, mapView, false);
+        View markerView = LayoutInflater.from(context).inflate(R.layout.icon_marker, mapView, false);
         markerOptions = new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromView(markerView));
         textOptions = new TextOptions()
