@@ -121,8 +121,7 @@ public class RouteWindow extends Window {
 
     public void displayPlan(@NonNull List<List<Position>> plans,
                             int selected,
-                            @NonNull Position myLocation,
-                            @NonNull OverlayHelper operator) {
+                            @NonNull Position myLocation) {
         if (this.selected != selected) { // 若新选中的方案与当前选中不相同，则更新
             this.selected = selected;
             // 设置选中按钮
@@ -130,7 +129,7 @@ public class RouteWindow extends Window {
 
             // 绘制路线
             List<Position> route = plans.get(selected);
-            showRoutes(route, myLocation, operator);
+            showRoutes(route, myLocation);
         }
     }
 
@@ -143,12 +142,11 @@ public class RouteWindow extends Window {
     }
 
     private void showRoutes(@NonNull List<Position> route,
-                           @NonNull Position myLocation,
-                           @NonNull OverlayHelper operator) {
-        operator.removeLines();
+                           @NonNull Position myLocation) {
+        OverlayHelper.removeLines();
         for (Position p : route) {
-            operator.drawLine(p);
+            OverlayHelper.drawLine(p);
         }
-        operator.drawLine(myLocation);
+        OverlayHelper.drawLine(myLocation);
     }
 }

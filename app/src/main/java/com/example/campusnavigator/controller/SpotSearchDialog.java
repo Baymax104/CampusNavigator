@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
-import com.example.campusnavigator.utility.Mode;
 import com.example.campusnavigator.utility.adapters.SpotSearchAdapter;
 import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
 import com.example.campusnavigator.utility.structures.List;
@@ -31,33 +30,23 @@ import com.lxj.xpopup.core.BottomPopupView;
 public class SpotSearchDialog extends BottomPopupView {
     private Context context;
     private PositionProvider provider;
-    private List<String> spotNames;
     private SpotSearchAdapter adapter;
     private SingleSelectListener listener;
-    private String mapSelectResult;
-    private Mode mapMode = Mode.DEFAULT;
-    private String selectSpotName;
+    private String selectResult;
 
     public SpotSearchDialog(@NonNull Context context) {
         super(context);
         this.context = context;
     }
 
-    public SpotSearchDialog(@NonNull Context context, PositionProvider provider, SingleSelectListener listener) {
+    public SpotSearchDialog(@NonNull Context context, PositionProvider provider, SingleSelectListener listener, Position... selectedSpot) {
         super(context);
         this.context = context;
         this.listener = listener;
         this.provider = provider;
-        spotNames = provider.getAllNames();
-    }
-
-    public SpotSearchDialog(@NonNull Context context, Position position, SingleSelectListener listener) {
-        super(context);
-        this.context = context;
-        this.listener = listener;
-        this.mapSelectResult = position.getName();
-        provider = PositionProvider.getInstance(context);
-        spotNames = provider.getAllNames();
+        if (selectedSpot != null && selectedSpot.length > 0) {
+            this.selectResult = selectedSpot[0].getName();
+        }
     }
 
     @Override
@@ -74,13 +63,14 @@ public class SpotSearchDialog extends BottomPopupView {
         Button routeButton = findViewById(R.id.single_route_button);
         MaterialCardView mapSelectCard = findViewById(R.id.select_spot_card);
 
+        List<String> spotNames = provider.getAllNames();
         adapter = new SpotSearchAdapter(spotNames);
         spotsRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         spotsRecyclerView.setLayoutManager(layoutManager);
 
-        if (mapSelectResult != null) {
-            editText.setText(mapSelectResult);
+        if (selectResult != null) {
+            editText.setText(selectResult);
         }
 
         editText.addTextChangedListener(new TextWatcher() {
@@ -95,12 +85,12 @@ public class SpotSearchDialog extends BottomPopupView {
             public void afterTextChanged(Editable editable) {
                 String content = editable.toString();
                 if (content.equals("")) { // 输入为空，重新展示所有地名
-                    spotNames = provider.getAllNames();
                     adapter.setData(spotNames);
                     adapter.notifyDataSetChanged();
                 } else {
-                    List<Position> results = provider.getPosByName(content);
-                    refreshDataSource(results);
+                    List<String> results = fuzzySearch(content, spotNames);
+                    adapter.setData(results);
+                    adapter.notifyDataSetChanged();
                 }
             }
         });
@@ -111,44 +101,28 @@ public class SpotSearchDialog extends BottomPopupView {
         });
 
         mapSelectCard.setOnClickListener(view -> {
-            mapMode = Mode.SINGLE_SELECT;
-            dismiss();
+            dismissWith(() -> listener.onSingleSelect());
         });
 
-        routeButton.setOnClickListener(view -> {
+        routeButton.setOnClickListener(view -> dismissWith(() -> {
             String name = editText.getText().toString();
-            mapMode = Mode.SINGLE_ROUTE_OPEN;
-            selectSpotName = name;
-            dismiss();
-        });
+            Position spot = provider.getPosByName(name);
+            if (spot != null) {
+                listener.onDestReceiveSuccess(spot);
+            } else {
+                listener.onDestReceiveError(new Exception("找不到该地点"));
+            }
+        }));
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void refreshDataSource(List<Position> positionList) {
-        spotNames.clear();
-        for (Position p : positionList) {
-            spotNames.add(p.getName());
-        }
-        adapter.setData(spotNames);
-        adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    protected void doAfterDismiss() {
-        listener.onMapStateChange(mapMode);
-        if (mapMode == Mode.SINGLE_ROUTE_OPEN && selectSpotName != null) {
-            try {
-                Position selectSpot = provider.getPosByName(selectSpotName).get(0);
-                if (selectSpot == null) {
-                    throw new Exception("找不到该地点");
-                }
-                listener.onDestReceiveSuccess(selectSpotName);
-            } catch (Exception e) {
-                listener.onDestReceiveError(e);
-            } finally {
-                super.doAfterDismiss();
+    private List<String> fuzzySearch(String content, List<String> spotNames) {
+        List<String> results = new List<>();
+        for (String name : spotNames) {
+            if (name.equals(content)) {
+                results.add(name);
             }
         }
-        super.doAfterDismiss();
+        return results;
     }
+
 }

@@ -13,17 +13,9 @@ import com.example.campusnavigator.utility.structures.List;
  * @Version 1
  */
 public class PositionProvider extends Map {
-    private static PositionProvider provider;
 
-    private PositionProvider(Context context) {
+    public PositionProvider(Context context) {
         super(context);
-    }
-
-    public static PositionProvider getInstance(Context context) {
-        if (provider == null) {
-            provider = new PositionProvider(context);
-        }
-        return provider;
     }
 
     public List<String> getAllNames() {
@@ -34,15 +26,14 @@ public class PositionProvider extends Map {
         return list;
     }
 
-    public List<Position> getPosByName(String name) {
-        List<Position> results = new List<>();
+    public Position getPosByName(String name) {
         for (int i = 0; i < sizeOfSpot; i++) {
             Position pos = spots[i];
             if (pos.getName() != null && pos.getName().equals(name)) {
-                results.add(pos);
+                return pos;
             }
         }
-        return results;
+        return null;
     }
 
 

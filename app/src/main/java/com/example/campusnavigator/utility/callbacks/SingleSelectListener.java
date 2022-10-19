@@ -1,6 +1,6 @@
 package com.example.campusnavigator.utility.callbacks;
 
-import com.example.campusnavigator.utility.Mode;
+import com.example.campusnavigator.model.Position;
 
 /**
  * @Description
@@ -10,7 +10,7 @@ import com.example.campusnavigator.utility.Mode;
  * @Version 1
  */
 public interface SingleSelectListener {
-    void onMapStateChange(Mode mode);
-    void onDestReceiveSuccess(String name);
+    void onSingleSelect();
+    void onDestReceiveSuccess(Position dest);
     void onDestReceiveError(Exception e);
 }

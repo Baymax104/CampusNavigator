@@ -24,19 +24,13 @@ import java.util.Arrays;
  */
 public class MapManager extends Map {
 
-    private boolean[] visited;
-    private static MapManager manager;
+    private static boolean[] visited;
 
-    private MapManager(Context context) {
+    public MapManager(Context context) {
         super(context);
-        visited = new boolean[size + 1];
-    }
-
-    public static MapManager getInstance(Context context) {
-        if (manager == null) {
-            manager = new MapManager(context);
+        if (visited == null) {
+            visited = new boolean[size + 1];
         }
-        return manager;
     }
 
     private boolean checkResult(RouteResult result) {

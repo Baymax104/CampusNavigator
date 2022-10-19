@@ -7,6 +7,7 @@ import com.example.campusnavigator.controller.SpotSearchDialog;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
+import com.example.campusnavigator.utility.structures.List;
 import com.lxj.xpopup.XPopup;
 
 /**
@@ -18,9 +19,9 @@ import com.lxj.xpopup.XPopup;
  */
 public class DialogHelper {
 
-    public static void showSpotSearchDialog(Context context, PositionProvider provider, SingleSelectListener listener) {
+    public static void showSpotSearchDialog(Context context, PositionProvider provider, SingleSelectListener listener, Position... selectedSpot) {
         new XPopup.Builder(context)
-                .asCustom(new SpotSearchDialog(context, provider, listener))
+                .asCustom(new SpotSearchDialog(context, provider, listener, selectedSpot))
                 .show();
     }
 
@@ -28,12 +29,6 @@ public class DialogHelper {
         new XPopup.Builder(context)
                 .isDestroyOnDismiss(true)
                 .asCustom(new PrivacyConfirmDialog(context))
-                .show();
-    }
-
-    public static void showSpotSearchDialog(Context context, Position position, SingleSelectListener listener) {
-        new XPopup.Builder(context)
-                .asCustom(new SpotSearchDialog(context, position, listener))
                 .show();
     }
 }

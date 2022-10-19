@@ -128,10 +128,10 @@ public class MultiRouteWindow extends Window {
     }
 
 
-    public void displayRoute(@NonNull List<Position> route, OverlayHelper operator) {
-        operator.removeLines();
+    public void displayRoute(@NonNull List<Position> route) {
+        OverlayHelper.removeLines();
         for (Position p : route) {
-            operator.drawLine(p);
+            OverlayHelper.drawLine(p);
         }
     }
 }

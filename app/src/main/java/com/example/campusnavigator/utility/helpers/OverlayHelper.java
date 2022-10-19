@@ -24,15 +24,17 @@ import com.example.campusnavigator.utility.structures.List;
  * @Version 1
  */
 public class OverlayHelper {
-    private AMap map;
-    private List<Polyline> lineBuffer;
-    private PolylineOptions lineStyle;
-    private MarkerOptions markerOptions;
-    private TextOptions textOptions;
-    private static OverlayHelper overlayHelper;
+    private static AMap map;
+    private static List<Polyline> lineBuffer;
+    private static PolylineOptions lineStyle;
+    private static MarkerOptions markerOptions;
+    private static TextOptions textOptions;
 
-    private OverlayHelper(AMap map, MapView mapView, Context context) {
-        this.map = map;
+    private OverlayHelper() {
+    }
+
+    public static void bind(AMap amap, MapView mapView, Context context) {
+        map = amap;
         lineBuffer = new List<>();
         lineStyle = new PolylineOptions()
                 .width(40)
@@ -47,28 +49,21 @@ public class OverlayHelper {
                 .backgroundColor(Color.TRANSPARENT);
     }
 
-    public static OverlayHelper getInstance(AMap map, MapView mapView, Context context) {
-        if (overlayHelper == null) {
-            overlayHelper = new OverlayHelper(map, mapView, context);
-        }
-        return overlayHelper;
-    }
-
-    public void drawLine(Position ...destination) {
+    public static void drawLine(Position ...destination) {
         for (Position p : destination) {
             Polyline polyline = map.addPolyline(lineStyle.add(p.getLatLng()));
             lineBuffer.add(polyline);
         }
     }
-    public void drawMarker(Position position) {
+    public static void drawMarker(Position position) {
         map.addMarker(markerOptions.position(position.getLatLng()));
     }
 
-    public void drawText(Position position, String text) {
+    public static void drawText(Position position, String text) {
         map.addText(textOptions.position(position.getLatLng()).text(text));
     }
 
-    public void removeLines() {
+    public static void removeLines() {
         for (Polyline line : lineBuffer) {
             line.remove();
         }
