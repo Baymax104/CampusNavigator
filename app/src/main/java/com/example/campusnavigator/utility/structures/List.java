@@ -63,6 +63,18 @@ public class List<T> implements Iterable<T>, RandomAccess {
         array = Arrays.copyOf(array, newCapacity);
     }
 
+    public static <T> void reverse(List<T> l) {
+        int i = 0;
+        int j = l.size - 1;
+        while (i < j) {
+            T t = l.array[i];
+            l.array[i] = l.array[j];
+            l.array[j] = t;
+            i++;
+            j--;
+        }
+    }
+
     @NonNull
     @Override
     public Iterator<T> iterator() {

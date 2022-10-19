@@ -79,6 +79,8 @@ public class MultiRouteWindow extends Window {
 
     public void notifyRouteInfo(Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
         List<Position> dests = destBuffer.toList(true);
+        List.reverse(times);
+        List.reverse(dists);
         setRouteInfo(times, dists);
         setSpotInfo(dests, times, dists);
     }

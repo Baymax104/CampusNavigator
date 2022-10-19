@@ -32,7 +32,6 @@ import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.model.RouteResult;
-import com.example.campusnavigator.utility.Mode;
 import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
 import com.example.campusnavigator.utility.callbacks.RouteResultReceiver;
 import com.example.campusnavigator.utility.helpers.DialogHelper;
