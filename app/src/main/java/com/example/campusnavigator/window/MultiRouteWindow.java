@@ -18,7 +18,7 @@ import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.adapters.MultiSpotAdapter;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
 import com.example.campusnavigator.utility.structures.List;
-import com.example.campusnavigator.utility.structures.Tuple;
+import com.example.campusnavigator.utility.structures.Stack;
 
 import java.util.Locale;
 
@@ -52,6 +52,11 @@ public class MultiRouteWindow extends Window {
 
         multiSpotBox = LayoutInflater.from(context).inflate(R.layout.layout_multi_route_spot_box, parent, false);
         multiSpotList = multiSpotBox.findViewById(R.id.multi_route_spot_list);
+
+        adapter = new MultiSpotAdapter();
+        multiSpotList.setAdapter(adapter);
+        LinearLayoutManager manager = new LinearLayoutManager(context);
+        multiSpotList.setLayoutManager(manager);
     }
 
     public int getWindowY() {
@@ -72,13 +77,42 @@ public class MultiRouteWindow extends Window {
         }
     }
 
-    public void setRouteInfo(Double time, Double dist) {
-        int t = time.intValue();
-        int d = dist.intValue();
+    public void notifyRouteInfo(Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
+        List<Position> dests = destBuffer.toList(true);
+        setRouteInfo(times, dists);
+        setSpotInfo(dests, times, dists);
+    }
+
+    private void setRouteInfo(List<Double> times, List<Double> dists) {
+        Double td = 0.0;
+        Double dd = 0.0;
+        for (Double t : times) {
+            td += t;
+        }
+        for (Double d : dists) {
+            dd += d;
+        }
+        int t = td.intValue();
+        int d = dd.intValue();
         if (timeInfo != null && distanceInfo != null) {
             timeInfo.setText(String.format(Locale.CHINA, "%d分钟", t));
             distanceInfo.setText(String.format(Locale.CHINA, "%d米", d));
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void setSpotInfo(List<Position> dests, List<Double> times, List<Double> dists) {
+        List<MultiSpotAdapter.Item> data = new List<>();
+        for (int i = 0; i < dests.length(); i++) {
+            MultiSpotAdapter.Item item = new MultiSpotAdapter.Item(
+                    dests.get(i).getName(),
+                    (i == 0) ? 0.0 : times.get(i - 1),
+                    (i == 0) ? 0.0 : dists.get(i - 1)
+            );
+            data.add(item);
+        }
+        adapter.setData(data);
+        adapter.notifyDataSetChanged();
     }
 
     public void openSpotBox() {
@@ -93,29 +127,11 @@ public class MultiRouteWindow extends Window {
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    public void setSpotData(List<Position> data) {
-        if (adapter == null) {
-            adapter = new MultiSpotAdapter(data);
-            multiSpotList.setAdapter(adapter);
-            LinearLayoutManager manager = new LinearLayoutManager(context);
-            multiSpotList.setLayoutManager(manager);
-        } else {
-            adapter.setData(data);
-            adapter.notifyDataSetChanged();
-        }
-    }
 
-
-    public void displayRoute(@NonNull List<Tuple<Position, Position>> route, OverlayHelper operator) {
+    public void displayRoute(@NonNull List<Position> route, OverlayHelper operator) {
         operator.removeLines();
-        for (int i = 0; i < route.length(); i++) {
-            Tuple<Position, Position> p = route.get(i);
-            if (i == 0) {
-                operator.drawLine(p.first, p.second);
-            } else {
-                operator.drawLine(p.second);
-            }
+        for (Position p : route) {
+            operator.drawLine(p);
         }
     }
 }

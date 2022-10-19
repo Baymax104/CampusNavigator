@@ -31,21 +31,21 @@ import com.example.campusnavigator.model.Map;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
+import com.example.campusnavigator.model.RouteResult;
 import com.example.campusnavigator.utility.Mode;
-import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
-import com.example.campusnavigator.utility.callbacks.RouteResultCallback;
+import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
+import com.example.campusnavigator.utility.callbacks.RouteResultReceiver;
 import com.example.campusnavigator.utility.helpers.DialogHelper;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.Stack;
-import com.example.campusnavigator.utility.structures.Tuple;
 import com.example.campusnavigator.window.MultiRouteWindow;
 import com.example.campusnavigator.window.MultiSelectWindow;
 import com.example.campusnavigator.window.RouteWindow;
 import com.example.campusnavigator.window.SearchWindow;
 
 
-public class MainActivity extends AppCompatActivity implements LocationSource, AMapLocationListener, RouteResultCallback, OnSpotSelectListener {
+public class MainActivity extends AppCompatActivity implements LocationSource, AMapLocationListener, RouteResultReceiver, SingleSelectListener {
     private MapView mapView;
     private AMap map = null;
 
@@ -68,9 +68,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private AMapLocationClient locationClient; // 定位启动和销毁类
 
     // 路径计算结果
-    private List<List<Tuple<Position, Position>>> routeOfPlans = new List<>();
-    private List<Double> distanceOfPlans = new List<>();
-    private List<Double> timeOfPlans = new List<>();
+    private List<RouteResult> routeResults = new List<>();
 
 
     @Override
@@ -169,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         // searchWindow对象监听
-        searchWindow.setSearchFieldListener(view -> DialogHelper.showSpotSearchDialog(this, this));
+        searchWindow.setSearchFieldListener(view -> DialogHelper.showSpotSearchDialog(this, provider, this));
 
         searchWindow.setMultiSelectEntryListener(view -> {
             if (mode == Mode.DEFAULT) { // 由初始状态切换到多点选择状态
@@ -186,7 +184,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
                 } else {
                     mode = Mode.MULTI_ROUTE_OPEN;
-                    manager.getRoutePlan(spotBuffer, true, this);
+                    try {
+                        manager.calculateRoutePlan(spotBuffer, true, this);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -219,7 +221,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             final int selected = i;
             routeWindow.setPlanListener(i, v -> {
                 routeWindow.refreshSelected();
-                routeWindow.displayPlan(routeOfPlans, selected, myLocation, overlayHelper);
+                List<List<Position>> route = RouteResult.extractRoute(routeResults);
+                routeWindow.displayPlan(route, selected, myLocation, overlayHelper);
             });
         }
 
@@ -297,10 +300,19 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onDestReceiveSuccess(String name) {
-        overlayHelper.removeLines(); // 清除线段
         routeWindow.setDestName(name);
-
         Position destPosition = provider.getPosByName(name).get(0);
+        calculateRoute(destPosition);
+    }
+
+    @Override
+    public void onDestReceiveError(Exception e) {
+        mode = Mode.DEFAULT; // 恢复到初始状态
+        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        Log.e("MainActivity", e.toString());
+    }
+
+    private void calculateRoute(Position destPosition) {
         try {
             // 判断当前定位点是否存在
             if (myLocation == null) {
@@ -311,87 +323,82 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             List<Position> attachPos = manager.attachToMap(myLocation);
             // 获取目的地邻接点，目的地邻接点表spotAttached
             List<Position> spotAttached = Map.spotAttached.get(destPosition);
-            if (attachPos == null || attachPos.length() == 0 || spotAttached == null) {
+            if (attachPos == null || attachPos.length() == 0 ||
+                    spotAttached == null || spotAttached.length() == 0) {
                 throw new Exception("连接点错误");
             }
 
             // 清空先前的结果
-            routeOfPlans.clear();
-            distanceOfPlans.clear();
-            timeOfPlans.clear();
+            routeResults.clear();
 
             // 计算连接点到目的地的路径方案，共有2nm种方案
             for (Position attach : attachPos) {
                 for (Position dest : spotAttached) {
+                    if (attach == null || dest == null) {
+                        throw new Exception("连接点错误");
+                    }
                     spotBuffer.push(attach);
                     spotBuffer.push(dest);
                     // 对于每一对起点和终点有2种方案
-                    manager.getRoutePlan(spotBuffer, false, this);
+                    manager.calculateRoutePlan(spotBuffer, false, this);
                 }
             }
 
-            // 在循环中经过onSuccess()生成规划结果数据，之后展示方案
+            // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
+            List<List<Position>> routes = RouteResult.extractRoute(routeResults);
+            List<Double> times = RouteResult.extractTime(routeResults);
+            List<Double> distances = RouteResult.extractDist(routeResults);
             // 初始化数据
-            routeWindow.setPlansInfo(timeOfPlans, distanceOfPlans);
+            routeWindow.notifyRouteInfo(times, distances);
             routeWindow.refreshSelected();
             // 展示
-            routeWindow.displayPlan(routeOfPlans, 0, myLocation, overlayHelper);
-            // 清空展示之前的临时数据
-            // 在getRoutePlan中清空栈
+            routeWindow.displayPlan(routes, 0, myLocation, overlayHelper);
             // 更换布局
             searchWindow.close();
             routeWindow.open();
             routeWindow.openPlanBox();
         } catch (Exception e) {
-            onDestReceiveError(e);
+            mode = Mode.DEFAULT;
+            String errorMsg = "计算错误：" + e.getMessage();
+            Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+            Log.e("MainActivity", errorMsg);
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void onDestReceiveError(Exception e) {
-        mode = Mode.DEFAULT; // 恢复到初始状态
-        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        Log.e("MainActivity", e.toString());
-    }
-
-    @Override
-    public void onSuccess(List<List<Tuple<Position, Position>>> results, List<Double> distances, List<Double> times, boolean isMultiSpot) {
-        // 该方法传入路径计算结果并保存
-        if (!isMultiSpot) {
-            // 每一对起点和终点返回2种方案，向容器中添加方案
-            for (int i = 0; i < 2; i++) {
-                List<Tuple<Position, Position>> result = results.get(i);
-                double dist = distances.get(i);
-                double time = times.get(i);
-                routeOfPlans.add(result);
-                distanceOfPlans.add(dist);
-                timeOfPlans.add(time);
-            }
-        } else {
-            // 多地点只有一种方案，直接提取方案进行展示
-            List<Tuple<Position, Position>> route = results.get(0);
-            Double dist = distances.get(0);
-            Double time = times.get(0);
-            // 初始化数据
-            multiRouteWindow.setRouteInfo(time, dist);
-            multiRouteWindow.setSpotData(destBuffer.toList(true));
-            // 展示
-            multiRouteWindow.displayRoute(route, overlayHelper);
-            // 清空展示之前的临时数据
-            multiSelectWindow.removeAllPosition();
-            destBuffer.popAll();
-            // 更换布局
-            multiSelectWindow.close();
-            multiRouteWindow.open();
-            multiRouteWindow.openSpotBox();
+    public void onSingleRouteReceive(List<RouteResult> results) {
+        // 每一对起点和终点返回2种方案，向容器中添加方案
+        for (int i = 0; i < 2; i++) {
+            RouteResult result = results.get(i);
+            routeResults.add(result);
         }
     }
 
     @Override
+    public void onMultiRouteReceive(List<RouteResult> results) {
+        // 多地点只有一种方案，包含到多个地点的路径
+        List<Position> route = RouteResult.combineRoute(results);
+        List<Double> times = RouteResult.extractTime(results);
+        List<Double> distances = RouteResult.extractDist(results);
+        // 初始化数据
+        multiRouteWindow.notifyRouteInfo(destBuffer, times, distances);
+        // 展示
+        multiRouteWindow.displayRoute(route, overlayHelper);
+        // 清空展示之前的临时数据
+        multiSelectWindow.removeAllPosition();
+        destBuffer.popAll();
+        // 更换布局
+        multiSelectWindow.close();
+        multiRouteWindow.open();
+        multiRouteWindow.openSpotBox();
+    }
+
     public void onError(Exception e) {
         mode = Mode.DEFAULT;
         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         Log.e("MainActivity", e.toString());
+        e.printStackTrace();
     }
 
     @Override

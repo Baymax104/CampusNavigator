@@ -15,7 +15,6 @@ import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
 import com.example.campusnavigator.utility.structures.List;
-import com.example.campusnavigator.utility.structures.Tuple;
 
 import java.util.Locale;
 
@@ -105,22 +104,22 @@ public class RouteWindow extends Window {
         child.setOnClickListener(listener);
     }
 
-    public void setPlansInfo(@NonNull List<Double> allTimes, @NonNull List<Double> allDistances) {
-        if (allTimes.length() == 0 || allDistances.length() == 0) {
+    public void notifyRouteInfo(@NonNull List<Double> times, @NonNull List<Double> distances) {
+        if (times.length() == 0 || distances.length() == 0) {
             return;
         }
         for (int i = 0; i < planGroup.getChildCount(); i++) {
             View child = planGroup.getChildAt(i);
             TextView timeTxt = child.findViewById(R.id.route_plan_time_info);
             TextView distanceTxt = child.findViewById(R.id.route_plan_distance_info);
-            int time = allTimes.get(i).intValue();
-            int distance = allDistances.get(i).intValue();
+            int time = times.get(i).intValue();
+            int distance = distances.get(i).intValue();
             timeTxt.setText(String.format(Locale.CHINA, "%d分钟", time));
             distanceTxt.setText(String.format(Locale.CHINA, "%d米", distance));
         }
     }
 
-    public void displayPlan(@NonNull List<List<Tuple<Position, Position>>> plans,
+    public void displayPlan(@NonNull List<List<Position>> plans,
                             int selected,
                             @NonNull Position myLocation,
                             @NonNull OverlayHelper operator) {
@@ -130,7 +129,7 @@ public class RouteWindow extends Window {
             setSelectedPlan(selected);
 
             // 绘制路线
-            List<Tuple<Position, Position>> route = plans.get(selected);
+            List<Position> route = plans.get(selected);
             showRoutes(route, myLocation, operator);
         }
     }
@@ -143,17 +142,12 @@ public class RouteWindow extends Window {
         }
     }
 
-    private void showRoutes(@NonNull List<Tuple<Position, Position>> route,
+    private void showRoutes(@NonNull List<Position> route,
                            @NonNull Position myLocation,
                            @NonNull OverlayHelper operator) {
         operator.removeLines();
-        for (int i = 0; i < route.length(); i++) {
-            Tuple<Position, Position> p = route.get(i);
-            if (i == 0) {
-                operator.drawLine(p.first, p.second);
-            } else {
-                operator.drawLine(p.second);
-            }
+        for (Position p : route) {
+            operator.drawLine(p);
         }
         operator.drawLine(myLocation);
     }

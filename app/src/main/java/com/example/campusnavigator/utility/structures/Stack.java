@@ -52,9 +52,8 @@ public class Stack<T> {
     }
 
     public void popAll() {
-        while (isNotEmpty()) {
-            pop();
-        }
+        tail = head;
+        size = 0;
     }
 
     public boolean isNotEmpty() {

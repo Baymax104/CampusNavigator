@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -12,16 +12,30 @@
             android:layout_width="20dp"
             android:layout_height="match_parent"
             android:src="@drawable/spot_location"
+            android:id="@+id/multi_route_spot_img"
             tools:ignore="ContentDescription"
             android:layout_marginStart="15dp"
-            android:layout_marginEnd="10dp"/>
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentStart="true"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:id="@+id/multi_spot_name"
+            android:id="@+id/multi_route_spot_name"
+            android:layout_toEndOf="@id/multi_route_spot_img"
             android:textSize="15sp"
             android:textColor="@color/black"
             android:gravity="center"
             android:maxLines="1"
             android:ellipsize="end" />
-</LinearLayout>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/multi_route_spot_info"
+            android:textSize="12sp"
+            android:textColor="#757575"
+            android:maxLines="1"
+            android:gravity="center_vertical"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="15dp" />
+
+</RelativeLayout>

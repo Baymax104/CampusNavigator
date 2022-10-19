@@ -6,11 +6,13 @@ import androidx.annotation.NonNull;
 
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
-import com.example.campusnavigator.utility.callbacks.RouteResultCallback;
+import com.example.campusnavigator.utility.callbacks.RouteResultReceiver;
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.MinHeap;
 import com.example.campusnavigator.utility.structures.Stack;
 import com.example.campusnavigator.utility.structures.Tuple;
+
+import java.util.Arrays;
 
 
 /**
@@ -37,96 +39,93 @@ public class MapManager extends Map {
         return manager;
     }
 
-    public void getRoutePlan(Stack<Position> spots, boolean isMultiSpot, RouteResultCallback callback) {
-        List<Double> distances = new List<>();
-        List<Double> times = new List<>();
-        List<List<Tuple<Position, Position>>> routeList = new List<>();
+    private boolean checkResult(RouteResult result) {
+        return result != null &&
+                result.getRoute() != null && result.getRoute().length() != 0 &&
+                result.getTime() != null && !result.getTime().isInfinite() &&
+                result.getDist() != null && !result.getDist().isInfinite();
+    }
+
+    public void calculateRoutePlan(Stack<Position> spotBuffer, boolean isMultiSpot, RouteResultReceiver receiver) throws Exception {
+        if (isMultiSpot) {
+            List<RouteResult> results = getMultiDestRoute(spotBuffer);
+            for (RouteResult result : results) {
+                if (!checkResult(result)) {
+                    throw new Exception("多点结果错误");
+                }
+            }
+            receiver.onMultiRouteReceive(results);
+            return;
+        }
         PriorityType[] types = PriorityType.values();
-        List<Position> spotsList = spots.toList(false); // 转换为List
-        spots.popAll();
-
-        List<Tuple<Position, Position>> routeTemp = new List<>();
+        List<RouteResult> results = new List<>();
+        Position to = spotBuffer.top();
+        spotBuffer.pop();
+        Position from = spotBuffer.top();
+        spotBuffer.pop();
         for (PriorityType type : types) {
-            Tuple<Double, Double> distAndTime = getMultiDestRoute(spotsList, type, routeTemp);
-            double distance = distAndTime.first;
-            double time = distAndTime.second;
-            List<Tuple<Position, Position>> routes = new List<>(routeTemp);
-            distances.add(distance);
-            times.add(time);
-            routeList.add(routes);
-            routeTemp.clear();
-            if (type == PriorityType.DISTANCE && isMultiSpot) {
-                break; // 若当前计算为距离优先且isMultiSpot = true，直接跳出循环
+            RouteResult result = getSingleDestRoute(from, to, type);
+            if (!checkResult(result)) {
+                throw new Exception("单点结果错误");
             }
+            results.add(result);
         }
-        callback.onSuccess(routeList, distances, times, isMultiSpot);
+        receiver.onSingleRouteReceive(results);
     }
 
-    public Tuple<Double, Double> getMultiDestRoute(List<Position> spotsList, PriorityType type, @ NonNull List<Tuple<Position, Position>> routes) {
-        List<Path> singleRouteResult = new List<>();
-        List<Double> distList = new List<>();
-        List<Double> timeList = new List<>();
-        int toIndex = 0;
-        int fromIndex = 1;
+    public List<RouteResult> getMultiDestRoute(Stack<Position> spotBuffer) {
+        List<RouteResult> results = new List<>();
+        Position to = spotBuffer.top();
+        spotBuffer.pop();
 
-        while (fromIndex < spotsList.length()) {
-            Position to = spotsList.get(toIndex);
-            Position from = spotsList.get(fromIndex);
-            Tuple<Double, Double> distAndTime = getSingleDestRoute(from, to, type, singleRouteResult);
-            distList.add(distAndTime.first);
-            timeList.add(distAndTime.second);
-            for (Path path : singleRouteResult) {
-                Position p1 = positions[path.from];
-                Position p2 = positions[path.to];
-                routes.add(new Tuple<>(p1, p2));
-            }
-            singleRouteResult.clear();
-            toIndex = fromIndex;
-            fromIndex++;
+        while (spotBuffer.isNotEmpty()) {
+            Position from = spotBuffer.top();
+            spotBuffer.pop();
+            RouteResult singleDestRoute = getSingleDestRoute(from, to, PriorityType.DISTANCE);
+            results.add(singleDestRoute);
+            to = from;
         }
 
-        double totalDistance = 0;
-        double totalTime = 0;
-        for (double dist : distList) {
-            totalDistance += dist;
-        }
-        for (double t : timeList) {
-            totalTime += t;
-        }
-        return new Tuple<>(totalDistance, totalTime);
+        return results;
     }
 
-    public Tuple<Double, Double> getSingleDestRoute(@NonNull Position from, @NonNull Position to, PriorityType type, List<Path> results) {
+    public RouteResult getSingleDestRoute(@NonNull Position from, @NonNull Position to, PriorityType type) {
+        List<Position> route = new List<>();
         int[] paths = new int[size];
+        Arrays.fill(paths, -1);
+
         int fromId = from.getId();
         int toId = to.getId();
-        Tuple<double[], double[]> distAndTime = Astar(fromId, toId, type, paths);
-        double[] distList = distAndTime.first;
-        double[] timeList = distAndTime.second;
-        double dist = distList[toId];
-        double time = timeList[toId];
+
+        Tuple<Double, Double> timeAndDist = Astar(fromId, toId, type, paths);
+
+        double time = timeAndDist.first;
+        double dist = timeAndDist.second;
         // 生成的路线为逆序
+        Path path = map[toId][paths[toId]];
+        Position startPoint = positions[path.from];
+        route.add(startPoint);
         while (paths[toId] != -1) {
-            Path path = map[toId][paths[toId]];
-            results.add(path);
+            path = map[toId][paths[toId]];
+            Position p = positions[path.to];
+            route.add(p);
             toId = paths[toId];
         }
-        return new Tuple<>(dist, time);
+        return new RouteResult(route, time, dist);
     }
 
-    public Tuple<double[], double[]> Astar(int source, int dest, @NonNull PriorityType type, @NonNull int[] paths) {
+    public Tuple<Double, Double> Astar(int source, int dest, @NonNull PriorityType type, @NonNull int[] paths) {
         double[] cost = new double[size];
         double[] dist = new double[size];
         double[] time = new double[size];
 
         int v = source;
         MinHeap<Integer, Double> heap = new MinHeap<>();
-        for (int i = 0; i < size; i++) {
-            cost[i] = INF;
-            dist[i] = INF;
-            time[i] = INF;
-            paths[i] = -1;
-        }
+
+        // 初始化
+        Arrays.fill(cost, INF);
+        Arrays.fill(dist, INF);
+        Arrays.fill(time, INF);
         cost[v] = 0;
         dist[v] = 0;
         time[v] = 0;
@@ -163,7 +162,7 @@ public class MapManager extends Map {
             }
         }
         refreshVisited();
-        return new Tuple<>(dist, time);
+        return new Tuple<>(time[dest], dist[dest]);
     }
 
     private void refreshVisited() {

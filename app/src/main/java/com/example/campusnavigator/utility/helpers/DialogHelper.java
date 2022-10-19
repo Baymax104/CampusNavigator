@@ -5,7 +5,8 @@ import android.content.Context;
 import com.example.campusnavigator.controller.PrivacyConfirmDialog;
 import com.example.campusnavigator.controller.SpotSearchDialog;
 import com.example.campusnavigator.model.Position;
-import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
+import com.example.campusnavigator.model.PositionProvider;
+import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
 import com.lxj.xpopup.XPopup;
 
 /**
@@ -17,9 +18,9 @@ import com.lxj.xpopup.XPopup;
  */
 public class DialogHelper {
 
-    public static void showSpotSearchDialog(Context context, OnSpotSelectListener listener) {
+    public static void showSpotSearchDialog(Context context, PositionProvider provider, SingleSelectListener listener) {
         new XPopup.Builder(context)
-                .asCustom(new SpotSearchDialog(context, listener))
+                .asCustom(new SpotSearchDialog(context, provider, listener))
                 .show();
     }
 
@@ -30,7 +31,7 @@ public class DialogHelper {
                 .show();
     }
 
-    public static void showSpotSearchDialog(Context context, Position position, OnSpotSelectListener listener) {
+    public static void showSpotSearchDialog(Context context, Position position, SingleSelectListener listener) {
         new XPopup.Builder(context)
                 .asCustom(new SpotSearchDialog(context, position, listener))
                 .show();

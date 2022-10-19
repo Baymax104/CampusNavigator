@@ -16,7 +16,7 @@ import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.Mode;
 import com.example.campusnavigator.utility.adapters.SpotSearchAdapter;
-import com.example.campusnavigator.utility.callbacks.OnSpotSelectListener;
+import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
 import com.example.campusnavigator.utility.structures.List;
 import com.google.android.material.card.MaterialCardView;
 import com.lxj.xpopup.core.BottomPopupView;
@@ -33,7 +33,7 @@ public class SpotSearchDialog extends BottomPopupView {
     private PositionProvider provider;
     private List<String> spotNames;
     private SpotSearchAdapter adapter;
-    private OnSpotSelectListener listener;
+    private SingleSelectListener listener;
     private String mapSelectResult;
     private Mode mapMode = Mode.DEFAULT;
     private String selectSpotName;
@@ -43,15 +43,15 @@ public class SpotSearchDialog extends BottomPopupView {
         this.context = context;
     }
 
-    public SpotSearchDialog(@NonNull Context context, OnSpotSelectListener listener) {
+    public SpotSearchDialog(@NonNull Context context, PositionProvider provider, SingleSelectListener listener) {
         super(context);
         this.context = context;
         this.listener = listener;
-        provider = PositionProvider.getInstance(context);
+        this.provider = provider;
         spotNames = provider.getAllNames();
     }
 
-    public SpotSearchDialog(@NonNull Context context, Position position, OnSpotSelectListener listener) {
+    public SpotSearchDialog(@NonNull Context context, Position position, SingleSelectListener listener) {
         super(context);
         this.context = context;
         this.listener = listener;

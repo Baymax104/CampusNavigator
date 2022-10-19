@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.utility.structures.List;
-import com.example.campusnavigator.utility.callbacks.OnItemClickedListener;
+import com.example.campusnavigator.utility.callbacks.ItemClickedListener;
 
 /**
  * @Description
@@ -21,7 +21,7 @@ import com.example.campusnavigator.utility.callbacks.OnItemClickedListener;
  */
 public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.ViewHolder> {
     private List<String> data;
-    private OnItemClickedListener itemClickListener;
+    private ItemClickedListener itemClickListener;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView spotName;
@@ -39,7 +39,7 @@ public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.Vi
         this.data = data;
     }
 
-    public void setItemClickListener(OnItemClickedListener itemClickListener) {
+    public void setItemClickListener(ItemClickedListener itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
 

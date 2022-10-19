@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.RandomAccess;
 
 /**
  * @Description
@@ -13,7 +14,7 @@ import java.util.Iterator;
  * @Date 2022/9/1 13:45
  * @Version 1
  */
-public class List<T> implements Iterable<T> {
+public class List<T> implements Iterable<T>, RandomAccess {
     private static final int MAX_SIZE = 80;
     @SuppressWarnings("unchecked")
     private T[] array = (T[]) new Object[MAX_SIZE];
@@ -41,10 +42,6 @@ public class List<T> implements Iterable<T> {
             return null;
         }
         return array[i];
-    }
-
-    public T back() {
-        return (size > 0) ? array[size - 1] : null;
     }
 
     public void popBack() {

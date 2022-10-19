@@ -7,6 +7,6 @@ package com.example.campusnavigator.utility.callbacks;
  * @Date 2022/9/5 16:06
  * @Version 1
  */
-public interface OnItemClickedListener {
+public interface ItemClickedListener {
     void onItemClicked(int position);
 }

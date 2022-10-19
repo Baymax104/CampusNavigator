@@ -26,7 +26,7 @@ import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
 public class MultiSelectWindow extends Window {
     private Button routeButton;
     private TextView selectNumber;
-    private ImageView selectRemoveButton;
+    private ImageView removeButton;
     private RecyclerView spotRecyclerView;
     private SpotSelectAdapter adapter;
 
@@ -35,7 +35,7 @@ public class MultiSelectWindow extends Window {
         routeButton = rootView.findViewById(R.id.multi_select_button);
         selectNumber = rootView.findViewById(R.id.multi_select_number);
         spotRecyclerView = rootView.findViewById(R.id.multi_select_list);
-        selectRemoveButton = rootView.findViewById(R.id.multi_select_remove);
+        removeButton = rootView.findViewById(R.id.multi_select_remove);
 
         selectNumber.setText("0");
 
@@ -58,7 +58,7 @@ public class MultiSelectWindow extends Window {
     }
 
     public void setSelectRemoveListener(View.OnClickListener listener) {
-        selectRemoveButton.setOnClickListener(listener);
+        removeButton.setOnClickListener(listener);
     }
 
     public void addPosition(Position position) {
