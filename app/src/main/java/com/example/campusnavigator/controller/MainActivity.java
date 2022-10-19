@@ -169,8 +169,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         searchWindow.setSearchFieldListener(view -> {
             if (mode == Mode.DEFAULT) {
                 DialogHelper.showSpotSearchDialog(this, provider, this);
-            } else if (mode == Mode.SINGLE_SELECT) {
-                Toast.makeText(this, "地图选点中，按返回键返回", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -298,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     @Override
     public void onSingleSelect() {
         Toast.makeText(this, "请选择你想去的地点~", Toast.LENGTH_SHORT).show();
+        searchWindow.close();
         mode = Mode.SINGLE_SELECT;
     }
 
@@ -400,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     @Override
     public void onBackPressed() {
         if (mode == Mode.SINGLE_SELECT) {
-            // TODO 可能可以展示选择的地点
+            searchWindow.open();
             mode = Mode.DEFAULT;
         } else if (mode == Mode.SINGLE_ROUTE_OPEN || mode == Mode.SINGLE_ROUTE_CLOSE) { // 若当前处于单点路径结果弹窗
             routeWindow.close();
