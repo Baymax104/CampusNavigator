@@ -172,7 +172,7 @@ public class MapManager extends Map {
         MinHeap<Integer, Double> minDist = new MinHeap<>();
         for (int i = 0; i < size; i++) {
             if (checkDirection(myPosition, positions[i], destPosition)) {
-                double distance = getDistanceById(myPosition.getId(), i);
+                double distance = getDistanceByPosition(myPosition, positions[i]);
                 minDist.push(i, distance);
             }
         }

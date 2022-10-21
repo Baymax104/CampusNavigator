@@ -153,4 +153,10 @@ public class Map {
         LatLng l2 = positions[p2].getLatLng();
         return AMapUtils.calculateLineDistance(l1, l2);
     }
+
+    protected static double getDistanceByPosition(Position p1, Position p2) {
+        LatLng l1 = p1.getLatLng();
+        LatLng l2 = p2.getLatLng();
+        return AMapUtils.calculateLineDistance(l1, l2);
+    }
 }

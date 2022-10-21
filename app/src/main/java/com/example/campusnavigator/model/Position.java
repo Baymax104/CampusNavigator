@@ -85,11 +85,7 @@ public class Position {
             1.用于判断连接点输入是否重复(name = null)
             2.用于查找时判断键值Position是否相同(name != null)
              */
-            if (name == null && other.name == null) {
-                return id == other.id && lat == other.lat && lng == other.lng;
-            } else if (name != null && other.name != null) {
-                return id == other.id && lat == other.lat && lng == other.lng && name.equals(other.name);
-            }
+            return id == other.id && lat == other.lat && lng == other.lng;
         }
         return false;
     }
