@@ -16,6 +16,7 @@ public class Position {
     private double lat;
     private double lng;
     private String name;
+    private String markerId;
 
     public Position() {
     }
@@ -72,6 +73,14 @@ public class Position {
 
     public LatLng getLatLng() {
         return new LatLng(lat, lng);
+    }
+
+    public String getMarkerId() {
+        return markerId;
+    }
+
+    public void setMarkerId(String markerId) {
+        this.markerId = markerId;
     }
 
     @Override

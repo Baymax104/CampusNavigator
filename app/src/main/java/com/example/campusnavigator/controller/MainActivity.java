@@ -32,17 +32,18 @@ import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.model.Route;
-import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
-import com.example.campusnavigator.utility.interfaces.RouteResultReceiver;
 import com.example.campusnavigator.utility.helpers.DialogHelper;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
+import com.example.campusnavigator.utility.interfaces.RouteResultReceiver;
+import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.Stack;
 import com.example.campusnavigator.window.MultiRouteWindow;
 import com.example.campusnavigator.window.MultiSelectWindow;
-import com.example.campusnavigator.window.SingleRouteWindow;
 import com.example.campusnavigator.window.SearchWindow;
+import com.example.campusnavigator.window.SingleRouteWindow;
 import com.example.campusnavigator.window.SingleSelectWindow;
+import com.example.campusnavigator.window.Window;
 
 
 public class MainActivity extends AppCompatActivity implements LocationSource, AMapLocationListener, RouteResultReceiver, SingleSelectListener {
@@ -93,8 +94,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         // Marker点击监听
         map.setOnMarkerClickListener(marker -> {
-            LatLng latLng = marker.getPosition();
-            Position spot = provider.getPosByLatLng(latLng);
+            String markerId = marker.getId();
+            Position spot = provider.getPosByMarkerId(markerId);
             switch (mode) {
                 case SINGLE_SELECT:
                     // 选择点后唤起对话框
@@ -107,18 +108,23 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                         if (spotAttachList == null) {
                             throw new Exception("地点选择错误，请重新选择");
                         }
+
                         Position spotAttach = spotAttachList.get(0);
                         // 检查重复输入
                         if (!manager.isBufferEmpty() && spotAttach.equals(manager.bufferTop())) {
                             throw new Exception("选择重复");
                         }
+
                         // 检查通过，将入口和目的地压入栈中
                         manager.pushBuffer(spotAttach);
                         provider.pushBuffer(spot);
                         multiSelectWindow.addPosition(spot);
+                        marker.startAnimation();
+                        OverlayHelper.onMarkerStart(marker);
+
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e("MultiSelectError", e.getMessage());
+                        Log.e("CamNav-MultiSelectError", e.getMessage());
                     }
                     break;
                 default:
@@ -180,8 +186,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         searchWindow.setMultiSelectEntryListener(view -> {
             if (mode == Mode.DEFAULT) { // 由初始状态切换到多点选择状态
-                searchWindow.close();
-                multiSelectWindow.open();
+                Window.transition(searchWindow, multiSelectWindow);
                 mode = Mode.MULTI_SELECT;
             }
         });
@@ -199,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     } catch (Exception e) {
                         String msg = "计算错误：" + e.getMessage();
                         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-                        Log.e("CalculateError", msg);
+                        Log.e("CamNav-CalculateError", msg);
                     }
                 }
             }
@@ -296,9 +301,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         map.setMyLocationEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(false);
         for (String s : spotNames) {
-            // 设置marker
             OverlayHelper.drawMarker(provider.getPosByName(s));
-            // 设置文字
             OverlayHelper.drawText(provider.getPosByName(s), s);
         }
     }
@@ -306,14 +309,12 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     @Override
     public void onSingleSelect() {
         Toast.makeText(this, "请选择你想去的地点~，按返回键返回", Toast.LENGTH_SHORT).show();
-        searchWindow.close();
-        singleSelectWindow.open();
+        Window.transition(searchWindow, singleSelectWindow);
         mode = Mode.SINGLE_SELECT;
     }
 
     @Override
     public void onDestReceiveSuccess(Position dest) {
-        singleRouteWindow.setDestName(dest.getName());
         calculateSingleRoute(dest);
     }
 
@@ -321,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     public void onDestReceiveError(Exception e) {
         String msg = "单点选择错误：" + e.getMessage();
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        Log.e("SingleSelectError", msg);
+        Log.e("CamNav-SingleSelectError", msg);
         mode = Mode.DEFAULT; // 恢复到初始状态
     }
 
@@ -375,20 +376,20 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             List<Double> times = Route.extractTime(routeResults);
             List<Double> distances = Route.extractDist(routeResults);
             // 初始化数据
-            singleRouteWindow.notifyRouteInfo(times, distances);
+            singleRouteWindow.setDestName(destPosition.getName());
+            singleRouteWindow.setRouteInfo(times, distances);
             singleRouteWindow.refreshSelected();
             // 展示
             singleRouteWindow.displayPlan(routes, 0, myLocation);
             // 更换布局
-            searchWindow.close();
-            singleRouteWindow.open();
+            Window.transition(searchWindow, singleRouteWindow);
             singleRouteWindow.openPlanBox();
             mode = Mode.SINGLE_ROUTE_OPEN;
         } catch (Exception e) {
             mode = Mode.DEFAULT;
             String msg = "计算错误：" + e.getMessage();
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-            Log.e("CalculateError", msg);
+            Log.e("CamNav-CalculateError", msg);
         }
     }
 
@@ -409,40 +410,40 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         List<Double> distances = Route.extractDist(results);
         // 初始化数据
         Stack<Position> buffer = provider.getBuffer();
-        multiRouteWindow.notifyRouteInfo(buffer, times, distances);
+        multiRouteWindow.setRouteInfo(buffer, times, distances);
         // 展示
         multiRouteWindow.displayRoute(route);
         // 清空展示之前的临时数据
         multiSelectWindow.removeAllPosition();
         provider.popBufferAll();
         // 更换布局
-        multiSelectWindow.close();
-        multiRouteWindow.open();
+        Window.transition(multiSelectWindow, multiRouteWindow);
         multiRouteWindow.openSpotBox();
     }
 
     @Override
     public void onBackPressed() {
         if (mode == Mode.SINGLE_SELECT) {
-            singleSelectWindow.close();
-            searchWindow.open();
+            Window.transition(singleSelectWindow, searchWindow);
             mode = Mode.DEFAULT;
+
         } else if (mode == Mode.SINGLE_ROUTE_OPEN || mode == Mode.SINGLE_ROUTE_CLOSE) { // 若当前处于单点路径结果弹窗
-            singleRouteWindow.close();
-            searchWindow.open();
-            OverlayHelper.removeLines();
+            Window.transition(singleRouteWindow, searchWindow);
+            OverlayHelper.removeAllLines();
             mode = Mode.DEFAULT;
+
         } else if (mode == Mode.MULTI_SELECT) { // 若当前处于多点路径选择状态
             manager.popBufferAll();
             multiSelectWindow.removeAllPosition();
-            multiSelectWindow.close();
-            searchWindow.open();
+            Window.transition(multiSelectWindow, searchWindow);
             mode = Mode.DEFAULT;
+
         } else if (mode == Mode.MULTI_ROUTE_OPEN || mode == Mode.MULTI_ROUTE_CLOSE) { // 若当前处于多点路径结果弹窗
-            multiRouteWindow.close();
-            searchWindow.open();
-            OverlayHelper.removeLines();
+            Window.transition(multiRouteWindow, searchWindow);
+            OverlayHelper.removeAllLines();
+            OverlayHelper.initAllMarkers();
             mode = Mode.DEFAULT;
+
         } else {
             super.onBackPressed();
         }
@@ -490,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 locationClient.setLocationOption(locationOption);
                 locationClient.startLocation();//启动定位
             } catch (Exception e) {
-                Log.e("LocationError", e.getMessage());
+                Log.e("CamNav-LocationError", e.getMessage());
             }
         }
     }

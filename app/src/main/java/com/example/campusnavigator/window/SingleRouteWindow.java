@@ -104,7 +104,7 @@ public class SingleRouteWindow extends Window {
         child.setOnClickListener(listener);
     }
 
-    public void notifyRouteInfo(@NonNull List<Double> times, @NonNull List<Double> distances) {
+    public void setRouteInfo(@NonNull List<Double> times, @NonNull List<Double> distances) {
         if (times.length() == 0 || distances.length() == 0) {
             return;
         }
@@ -143,7 +143,7 @@ public class SingleRouteWindow extends Window {
 
     private void showRoutes(@NonNull List<Position> route,
                            @NonNull Position myLocation) {
-        OverlayHelper.removeLines();
+        OverlayHelper.removeAllLines();
         for (Position p : route) {
             OverlayHelper.drawLine(p);
         }

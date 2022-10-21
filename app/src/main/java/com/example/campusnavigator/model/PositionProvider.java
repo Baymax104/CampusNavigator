@@ -1,6 +1,5 @@
 package com.example.campusnavigator.model;
 
-import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.Stack;
 
@@ -45,11 +44,10 @@ public class PositionProvider extends Map {
         return null;
     }
 
-
-    public Position getPosByLatLng(LatLng latLng) {
+    public Position getPosByMarkerId(String markerId) {
         for (int i = 0; i < sizeOfSpot; i++) {
             Position pos = spots[i];
-            if (pos.getLat() == latLng.latitude && pos.getLng() == latLng.longitude) {
+            if (pos.getMarkerId().equals(markerId)) {
                 return pos;
             }
         }

@@ -77,7 +77,7 @@ public class MultiRouteWindow extends Window {
         }
     }
 
-    public void notifyRouteInfo(Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
+    public void setRouteInfo(Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
         List<Position> dests = destBuffer.toList(true);
         List.reverse(times);
         List.reverse(dists);
@@ -131,7 +131,7 @@ public class MultiRouteWindow extends Window {
 
 
     public void displayRoute(@NonNull List<Position> route) {
-        OverlayHelper.removeLines();
+        OverlayHelper.removeAllLines();
         for (Position p : route) {
             OverlayHelper.drawLine(p);
         }

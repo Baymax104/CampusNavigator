@@ -34,4 +34,9 @@ public abstract class Window {
             parent.removeView(rootView);
         }
     }
+
+    public static void transition(Window close, Window open) {
+        close.close();
+        open.open();
+    }
 }
