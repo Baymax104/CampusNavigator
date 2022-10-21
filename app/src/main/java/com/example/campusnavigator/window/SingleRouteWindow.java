@@ -25,7 +25,7 @@ import java.util.Locale;
  * @Date 2022/9/26 9:58
  * @Version 1
  */
-public class RouteWindow extends Window {
+public class SingleRouteWindow extends Window {
     private LinearLayout routeContainer;
 
     // 上方信息窗口
@@ -39,14 +39,14 @@ public class RouteWindow extends Window {
     private View selectedPlanView; // 当前选中的方案布局
 
 
-    public RouteWindow(Context context, ViewGroup parent) {
-        super(R.layout.layout_route_window, context, parent);
+    public SingleRouteWindow(Context context, ViewGroup parent) {
+        super(R.layout.layout_single_route_window, context, parent);
         routeContainer = rootView.findViewById(R.id.route_container);
         // 获取布局对象
         expendButton = routeContainer.findViewById(R.id.expend_button);
         destTxt = routeContainer.findViewById(R.id.route_info_dest_name);
 
-        routePlanBox = LayoutInflater.from(context).inflate(R.layout.layout_route_plan_box, routeContainer, false);
+        routePlanBox = LayoutInflater.from(context).inflate(R.layout.layout_single_route_plan_box, routeContainer, false);
         planGroup = routePlanBox.findViewById(R.id.route_plan_group);
         routeContainer.addView(routePlanBox);
 

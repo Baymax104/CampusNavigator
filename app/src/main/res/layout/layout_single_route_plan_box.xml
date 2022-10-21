@@ -17,14 +17,14 @@
                 android:layout_height="match_parent"
                 android:layout_columnWeight="1"
                 android:id="@+id/route_plan1"
-                layout="@layout/layout_route_plan_item"
+                layout="@layout/layout_single_route_plan_item"
                 android:layout_marginEnd="5dp"/>
         <include
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_columnWeight="1"
                 android:id="@+id/route_plan2"
-                layout="@layout/layout_route_plan_item"
+                layout="@layout/layout_single_route_plan_item"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"/>
         <include
@@ -32,7 +32,7 @@
                 android:layout_height="match_parent"
                 android:layout_columnWeight="1"
                 android:id="@+id/route_plan3"
-                layout="@layout/layout_route_plan_item"
+                layout="@layout/layout_single_route_plan_item"
                 android:layout_marginStart="5dp"/>
     </GridLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

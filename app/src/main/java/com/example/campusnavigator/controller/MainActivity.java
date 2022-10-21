@@ -40,8 +40,9 @@ import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.Stack;
 import com.example.campusnavigator.window.MultiRouteWindow;
 import com.example.campusnavigator.window.MultiSelectWindow;
-import com.example.campusnavigator.window.RouteWindow;
+import com.example.campusnavigator.window.SingleRouteWindow;
 import com.example.campusnavigator.window.SearchWindow;
+import com.example.campusnavigator.window.SingleSelectWindow;
 
 
 public class MainActivity extends AppCompatActivity implements LocationSource, AMapLocationListener, RouteResultReceiver, SingleSelectListener {
@@ -58,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private SearchWindow searchWindow;
     private MultiSelectWindow multiSelectWindow;
     private MultiRouteWindow multiRouteWindow;
-    private RouteWindow routeWindow;
+    private SingleRouteWindow singleRouteWindow;
+    private SingleSelectWindow singleSelectWindow;
 
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             switch (mode) {
                 case SINGLE_SELECT:
                     // 选择点后唤起对话框
-                    DialogHelper.showSpotSearchDialog(this, provider, this, spot);
+                    DialogHelper.showSpotSearchDialog(this, mode, provider, this, spot);
                     break;
                 case MULTI_SELECT:
                     try {
@@ -127,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         // 地图触摸监听，控制弹窗区域手势不生效，地图区域手势生效
         map.setOnMapTouchListener(latLng -> {
-            int routeWindowY = routeWindow.getWindowY();
+            int routeWindowY = singleRouteWindow.getWindowY();
             int multiRouteWindowY = multiRouteWindow.getWindowY();
             int multiSelectWindowY = multiSelectWindow.getWindowY();
             float touchY = latLng.getRawY();
@@ -135,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 case SINGLE_ROUTE_OPEN: // 单点路径弹窗处于打开状态
                     // 触摸起始点位于弹窗外侧，关闭弹窗
                     if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < routeWindowY) {
-                        routeWindow.closePlanBox();
-                        routeWindow.setExpendButtonUp(true);
+                        singleRouteWindow.closePlanBox();
+                        singleRouteWindow.setExpendButtonUp(true);
                         map.getUiSettings().setAllGesturesEnabled(true);
                         mode = Mode.SINGLE_ROUTE_CLOSE;
                     } else if (touchY >= routeWindowY) { // 触摸点位于弹窗内侧
@@ -172,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // searchWindow对象监听
         searchWindow.setSearchFieldListener(view -> {
             if (mode == Mode.DEFAULT) {
-                DialogHelper.showSpotSearchDialog(this, provider, this);
+                DialogHelper.showSpotSearchDialog(this, mode, provider, this);
             }
         });
 
@@ -214,25 +216,25 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         // 单点路径结果弹窗监听
-        routeWindow.setExpendButtonListener(view -> {
+        singleRouteWindow.setExpendButtonListener(view -> {
             if (mode == Mode.SINGLE_ROUTE_OPEN) { // 处于打开状态，关闭planBox
-                routeWindow.closePlanBox();
-                routeWindow.setExpendButtonUp(true);
+                singleRouteWindow.closePlanBox();
+                singleRouteWindow.setExpendButtonUp(true);
                 mode = Mode.SINGLE_ROUTE_CLOSE;
             } else if (mode == Mode.SINGLE_ROUTE_CLOSE) { // 处于关闭状态，打开planBox
-                routeWindow.openPlanBox();
-                routeWindow.setExpendButtonUp(false);
+                singleRouteWindow.openPlanBox();
+                singleRouteWindow.setExpendButtonUp(false);
                 mode = Mode.SINGLE_ROUTE_OPEN;
             }
         });
 
-        int count = routeWindow.getPlanCount();
+        int count = singleRouteWindow.getPlanCount();
         for (int i = 0; i < count; i++) {
             final int selected = i;
-            routeWindow.setPlanListener(i, v -> {
-                routeWindow.refreshSelected();
+            singleRouteWindow.setPlanListener(i, v -> {
+                singleRouteWindow.refreshSelected();
                 List<List<Position>> route = Route.extractRoute(routeResults);
-                routeWindow.displayPlan(route, selected, myLocation);
+                singleRouteWindow.displayPlan(route, selected, myLocation);
             });
         }
 
@@ -270,7 +272,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         searchWindow = new SearchWindow(this, container);
         multiSelectWindow = new MultiSelectWindow(this, container);
         multiRouteWindow = new MultiRouteWindow(this, container);
-        routeWindow = new RouteWindow(this, container);
+        singleRouteWindow = new SingleRouteWindow(this, container);
+        singleSelectWindow = new SingleSelectWindow(this, container);
         searchWindow.open();
     }
 
@@ -304,12 +307,13 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     public void onSingleSelect() {
         Toast.makeText(this, "请选择你想去的地点~，按返回键返回", Toast.LENGTH_SHORT).show();
         searchWindow.close();
+        singleSelectWindow.open();
         mode = Mode.SINGLE_SELECT;
     }
 
     @Override
     public void onDestReceiveSuccess(Position dest) {
-        routeWindow.setDestName(dest.getName());
+        singleRouteWindow.setDestName(dest.getName());
         calculateSingleRoute(dest);
     }
 
@@ -371,14 +375,14 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             List<Double> times = Route.extractTime(routeResults);
             List<Double> distances = Route.extractDist(routeResults);
             // 初始化数据
-            routeWindow.notifyRouteInfo(times, distances);
-            routeWindow.refreshSelected();
+            singleRouteWindow.notifyRouteInfo(times, distances);
+            singleRouteWindow.refreshSelected();
             // 展示
-            routeWindow.displayPlan(routes, 0, myLocation);
+            singleRouteWindow.displayPlan(routes, 0, myLocation);
             // 更换布局
             searchWindow.close();
-            routeWindow.open();
-            routeWindow.openPlanBox();
+            singleRouteWindow.open();
+            singleRouteWindow.openPlanBox();
             mode = Mode.SINGLE_ROUTE_OPEN;
         } catch (Exception e) {
             mode = Mode.DEFAULT;
@@ -420,10 +424,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     @Override
     public void onBackPressed() {
         if (mode == Mode.SINGLE_SELECT) {
+            singleSelectWindow.close();
             searchWindow.open();
             mode = Mode.DEFAULT;
         } else if (mode == Mode.SINGLE_ROUTE_OPEN || mode == Mode.SINGLE_ROUTE_CLOSE) { // 若当前处于单点路径结果弹窗
-            routeWindow.close();
+            singleRouteWindow.close();
             searchWindow.open();
             OverlayHelper.removeLines();
             mode = Mode.DEFAULT;

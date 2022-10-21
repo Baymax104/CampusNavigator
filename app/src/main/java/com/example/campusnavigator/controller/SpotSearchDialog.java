@@ -33,17 +33,24 @@ public class SpotSearchDialog extends BottomPopupView {
     private SpotSearchAdapter adapter;
     private SingleSelectListener listener;
     private String selectResult;
+    private Mode modeContext;
 
     public SpotSearchDialog(@NonNull Context context) {
         super(context);
         this.context = context;
     }
 
-    public SpotSearchDialog(@NonNull Context context, PositionProvider provider, SingleSelectListener listener, Position... selectedSpot) {
+    public SpotSearchDialog(
+            @NonNull Context context,
+            Mode mode,
+            PositionProvider provider,
+            SingleSelectListener listener,
+            Position... selectedSpot) {
         super(context);
         this.context = context;
         this.listener = listener;
         this.provider = provider;
+        this.modeContext = mode;
         if (selectedSpot != null && selectedSpot.length > 0) {
             this.selectResult = selectedSpot[0].getName();
         }
@@ -102,7 +109,9 @@ public class SpotSearchDialog extends BottomPopupView {
         });
 
         mapSelectCard.setOnClickListener(view -> {
-            dismissWith(() -> listener.onSingleSelect());
+            if (modeContext == Mode.DEFAULT) {
+                dismissWith(() -> listener.onSingleSelect());
+            }
         });
 
         routeButton.setOnClickListener(view -> dismissWith(() -> {
