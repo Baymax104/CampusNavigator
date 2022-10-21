@@ -84,6 +84,7 @@ public class SpotSearchDialog extends BottomPopupView {
             @Override
             public void afterTextChanged(Editable editable) {
                 String content = editable.toString();
+                // TODO 添加清除按钮，指针自动调整到最后
                 if (content.equals("")) { // 输入为空，重新展示所有地名
                     adapter.setData(spotNames);
                     adapter.notifyDataSetChanged();
@@ -119,7 +120,7 @@ public class SpotSearchDialog extends BottomPopupView {
         List<String> results = new List<>();
         for (String name : spotNames) {
             if (name.equals(content)) {
-                results.add(name);
+                results.push(name);
             }
         }
         return results;

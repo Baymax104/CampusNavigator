@@ -1,10 +1,13 @@
 package com.example.campusnavigator.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.core.math.MathUtils;
 
 import com.amap.api.maps.AMapUtils;
+import com.amap.api.maps.CoordinateConverter;
 import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.utility.callbacks.RouteResultReceiver;
 import com.example.campusnavigator.utility.structures.List;
@@ -62,7 +65,7 @@ public class MapManager extends Map {
             if (!checkResult(result)) {
                 throw new Exception("单点结果错误");
             }
-            results.add(result);
+            results.push(result);
         }
         receiver.onSingleRouteReceive(results);
     }
@@ -76,7 +79,7 @@ public class MapManager extends Map {
             Position from = spotBuffer.top();
             spotBuffer.pop();
             RouteResult singleDestRoute = getSingleDestRoute(from, to, PriorityType.DISTANCE);
-            results.add(singleDestRoute);
+            results.push(singleDestRoute);
             to = from;
         }
 
@@ -98,11 +101,11 @@ public class MapManager extends Map {
         // 生成的路线为逆序
         Path path = map[toId][paths[toId]];
         Position startPoint = positions[path.from];
-        route.add(startPoint);
+        route.push(startPoint);
         while (paths[toId] != -1) {
             path = map[toId][paths[toId]];
             Position p = positions[path.to];
-            route.add(p);
+            route.push(p);
             toId = paths[toId];
         }
         return new RouteResult(route, time, dist);
@@ -165,21 +168,43 @@ public class MapManager extends Map {
         }
     }
 
-    public List<Position> attachToMap(Position myPosition) {
+    public List<Position> attachToMap(Position myPosition, Position destPosition) {
         List<Position> attachPositions = new List<>();
         LatLng latLng = myPosition.getLatLng();
 
         // 使用最小堆取距离最小的两个点
         MinHeap<Integer, Double> minDist = new MinHeap<>();
         for (int i = 0; i < size; i++) {
-            double distance = AMapUtils.calculateLineDistance(latLng, positions[i].getLatLng());
-            minDist.push(i, distance);
+            if (checkDirection(myPosition, positions[i], destPosition)) {
+                double distance = AMapUtils.calculateLineDistance(latLng, positions[i].getLatLng());
+                minDist.push(i, distance);
+            }
         }
         int min1 = minDist.top().first();
         minDist.pop();
         int min2 = minDist.top().first();
-        attachPositions.add(positions[min1]);
-        attachPositions.add(positions[min2]);
+        attachPositions.push(positions[min1]);
+        attachPositions.push(positions[min2]);
         return attachPositions;
+    }
+
+    private boolean checkDirection(Position myPosition, Position position, Position destPosition) {
+        LatLng me = myPosition.getLatLng();
+        LatLng pos = position.getLatLng();
+        LatLng dest = destPosition.getLatLng();
+
+        double vX1 = dest.longitude - me.longitude;
+        double vY1 = dest.latitude - me.latitude;
+
+        double vX2 = pos.longitude - me.longitude;
+        double vY2 = pos.latitude - me.latitude;
+
+        // 计算两个向量的夹角，当 cos(theta) >= 0 时为true
+        double dot = vX1 * vX2 + vY1 * vY2;
+        double modFirst = Math.sqrt(vX1 * vX1 + vY1 * vY2);
+        double modSecond = Math.sqrt(vX2 * vX2 + vY2 * vY2);
+        double angle = dot / (modFirst * modSecond);
+
+        return angle >= 0;
     }
 }

@@ -34,17 +34,6 @@ public class MinHeap<T1, T2 extends Comparable<T2>> {
         array = (Entry[]) Array.newInstance(Entry.class, MAX_SIZE);
     }
 
-    @SuppressWarnings("unchecked")
-    public MinHeap(Entry[] entries) {
-        array = (Entry[]) Array.newInstance(Entry.class, MAX_SIZE);
-        int i;
-        for (i = 0; i < entries.length; i++) {
-            array[i] = entries[i];
-            shiftUp(i);
-        }
-        size = i;
-    }
-
     public boolean push(T1 t1, T2 t2) {
         if (size == MAX_SIZE) {
             return false;

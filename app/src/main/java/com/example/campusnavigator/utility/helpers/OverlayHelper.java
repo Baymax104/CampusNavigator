@@ -52,7 +52,7 @@ public class OverlayHelper {
     public static void drawLine(Position ...destination) {
         for (Position p : destination) {
             Polyline polyline = map.addPolyline(lineStyle.add(p.getLatLng()));
-            lineBuffer.add(polyline);
+            lineBuffer.push(polyline);
         }
     }
     public static void drawMarker(Position position) {

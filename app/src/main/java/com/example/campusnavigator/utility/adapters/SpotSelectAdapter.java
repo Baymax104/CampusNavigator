@@ -54,13 +54,13 @@ public class SpotSelectAdapter extends RecyclerView.Adapter<SpotSelectAdapter.Vi
     public void removeItem() {
         int position = data.length() - 1;
         if (position >= 0) {
-            data.popBack();
+            data.pop();
             notifyItemRemoved(position);
         }
     }
 
     public void addItem(Position position) {
-        data.add(position);
+        data.push(position);
         notifyItemInserted(data.length() - 1);
     }
 }

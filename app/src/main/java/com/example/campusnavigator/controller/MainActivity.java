@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onSingleSelect() {
-        Toast.makeText(this, "请选择你想去的地点~", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "请选择你想去的地点~，按返回键返回", Toast.LENGTH_SHORT).show();
         searchWindow.close();
         mode = Mode.SINGLE_SELECT;
     }
@@ -302,17 +302,28 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     @Override
     public void onDestReceiveSuccess(Position dest) {
         routeWindow.setDestName(dest.getName());
-        calculateRoute(dest);
+        calculateSingleRoute(dest);
     }
 
     @Override
     public void onDestReceiveError(Exception e) {
         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        Log.e("MainActivity", e.toString());
+        Log.e("DestReceiveError", e.toString());
+        e.printStackTrace();
         mode = Mode.DEFAULT; // 恢复到初始状态
     }
 
-    private void calculateRoute(Position destPosition) {
+    private void filterPlan() {
+        // TODO 过滤算法
+        List.sort(routeResults);
+        List<RouteResult> results = new List<>();
+        results.push(routeResults.get(0));
+        results.push(routeResults.get(1));
+        results.push(routeResults.get(2));
+        routeResults = results;
+    }
+
+    private void calculateSingleRoute(Position destPosition) {
         try {
             // 判断当前定位点是否存在
             if (myLocation == null) {
@@ -320,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
 
             // 计算距定位点最近的连接点，定位点邻接点表attachPos
-            List<Position> attachPos = manager.attachToMap(myLocation);
+            List<Position> attachPos = manager.attachToMap(myLocation, destPosition);
             // 获取目的地邻接点，目的地邻接点表spotAttached
             List<Position> spotAttached = Map.spotAttached.get(destPosition);
             if (attachPos == null || attachPos.length() == 0 ||
@@ -344,6 +355,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 }
             }
 
+//            filterPlan();
+
             // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
             List<List<Position>> routes = RouteResult.extractRoute(routeResults);
             List<Double> times = RouteResult.extractTime(routeResults);
@@ -362,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             mode = Mode.DEFAULT;
             String errorMsg = "计算错误：" + e.getMessage();
             Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
-            Log.e("MainActivity", errorMsg);
+            Log.e("CalculateError", errorMsg);
             e.printStackTrace();
         }
     }
@@ -370,9 +383,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     @Override
     public void onSingleRouteReceive(List<RouteResult> results) {
         // 每一对起点和终点返回2种方案，向容器中添加方案
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < results.length(); i++) {
             RouteResult result = results.get(i);
-            routeResults.add(result);
+            routeResults.push(result);
         }
     }
 

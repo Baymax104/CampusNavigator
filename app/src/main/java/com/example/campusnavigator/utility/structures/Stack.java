@@ -8,7 +8,7 @@ package com.example.campusnavigator.utility.structures;
  * @Date 2022/9/1 14:15
  * @Version 1
  */
-public class Stack<T> {
+public class Stack<T> implements Stackable<T> {
     private static class Node<T> {
         private T value;
         private Node<T> pre;
@@ -27,6 +27,7 @@ public class Stack<T> {
     public Stack() {
     }
 
+    @Override
     public void push(T value) {
         Node<T> node = new Node<>(value);
         tail.next = node;
@@ -35,13 +36,13 @@ public class Stack<T> {
         size++;
     }
 
-    public boolean pop() {
+    @Override
+    public void pop() {
         if (size == 0) {
-            return false;
+            return;
         }
         tail = tail.pre;
         size--;
-        return true;
     }
 
     public T top() {
@@ -68,7 +69,7 @@ public class Stack<T> {
         List<T> list = new List<>();
         Node<T> cur = reverse ? head.next : tail;
         for (int l = size; l > 0; l--) {
-            list.add(cur.value);
+            list.push(cur.value);
             cur = reverse ? cur.next : cur.pre;
         }
         return list;

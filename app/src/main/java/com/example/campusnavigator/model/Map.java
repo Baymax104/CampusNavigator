@@ -135,7 +135,7 @@ public class Map {
                     List<Position> attachList = new List<>();
                     for (int j = 0; j < attachArray.length(); j++) {
                         int positionIndex = attachArray.getInt(j) - 1;
-                        attachList.add(positions[positionIndex]);
+                        attachList.push(positions[positionIndex]);
                     }
                     spotAttached.put(spot, attachList);
                 }

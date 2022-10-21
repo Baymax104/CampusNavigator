@@ -21,7 +21,7 @@ public class PositionProvider extends Map {
     public List<String> getAllNames() {
         List<String> list = new List<>();
         for (int i = 0; i < sizeOfSpot; i++) {
-            list.add(spots[i].getName());
+            list.push(spots[i].getName());
         }
         return list;
     }

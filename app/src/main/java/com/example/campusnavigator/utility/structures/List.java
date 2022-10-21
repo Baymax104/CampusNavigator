@@ -2,10 +2,10 @@ package com.example.campusnavigator.utility.structures;
 
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Size;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.RandomAccess;
 
 /**
  * @Description
@@ -14,7 +14,7 @@ import java.util.RandomAccess;
  * @Date 2022/9/1 13:45
  * @Version 1
  */
-public class List<T> implements Iterable<T>, RandomAccess {
+public class List<T> implements Iterable<T>, Stackable<T> {
     private static final int MAX_SIZE = 80;
     @SuppressWarnings("unchecked")
     private T[] array = (T[]) new Object[MAX_SIZE];
@@ -29,7 +29,8 @@ public class List<T> implements Iterable<T>, RandomAccess {
         size = other.size;
     }
 
-    public void add(T value) {
+    @Override
+    public void push(T value) {
         if (size == MAX_SIZE) {
             grow(); // 当存满时进行扩容
         }
@@ -44,7 +45,8 @@ public class List<T> implements Iterable<T>, RandomAccess {
         return array[i];
     }
 
-    public void popBack() {
+    @Override
+    public void pop() {
         if (size > 0) {
             size--;
         }
@@ -73,6 +75,10 @@ public class List<T> implements Iterable<T>, RandomAccess {
             i++;
             j--;
         }
+    }
+
+    public static <T> void sort(List<T> list) {
+        Arrays.sort(list.array, 0, list.size);
     }
 
     @NonNull

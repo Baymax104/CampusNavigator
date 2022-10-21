@@ -19,6 +19,9 @@ import com.lxj.xpopup.XPopup;
  */
 public class DialogHelper {
 
+    private DialogHelper() {
+    }
+
     public static void showSpotSearchDialog(Context context, PositionProvider provider, SingleSelectListener listener, Position... selectedSpot) {
         new XPopup.Builder(context)
                 .asCustom(new SpotSearchDialog(context, provider, listener, selectedSpot))

@@ -111,7 +111,7 @@ public class MultiRouteWindow extends Window {
                     (i == 0) ? 0.0 : times.get(i - 1),
                     (i == 0) ? 0.0 : dists.get(i - 1)
             );
-            data.add(item);
+            data.push(item);
         }
         adapter.setData(data);
         adapter.notifyDataSetChanged();
