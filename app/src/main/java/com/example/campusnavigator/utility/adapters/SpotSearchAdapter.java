@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.utility.structures.List;
-import com.example.campusnavigator.utility.callbacks.ItemClickedListener;
+import com.example.campusnavigator.utility.interfaces.ItemClickedListener;
 
 /**
  * @Description

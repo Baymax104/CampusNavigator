@@ -1,4 +1,4 @@
-package com.example.campusnavigator.utility.structures;
+package com.example.campusnavigator.utility.interfaces;
 
 /**
  * @Description

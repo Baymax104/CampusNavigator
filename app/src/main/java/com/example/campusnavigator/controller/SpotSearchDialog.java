@@ -15,7 +15,7 @@ import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.utility.adapters.SpotSearchAdapter;
-import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
+import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
 import com.example.campusnavigator.utility.structures.List;
 import com.google.android.material.card.MaterialCardView;
 import com.lxj.xpopup.core.BottomPopupView;

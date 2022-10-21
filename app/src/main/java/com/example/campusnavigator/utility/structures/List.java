@@ -3,6 +3,8 @@ package com.example.campusnavigator.utility.structures;
 
 import androidx.annotation.NonNull;
 
+import com.example.campusnavigator.utility.interfaces.Stackable;
+
 import java.util.Arrays;
 import java.util.Iterator;
 

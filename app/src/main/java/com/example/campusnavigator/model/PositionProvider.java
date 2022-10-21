@@ -1,7 +1,5 @@
 package com.example.campusnavigator.model;
 
-import android.content.Context;
-
 import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.Stack;
@@ -16,10 +14,17 @@ import com.example.campusnavigator.utility.structures.Stack;
 public class PositionProvider extends Map {
 
     private Stack<Position> spotBuffer;
+    private static PositionProvider obj;
 
-    public PositionProvider(Context context) {
-        super(context);
+    private PositionProvider() {
         spotBuffer = new Stack<>();
+    }
+
+    public static PositionProvider getInstance() {
+        if (obj == null) {
+            obj = new PositionProvider();
+        }
+        return obj;
     }
 
     public List<String> getAllNames() {

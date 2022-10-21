@@ -1,12 +1,9 @@
 package com.example.campusnavigator.model;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
-import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
-import com.example.campusnavigator.utility.callbacks.RouteResultReceiver;
+import com.example.campusnavigator.utility.interfaces.RouteResultReceiver;
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.MinHeap;
 import com.example.campusnavigator.utility.structures.Stack;
@@ -26,11 +23,18 @@ public class MapManager extends Map {
 
     private Stack<Position> positionBuffer;
     private boolean[] visited;
+    private static MapManager obj;
 
-    public MapManager(Context context) {
-        super(context);
+    private MapManager() {
         visited = new boolean[size + 1];
         positionBuffer = new Stack<>();
+    }
+
+    public static MapManager getInstance() {
+        if (obj == null) {
+            obj = new MapManager();
+        }
+        return obj;
     }
 
     private boolean checkResult(Route result) {

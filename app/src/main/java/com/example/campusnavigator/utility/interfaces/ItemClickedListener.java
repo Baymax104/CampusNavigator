@@ -1,4 +1,4 @@
-package com.example.campusnavigator.utility.callbacks;
+package com.example.campusnavigator.utility.interfaces;
 
 /**
  * @Description

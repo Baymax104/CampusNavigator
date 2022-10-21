@@ -1,4 +1,4 @@
-package com.example.campusnavigator.utility.callbacks;
+package com.example.campusnavigator.utility.interfaces;
 
 import com.example.campusnavigator.model.Route;
 import com.example.campusnavigator.utility.structures.List;

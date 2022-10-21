@@ -32,8 +32,8 @@ import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
 import com.example.campusnavigator.model.Route;
-import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
-import com.example.campusnavigator.utility.callbacks.RouteResultReceiver;
+import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
+import com.example.campusnavigator.utility.interfaces.RouteResultReceiver;
 import com.example.campusnavigator.utility.helpers.DialogHelper;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
 import com.example.campusnavigator.utility.structures.List;
@@ -79,10 +79,13 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         if (map == null) {
             map = mapView.getMap();
         }
-        // provider需要context，必须延迟初始化
-        provider = new PositionProvider(this);
-        manager = new MapManager(this);
+
+        // Map绑定Context
+        Map.bind(this);
+        provider = PositionProvider.getInstance();
+        manager = MapManager.getInstance();
         OverlayHelper.bind(map, mapView, this);
+
         // 设置地图属性
         setMap();
 

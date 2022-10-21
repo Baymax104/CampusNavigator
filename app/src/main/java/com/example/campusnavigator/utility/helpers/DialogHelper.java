@@ -6,8 +6,7 @@ import com.example.campusnavigator.controller.PrivacyConfirmDialog;
 import com.example.campusnavigator.controller.SpotSearchDialog;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
-import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
-import com.example.campusnavigator.utility.structures.List;
+import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
 import com.lxj.xpopup.XPopup;
 
 /**
