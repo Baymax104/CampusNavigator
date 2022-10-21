@@ -1,13 +1,10 @@
 package com.example.campusnavigator.model;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.math.MathUtils;
 
 import com.amap.api.maps.AMapUtils;
-import com.amap.api.maps.CoordinateConverter;
 import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.utility.callbacks.RouteResultReceiver;
 import com.example.campusnavigator.utility.structures.List;
@@ -27,16 +24,16 @@ import java.util.Arrays;
  */
 public class MapManager extends Map {
 
-    private static boolean[] visited;
+    private Stack<Position> positionBuffer;
+    private boolean[] visited;
 
     public MapManager(Context context) {
         super(context);
-        if (visited == null) {
-            visited = new boolean[size + 1];
-        }
+        visited = new boolean[size + 1];
+        positionBuffer = new Stack<>();
     }
 
-    private boolean checkResult(RouteResult result) {
+    private boolean checkResult(Route result) {
         return result != null &&
                 result.getRoute() != null && result.getRoute().length() != 0 &&
                 result.getTime() != null && !result.getTime().isInfinite() &&
@@ -45,8 +42,8 @@ public class MapManager extends Map {
 
     public void calculateRoutePlan(Stack<Position> spotBuffer, boolean isMultiSpot, RouteResultReceiver receiver) throws Exception {
         if (isMultiSpot) {
-            List<RouteResult> results = getMultiDestRoute(spotBuffer);
-            for (RouteResult result : results) {
+            List<Route> results = getMultiDestRoute(spotBuffer);
+            for (Route result : results) {
                 if (!checkResult(result)) {
                     throw new Exception("多点结果错误");
                 }
@@ -55,13 +52,13 @@ public class MapManager extends Map {
             return;
         }
         PriorityType[] types = PriorityType.values();
-        List<RouteResult> results = new List<>();
+        List<Route> results = new List<>();
         Position to = spotBuffer.top();
         spotBuffer.pop();
         Position from = spotBuffer.top();
         spotBuffer.pop();
         for (PriorityType type : types) {
-            RouteResult result = getSingleDestRoute(from, to, type);
+            Route result = getSingleDestRoute(from, to, type);
             if (!checkResult(result)) {
                 throw new Exception("单点结果错误");
             }
@@ -70,15 +67,15 @@ public class MapManager extends Map {
         receiver.onSingleRouteReceive(results);
     }
 
-    public List<RouteResult> getMultiDestRoute(Stack<Position> spotBuffer) {
-        List<RouteResult> results = new List<>();
+    public List<Route> getMultiDestRoute(Stack<Position> spotBuffer) {
+        List<Route> results = new List<>();
         Position to = spotBuffer.top();
         spotBuffer.pop();
 
-        while (spotBuffer.isNotEmpty()) {
+        while (!spotBuffer.isEmpty()) {
             Position from = spotBuffer.top();
             spotBuffer.pop();
-            RouteResult singleDestRoute = getSingleDestRoute(from, to, PriorityType.DISTANCE);
+            Route singleDestRoute = getSingleDestRoute(from, to, PriorityType.DISTANCE);
             results.push(singleDestRoute);
             to = from;
         }
@@ -86,7 +83,7 @@ public class MapManager extends Map {
         return results;
     }
 
-    public RouteResult getSingleDestRoute(@NonNull Position from, @NonNull Position to, PriorityType type) {
+    public Route getSingleDestRoute(@NonNull Position from, @NonNull Position to, PriorityType type) {
         List<Position> route = new List<>();
         int[] paths = new int[size];
         Arrays.fill(paths, -1);
@@ -108,7 +105,7 @@ public class MapManager extends Map {
             route.push(p);
             toId = paths[toId];
         }
-        return new RouteResult(route, time, dist);
+        return new Route(route, time, dist);
     }
 
     public Tuple<Double, Double> Astar(int source, int dest, @NonNull PriorityType type, @NonNull int[] paths) {
@@ -170,13 +167,12 @@ public class MapManager extends Map {
 
     public List<Position> attachToMap(Position myPosition, Position destPosition) {
         List<Position> attachPositions = new List<>();
-        LatLng latLng = myPosition.getLatLng();
 
         // 使用最小堆取距离最小的两个点
         MinHeap<Integer, Double> minDist = new MinHeap<>();
         for (int i = 0; i < size; i++) {
             if (checkDirection(myPosition, positions[i], destPosition)) {
-                double distance = AMapUtils.calculateLineDistance(latLng, positions[i].getLatLng());
+                double distance = getDistanceById(myPosition.getId(), i);
                 minDist.push(i, distance);
             }
         }
@@ -206,5 +202,48 @@ public class MapManager extends Map {
         double angle = dot / (modFirst * modSecond);
 
         return angle >= 0;
+    }
+
+    public Stack<Position> getBuffer() {
+        return positionBuffer;
+    }
+
+    public void pushBuffer(Position position) {
+        if (positionBuffer != null) {
+            positionBuffer.push(position);
+        }
+    }
+
+    public void popBuffer() {
+        if (positionBuffer != null) {
+            positionBuffer.pop();
+        }
+    }
+
+    public void popBufferAll() {
+        if (positionBuffer != null) {
+            positionBuffer.popAll();
+        }
+    }
+
+    public boolean isBufferEmpty() {
+        if (positionBuffer != null) {
+            return positionBuffer.isEmpty();
+        }
+        return true;
+    }
+
+    public Position bufferTop() {
+        if (positionBuffer != null) {
+            return positionBuffer.top();
+        }
+        return null;
+    }
+
+    public int bufferSize() {
+        if (positionBuffer != null) {
+            return positionBuffer.size();
+        }
+        return 0;
     }
 }

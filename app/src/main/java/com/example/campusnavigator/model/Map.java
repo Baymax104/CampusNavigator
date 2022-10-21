@@ -1,6 +1,7 @@
 package com.example.campusnavigator.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
@@ -141,6 +142,7 @@ public class Map {
                 }
 
             } catch (IOException | JSONException e) {
+                Log.e("MapGenerateError", e.getMessage());
                 e.printStackTrace();
             }
         }

@@ -1,6 +1,6 @@
 package com.example.campusnavigator.utility.callbacks;
 
-import com.example.campusnavigator.model.RouteResult;
+import com.example.campusnavigator.model.Route;
 import com.example.campusnavigator.utility.structures.List;
 
 /**
@@ -11,6 +11,6 @@ import com.example.campusnavigator.utility.structures.List;
  * @Version 1
  */
 public interface RouteResultReceiver {
-    void onSingleRouteReceive(List<RouteResult> results);
-    void onMultiRouteReceive(List<RouteResult> results);
+    void onSingleRouteReceive(List<Route> results);
+    void onMultiRouteReceive(List<Route> results);
 }

@@ -57,8 +57,8 @@ public class Stack<T> implements Stackable<T> {
         size = 0;
     }
 
-    public boolean isNotEmpty() {
-        return size != 0;
+    public boolean isEmpty() {
+        return size == 0;
     }
 
     public int size() {

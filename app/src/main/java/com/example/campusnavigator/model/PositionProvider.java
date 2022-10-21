@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.utility.structures.List;
+import com.example.campusnavigator.utility.structures.Stack;
 
 /**
  * @Description 提供外部查找Position的方法类
@@ -14,8 +15,11 @@ import com.example.campusnavigator.utility.structures.List;
  */
 public class PositionProvider extends Map {
 
+    private Stack<Position> spotBuffer;
+
     public PositionProvider(Context context) {
         super(context);
+        spotBuffer = new Stack<>();
     }
 
     public List<String> getAllNames() {
@@ -45,5 +49,27 @@ public class PositionProvider extends Map {
             }
         }
         return null;
+    }
+
+    public Stack<Position> getBuffer() {
+        return spotBuffer;
+    }
+
+    public void pushBuffer(Position position) {
+        if (spotBuffer != null) {
+            spotBuffer.push(position);
+        }
+    }
+
+    public void popBuffer() {
+        if (spotBuffer != null) {
+            spotBuffer.pop();
+        }
+    }
+
+    public void popBufferAll() {
+        if (spotBuffer != null) {
+            spotBuffer.popAll();
+        }
     }
 }

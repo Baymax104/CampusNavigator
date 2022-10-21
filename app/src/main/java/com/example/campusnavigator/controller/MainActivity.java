@@ -31,7 +31,7 @@ import com.example.campusnavigator.model.Map;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.PositionProvider;
-import com.example.campusnavigator.model.RouteResult;
+import com.example.campusnavigator.model.Route;
 import com.example.campusnavigator.utility.callbacks.SingleSelectListener;
 import com.example.campusnavigator.utility.callbacks.RouteResultReceiver;
 import com.example.campusnavigator.utility.helpers.DialogHelper;
@@ -51,8 +51,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     // 主要数据管理对象
     private PositionProvider provider;
     private MapManager manager;
-    private Stack<Position> spotBuffer = new Stack<>(); // 地点参数栈
-    private Stack<Position> destBuffer = new Stack<>(); // 目的地栈
     private Position myLocation;
     private Mode mode = Mode.DEFAULT;
 
@@ -66,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private AMapLocationClient locationClient; // 定位启动和销毁类
 
     // 路径计算结果
-    private List<RouteResult> routeResults = new List<>();
+    private List<Route> routeResults = new List<>();
 
 
     @Override
@@ -98,20 +96,24 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     DialogHelper.showSpotSearchDialog(this, provider, this, spot);
                     break;
                 case MULTI_SELECT:
-                    List<Position> spotAttachList = Map.spotAttached.get(spot);
-                    // 检查地点连接点空指针
-                    if (spotAttachList == null) {
-                        Toast.makeText(this, "地点选择错误，请重新选择", Toast.LENGTH_SHORT).show();
-                    } else {
+                    try {
+                        List<Position> spotAttachList = Map.spotAttached.get(spot);
+                        // 检查地点连接点空指针
+                        if (spotAttachList == null) {
+                            throw new Exception("地点选择错误，请重新选择");
+                        }
                         Position spotAttach = spotAttachList.get(0);
                         // 检查重复输入
-                        if (spotBuffer.isNotEmpty() && spotAttach.equals(spotBuffer.top())) {
-                            Toast.makeText(this, "选择重复", Toast.LENGTH_SHORT).show();
-                        } else { // 检查通过，将入口和目的地压入栈中
-                            spotBuffer.push(spotAttach);
-                            destBuffer.push(spot);
-                            multiSelectWindow.addPosition(spot);
+                        if (!manager.isBufferEmpty() && spotAttach.equals(manager.bufferTop())) {
+                            throw new Exception("选择重复");
                         }
+                        // 检查通过，将入口和目的地压入栈中
+                        manager.pushBuffer(spotAttach);
+                        provider.pushBuffer(spot);
+                        multiSelectWindow.addPosition(spot);
+                    } catch (Exception e) {
+                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("MultiSelectError", e.getMessage());
                     }
                     break;
                 default:
@@ -182,14 +184,17 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // 多点选择地点监听
         multiSelectWindow.setRouteButtonListener(view -> {
             if (mode == Mode.MULTI_SELECT) {
-                if (spotBuffer.size() < 2) {
+                if (manager.bufferSize() < 2) {
                     Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        manager.calculateRoutePlan(spotBuffer, true, this);
+                        Stack<Position> buffer = manager.getBuffer();
+                        manager.calculateRoutePlan(buffer, true, this);
                         mode = Mode.MULTI_ROUTE_OPEN;
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        String msg = "计算错误：" + e.getMessage();
+                        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                        Log.e("CalculateError", msg);
                     }
                 }
             }
@@ -198,8 +203,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         multiSelectWindow.setSelectRemoveListener(v -> {
             boolean isCompleted = multiSelectWindow.removePosition();
             if (isCompleted) {
-                spotBuffer.pop();
-                destBuffer.pop();
+                manager.popBuffer();
+                provider.popBuffer();
             } else {
                 Toast.makeText(this, "无选中顶点", Toast.LENGTH_SHORT).show();
             }
@@ -223,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             final int selected = i;
             routeWindow.setPlanListener(i, v -> {
                 routeWindow.refreshSelected();
-                List<List<Position>> route = RouteResult.extractRoute(routeResults);
+                List<List<Position>> route = Route.extractRoute(routeResults);
                 routeWindow.displayPlan(route, selected, myLocation);
             });
         }
@@ -307,16 +312,16 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onDestReceiveError(Exception e) {
-        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        Log.e("DestReceiveError", e.toString());
-        e.printStackTrace();
+        String msg = "单点选择错误：" + e.getMessage();
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        Log.e("SingleSelectError", msg);
         mode = Mode.DEFAULT; // 恢复到初始状态
     }
 
     private void filterPlan() {
         // TODO 过滤算法
         List.sort(routeResults);
-        List<RouteResult> results = new List<>();
+        List<Route> results = new List<>();
         results.push(routeResults.get(0));
         results.push(routeResults.get(1));
         results.push(routeResults.get(2));
@@ -348,19 +353,20 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     if (attach == null || dest == null) {
                         throw new Exception("连接点错误");
                     }
-                    spotBuffer.push(attach);
-                    spotBuffer.push(dest);
+                    manager.pushBuffer(attach);
+                    manager.pushBuffer(dest);
                     // 对于每一对起点和终点有2种方案
-                    manager.calculateRoutePlan(spotBuffer, false, this);
+                    Stack<Position> buffer = manager.getBuffer();
+                    manager.calculateRoutePlan(buffer, false, this);
                 }
             }
 
-//            filterPlan();
+            filterPlan(); // 选取最优的三个方案
 
             // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
-            List<List<Position>> routes = RouteResult.extractRoute(routeResults);
-            List<Double> times = RouteResult.extractTime(routeResults);
-            List<Double> distances = RouteResult.extractDist(routeResults);
+            List<List<Position>> routes = Route.extractRoute(routeResults);
+            List<Double> times = Route.extractTime(routeResults);
+            List<Double> distances = Route.extractDist(routeResults);
             // 初始化数据
             routeWindow.notifyRouteInfo(times, distances);
             routeWindow.refreshSelected();
@@ -373,35 +379,35 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             mode = Mode.SINGLE_ROUTE_OPEN;
         } catch (Exception e) {
             mode = Mode.DEFAULT;
-            String errorMsg = "计算错误：" + e.getMessage();
-            Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
-            Log.e("CalculateError", errorMsg);
-            e.printStackTrace();
+            String msg = "计算错误：" + e.getMessage();
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            Log.e("CalculateError", msg);
         }
     }
 
     @Override
-    public void onSingleRouteReceive(List<RouteResult> results) {
+    public void onSingleRouteReceive(List<Route> results) {
         // 每一对起点和终点返回2种方案，向容器中添加方案
         for (int i = 0; i < results.length(); i++) {
-            RouteResult result = results.get(i);
+            Route result = results.get(i);
             routeResults.push(result);
         }
     }
 
     @Override
-    public void onMultiRouteReceive(List<RouteResult> results) {
+    public void onMultiRouteReceive(List<Route> results) {
         // 多地点只有一种方案，包含到多个地点的路径
-        List<Position> route = RouteResult.combineRoute(results);
-        List<Double> times = RouteResult.extractTime(results);
-        List<Double> distances = RouteResult.extractDist(results);
+        List<Position> route = Route.combineRoute(results);
+        List<Double> times = Route.extractTime(results);
+        List<Double> distances = Route.extractDist(results);
         // 初始化数据
-        multiRouteWindow.notifyRouteInfo(destBuffer, times, distances);
+        Stack<Position> buffer = provider.getBuffer();
+        multiRouteWindow.notifyRouteInfo(buffer, times, distances);
         // 展示
         multiRouteWindow.displayRoute(route);
         // 清空展示之前的临时数据
         multiSelectWindow.removeAllPosition();
-        destBuffer.popAll();
+        provider.popBufferAll();
         // 更换布局
         multiSelectWindow.close();
         multiRouteWindow.open();
@@ -419,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             OverlayHelper.removeLines();
             mode = Mode.DEFAULT;
         } else if (mode == Mode.MULTI_SELECT) { // 若当前处于多点路径选择状态
-            spotBuffer.popAll();
+            manager.popBufferAll();
             multiSelectWindow.removeAllPosition();
             multiSelectWindow.close();
             searchWindow.open();
@@ -476,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 locationClient.setLocationOption(locationOption);
                 locationClient.startLocation();//启动定位
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e("LocationError", e.getMessage());
             }
         }
     }

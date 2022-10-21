@@ -11,12 +11,12 @@ import java.util.Objects;
  * @Date 2022/10/18 20:21
  * @Version 1
  */
-public class RouteResult implements Comparable<RouteResult> {
+public class Route implements Comparable<Route> {
     private List<Position> route;
     private Double time;
     private Double dist;
 
-    public RouteResult(List<Position> route, Double time, Double dist) {
+    public Route(List<Position> route, Double time, Double dist) {
         this.route = route;
         this.time = time;
         this.dist = dist;
@@ -34,33 +34,33 @@ public class RouteResult implements Comparable<RouteResult> {
         return dist;
     }
 
-    public static List<Double> extractTime(List<RouteResult> results) {
+    public static List<Double> extractTime(List<Route> results) {
         List<Double> times = new List<>();
-        for (RouteResult result : results) {
+        for (Route result : results) {
             times.push(result.getTime());
         }
         return times;
     }
 
-    public static List<Double> extractDist(List<RouteResult> results) {
+    public static List<Double> extractDist(List<Route> results) {
         List<Double> distances = new List<>();
-        for (RouteResult result : results) {
+        for (Route result : results) {
             distances.push(result.getDist());
         }
         return distances;
     }
 
-    public static List<List<Position>> extractRoute(List<RouteResult> results) {
+    public static List<List<Position>> extractRoute(List<Route> results) {
         List<List<Position>> routes = new List<>();
-        for (RouteResult result : results) {
+        for (Route result : results) {
             routes.push(result.getRoute());
         }
         return routes;
     }
 
-    public static List<Position> combineRoute(List<RouteResult> results) {
+    public static List<Position> combineRoute(List<Route> results) {
         List<Position> routes = new List<>();
-        for (RouteResult result : results) {
+        for (Route result : results) {
             List<Position> route = result.getRoute();
             for (Position p : route) {
                 routes.push(p);
@@ -70,7 +70,7 @@ public class RouteResult implements Comparable<RouteResult> {
     }
 
     @Override
-    public int compareTo(RouteResult o) {
+    public int compareTo(Route o) {
         if (!Objects.equals(this.time, o.time)) {
             return Double.compare(this.time, o.time);
         }

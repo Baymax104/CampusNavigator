@@ -2,7 +2,6 @@ package com.example.campusnavigator.utility.structures;
 
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Size;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -20,13 +19,14 @@ public class List<T> implements Iterable<T>, Stackable<T> {
     private T[] array = (T[]) new Object[MAX_SIZE];
     private int size = 0;
 
+
     public List() {
     }
 
     public List(List<T> other) {
         // 只需要复制数组内对象的引用
         System.arraycopy(other.array, 0, this.array, 0, other.size);
-        size = other.size;
+        this.size = other.size;
     }
 
     @Override
