@@ -271,9 +271,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         LatLng defaultPosition = new LatLng(39.8751, 116.48134);
         options.camera(CameraPosition.fromLatLngZoom(defaultPosition, 18));
         mapView = new MapView(this, options);
+
         FrameLayout layout = findViewById(R.id.map_view_container);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
         layout.addView(mapView, params);
+
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         CoordinatorLayout container = findViewById(R.id.view_container);
@@ -304,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         map.setMyLocationEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(false);
 
-        List<String> spotNames = provider.getAllNames();
+        List<String> spotNames = provider.allNames();
         for (String n : spotNames) {
             runOnUiThread(() -> {
                 OverlayHelper.drawMarker(provider.getPosByName(n));

@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -71,16 +72,14 @@ public class SpotSearchDialog extends BottomPopupView {
         MaterialCardView mapSelectButton = findViewById(R.id.dialog_search_select_spot);
         ImageView cleanButton = findViewById(R.id.dialog_search_clean_button);
 
-        List<String> spotNames = provider.getAllNames();
+        List<String> spotNames = provider.allNames();
         adapter = new SpotSearchAdapter(spotNames);
         spotsRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         spotsRecyclerView.setLayoutManager(layoutManager);
 
-        if (selectResult != null) {
-            editText.setText(selectResult);
-        }
 
+        // editText内容变化监听
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -98,13 +97,19 @@ public class SpotSearchDialog extends BottomPopupView {
                     adapter.notifyDataSetChanged();
                     cleanButton.setVisibility(INVISIBLE);
                 } else {
-                    List<String> results = fuzzySearch(content, spotNames);
-                    adapter.setData(results);
+                    List<Position> result = provider.fuzzyQuery(content);
+                    List<String> names = SpotProvider.extractName(result);
+                    adapter.setData(names);
                     adapter.notifyDataSetChanged();
                     cleanButton.setVisibility(VISIBLE);
                 }
             }
         });
+
+        // 若地图选点返回了选点结果，则填充地点名称
+        if (selectResult != null) {
+            editText.setText(selectResult);
+        }
 
         // 列表item点击监听
         adapter.setItemClickListener(name -> {
@@ -116,32 +121,31 @@ public class SpotSearchDialog extends BottomPopupView {
         mapSelectButton.setOnClickListener(view -> {
             if (modeContext == Mode.DEFAULT) {
                 dismissWith(() -> listener.onSingleSelect());
+            } else if (modeContext == Mode.SINGLE_SELECT) {
+                // 若当前处于地图选点状态，则直接关闭，继续选点
+                dismiss();
             }
         });
 
+        // 清除按钮监听
         cleanButton.setOnClickListener(view -> editText.setText(""));
 
         // 路线点击监听
-        routeButton.setOnClickListener(view -> dismissWith(() -> {
-            String name = editText.getText().toString();
-            Position spot = provider.getPosByName(name);
-            if (spot != null) {
-                listener.onDestReceiveSuccess(spot);
-            } else {
-                listener.onDestReceiveError(new Exception("找不到该地点"));
-            }
-        }));
-    }
+        routeButton.setOnClickListener(view -> {
+            String content = editText.getText().toString();
 
-    // TODO 模糊搜索
-    private List<String> fuzzySearch(String content, List<String> spotNames) {
-        List<String> results = new List<>();
-        for (String name : spotNames) {
-            if (name.equals(content)) {
-                results.push(name);
+            if ("".equals(content)) {
+                Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show();
+                return;
             }
-        }
-        return results;
+            Position spot = provider.getPosByName(content);
+            if (spot == null) {
+                Toast.makeText(context, "找不到该地点", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            dismissWith(() -> listener.onDestReceiveSuccess(spot));
+        });
     }
 
 }

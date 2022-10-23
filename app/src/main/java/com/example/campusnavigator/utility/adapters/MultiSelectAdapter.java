@@ -19,7 +19,7 @@ import com.example.campusnavigator.utility.structures.List;
  * @Date 2022/9/26 18:56
  * @Version 1
  */
-public class SpotSelectAdapter extends RecyclerView.Adapter<SpotSelectAdapter.ViewHolder> {
+public class MultiSelectAdapter extends RecyclerView.Adapter<MultiSelectAdapter.ViewHolder> {
     private List<Position> data = new List<>(); // 初始总为空
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -30,7 +30,7 @@ public class SpotSelectAdapter extends RecyclerView.Adapter<SpotSelectAdapter.Vi
         }
     }
 
-    public SpotSelectAdapter() {
+    public MultiSelectAdapter() {
     }
 
     @NonNull

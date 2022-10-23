@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
-import com.example.campusnavigator.utility.adapters.SpotSelectAdapter;
+import com.example.campusnavigator.utility.adapters.MultiSelectAdapter;
 
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
 
@@ -28,7 +28,7 @@ public class MultiSelectWindow extends Window {
     private TextView selectNumber;
     private ImageView removeButton;
     private RecyclerView spotRecyclerView;
-    private SpotSelectAdapter adapter;
+    private MultiSelectAdapter adapter;
 
     public MultiSelectWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_multi_select_window, context, parent);
@@ -39,7 +39,7 @@ public class MultiSelectWindow extends Window {
 
         selectNumber.setText("0");
 
-        adapter = new SpotSelectAdapter();
+        adapter = new MultiSelectAdapter();
         spotRecyclerView.setAdapter(adapter);
         LinearLayoutManager manager = new LinearLayoutManager(context);
         manager.setOrientation(RecyclerView.HORIZONTAL);

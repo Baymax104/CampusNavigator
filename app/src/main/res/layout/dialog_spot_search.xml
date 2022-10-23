@@ -77,8 +77,8 @@
                     android:inputType="text"
                     />
             <ImageView
-                    android:layout_width="23dp"
-                    android:layout_height="23dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:src="@drawable/clean_button"
                     android:id="@+id/dialog_search_clean_button"
                     android:layout_gravity="center_vertical"

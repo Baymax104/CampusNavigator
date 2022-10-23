@@ -1,7 +1,13 @@
 package com.example.campusnavigator.model;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.Stack;
+
+import java.util.Arrays;
 
 /**
  * @Description 提供外部查找Position的方法类
@@ -26,7 +32,7 @@ public class SpotProvider extends Map {
         return obj;
     }
 
-    public List<String> getAllNames() {
+    public List<String> allNames() {
         List<String> list = new List<>();
         for (int i = 0; i < sizeOfSpot; i++) {
             list.push(spots[i].getName());
@@ -36,9 +42,9 @@ public class SpotProvider extends Map {
 
     public Position getPosByName(String name) {
         for (int i = 0; i < sizeOfSpot; i++) {
-            Position pos = spots[i];
-            if (pos.getName() != null && pos.getName().equals(name)) {
-                return pos;
+            Position spot = spots[i];
+            if (spot.getName() != null && spot.getName().equals(name)) {
+                return spot;
             }
         }
         return null;
@@ -46,13 +52,44 @@ public class SpotProvider extends Map {
 
     public Position getPosByMarkerId(String markerId) {
         for (int i = 0; i < sizeOfSpot; i++) {
-            Position pos = spots[i];
-            if (pos.getMarkerId().equals(markerId)) {
-                return pos;
+            Position spot = spots[i];
+            if (spot.getMarkerId().equals(markerId)) {
+                return spot;
             }
         }
         return null;
     }
+
+    public List<Position> fuzzyQuery(@NonNull String name) {
+        // 将字符串处理为正则表达式
+        char[] nameArray = name.toCharArray();
+        StringBuilder builder = new StringBuilder();
+        for (char c : nameArray) {
+            builder.append("(.*)").append(c);
+        }
+        builder.append("(.*)");
+        String regex = builder.toString();
+
+        // 根据正则表达式模糊搜索
+        List<Position> result = new List<>();
+        for (int i = 0; i < sizeOfSpot; i++) {
+            Position spot = spots[i];
+            if (spot.getName().matches(regex)) {
+                result.push(spot);
+            }
+        }
+        return result;
+    }
+
+    @NonNull
+    public static List<String> extractName(@NonNull List<Position> positions) {
+        List<String> names = new List<>();
+        for (Position p : positions) {
+            names.push(p.getName());
+        }
+        return names;
+    }
+
 
     public Stack<Position> getBuffer() {
         return spotBuffer;

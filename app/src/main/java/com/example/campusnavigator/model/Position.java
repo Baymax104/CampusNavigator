@@ -47,16 +47,8 @@ public class Position {
         this.id = id;
     }
 
-    public double getLat() {
-        return lat;
-    }
-
     public void setLat(double lat) {
         this.lat = lat;
-    }
-
-    public double getLng() {
-        return lng;
     }
 
     public void setLng(double lng) {
@@ -90,10 +82,6 @@ public class Position {
         }
         if (obj instanceof Position) {
             Position other = (Position) obj;
-            /*
-            1.用于判断连接点输入是否重复(name = null)
-            2.用于查找时判断键值Position是否相同(name != null)
-             */
             return id == other.id && lat == other.lat && lng == other.lng;
         }
         return false;
@@ -101,9 +89,9 @@ public class Position {
 
     @Override
     public int hashCode() {
-        int code = 17;
         long lat = Double.doubleToLongBits(this.lat);
         long lng = Double.doubleToLongBits(this.lng);
+        int code = 17;
         code = 31 * code + id;
         code = 31 * code + (int) (lat ^ (lat >>> 32));
         code = 31 * code + (int) (lng ^ (lng >>> 32));
