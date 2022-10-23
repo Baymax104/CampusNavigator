@@ -16,6 +16,7 @@ import com.amap.api.maps.model.TextOptions;
 import com.amap.api.maps.model.animation.ScaleAnimation;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
+import com.example.campusnavigator.utility.structures.HashMap;
 import com.example.campusnavigator.utility.structures.List;
 
 /**
@@ -31,11 +32,15 @@ public class OverlayHelper {
     private static PolylineOptions lineStyle;
     private static MarkerOptions markerOptions;
     private static TextOptions textOptions;
-    private static ScaleAnimation startAnimation;
-    private static ScaleAnimation endAnimation;
+    private static ScaleAnimation openAnimation;
+    private static ScaleAnimation closeAnimation;
 
+    // Buffer存储当前活动的Overlay
     private static List<Polyline> lineBuffer;
     private static List<Marker> markerBuffer;
+
+    // map记录每个marker在buffer的个数，通过markerId绑定
+    private static HashMap<String, Integer> markerMap;
 
     private OverlayHelper() {
     }
@@ -44,6 +49,7 @@ public class OverlayHelper {
         map = amap;
         lineBuffer = new List<>();
         markerBuffer = new List<>();
+        markerMap = new HashMap<>();
 
         lineStyle = new PolylineOptions()
                 .width(40)
@@ -59,11 +65,10 @@ public class OverlayHelper {
                 .fontSize(37)
                 .backgroundColor(Color.TRANSPARENT);
 
-        startAnimation = new ScaleAnimation(0.5f, 1.4f, 0.5f, 1.4f);
-        startAnimation.setDuration(200);
+        openAnimation = new ScaleAnimation(0.5f, 1.4f, 0.5f, 1.4f);
 
-        endAnimation = new ScaleAnimation(1.4f, 1f, 1.4f, 1f);
-        endAnimation.setDuration(0);
+        closeAnimation = new ScaleAnimation(1.4f, 1f, 1.4f, 1f);
+        closeAnimation.setDuration(0);
     }
 
     public static void drawLine(Position ...destination) {
@@ -74,7 +79,11 @@ public class OverlayHelper {
     }
     public static void drawMarker(Position position) {
         Marker marker = map.addMarker(markerOptions.position(position.getLatLng()));
-        marker.setAnimation(startAnimation);
+
+        // 当前marker为关闭状态，设置下一次的动画为开启动画
+        markerMap.put(marker.getId(), 0);
+        marker.setAnimation(openAnimation);
+        // position与marker绑定
         position.setMarkerId(marker.getId());
     }
 
@@ -82,15 +91,38 @@ public class OverlayHelper {
         map.addText(textOptions.position(position.getLatLng()).text(text));
     }
 
-    public static void onMarkerStart(Marker marker) {
-        marker.setAnimation(endAnimation);
+    public static void onMarkerClicked(Marker marker) {
+        // 根据marker状态设置动画
+        int count = markerMap.get(marker.getId());
+
+        // 当前marker已经开启，重新设置开启动画
+        if (count != 0) {
+            marker.setAnimation(openAnimation);
+        }
+        marker.startAnimation();
+        marker.setAnimation(closeAnimation);
         markerBuffer.push(marker);
+        markerMap.put(marker.getId(), count + 1);
+    }
+
+    public static void onSpotRemoved(Position spot) {
+        String markerId = spot.getMarkerId();
+        Marker marker = markerBuffer.top();
+
+        // 根据buffer内当前marker的个数判断状态
+        int count = markerMap.get(markerId);
+        if (count == 1) { // 若当前marker为buffer内最后一个
+            marker.startAnimation();
+            marker.setAnimation(openAnimation);
+        }
+        markerBuffer.pop();
+        markerMap.put(markerId, count - 1);
     }
 
     public static void initAllMarkers() {
         for (Marker marker : markerBuffer) {
             marker.startAnimation();
-            marker.setAnimation(startAnimation);
+            marker.setAnimation(openAnimation);
         }
         markerBuffer.clear();
     }

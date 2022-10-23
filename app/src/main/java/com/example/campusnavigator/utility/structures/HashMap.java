@@ -44,6 +44,16 @@ public class HashMap<K, V> {
             entry = new Entry<>(hash(key), key, value);
             table[i] = entry;
         } else {
+            Entry<K, V> e = entry;
+            // 查找是否存在重复对象，存在则更新
+            while (e != null) {
+                if (e.hash == hash(key) && (e.key == key || key.equals(e.key))) {
+                    e.value = value;
+                    return;
+                }
+                e = e.next;
+            }
+
             Entry<K, V> newEntry = new Entry<>(hash(key), key, value);
             newEntry.next = entry;
             table[i] = newEntry;
@@ -57,9 +67,6 @@ public class HashMap<K, V> {
         int i = index(key);
         int hash = hash(key);
         Entry<K, V> e = table[i];
-        if (e == null) {
-            return null;
-        }
         while (e != null) {
             if (e.hash == hash && (e.key == key || key.equals(e.key))) {
                 return e.value;

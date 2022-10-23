@@ -6,7 +6,7 @@ import com.example.campusnavigator.controller.Mode;
 import com.example.campusnavigator.controller.PrivacyConfirmDialog;
 import com.example.campusnavigator.controller.SpotSearchDialog;
 import com.example.campusnavigator.model.Position;
-import com.example.campusnavigator.model.PositionProvider;
+import com.example.campusnavigator.model.SpotProvider;
 import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
 import com.lxj.xpopup.XPopup;
 
@@ -25,7 +25,7 @@ public class DialogHelper {
     public static void showSpotSearchDialog(
             Context context,
             Mode mode,
-            PositionProvider provider,
+            SpotProvider provider,
             SingleSelectListener listener,
             Position... selectedSpot) {
         new XPopup.Builder(context)

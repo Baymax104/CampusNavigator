@@ -30,7 +30,7 @@ import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Map;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.Position;
-import com.example.campusnavigator.model.PositionProvider;
+import com.example.campusnavigator.model.SpotProvider;
 import com.example.campusnavigator.model.Route;
 import com.example.campusnavigator.utility.helpers.DialogHelper;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private AMap map = null;
 
     // 主要数据管理对象
-    private PositionProvider provider;
+    private SpotProvider provider;
     private MapManager manager;
     private Position myLocation;
     private Mode mode = Mode.DEFAULT;
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         // Map绑定Context
         Map.bind(this);
-        provider = PositionProvider.getInstance();
+        provider = SpotProvider.getInstance();
         manager = MapManager.getInstance();
         OverlayHelper.bind(map, mapView, this);
 
@@ -119,8 +119,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                         manager.pushBuffer(spotAttach);
                         provider.pushBuffer(spot);
                         multiSelectWindow.addPosition(spot);
-                        marker.startAnimation();
-                        OverlayHelper.onMarkerStart(marker);
+                        OverlayHelper.onMarkerClicked(marker);
 
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -147,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                         singleRouteWindow.setExpendButtonUp(true);
                         map.getUiSettings().setAllGesturesEnabled(true);
                         mode = Mode.SINGLE_ROUTE_CLOSE;
+
                     } else if (touchY >= routeWindowY) { // 触摸点位于弹窗内侧
                         // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
                         map.getUiSettings().setAllGesturesEnabled(false);
@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                         multiRouteWindow.setExpendButtonUp(true);
                         map.getUiSettings().setAllGesturesEnabled(true);
                         mode = Mode.MULTI_ROUTE_CLOSE;
+
                     } else if (touchY >= multiRouteWindowY) { // 触摸点位于弹窗内侧
                         // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
                         map.getUiSettings().setAllGesturesEnabled(false);
@@ -213,8 +214,10 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         multiSelectWindow.setSelectRemoveListener(v -> {
             boolean isCompleted = multiSelectWindow.removePosition();
             if (isCompleted) {
+                Position removedSpot = provider.bufferTop();
                 manager.popBuffer();
                 provider.popBuffer();
+                OverlayHelper.onSpotRemoved(removedSpot);
             } else {
                 Toast.makeText(this, "无选中顶点", Toast.LENGTH_SHORT).show();
             }
@@ -279,6 +282,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         multiRouteWindow = new MultiRouteWindow(this, container);
         singleRouteWindow = new SingleRouteWindow(this, container);
         singleSelectWindow = new SingleSelectWindow(this, container);
+
         searchWindow.open();
     }
 
@@ -293,16 +297,19 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 .radiusFillColor(Color.TRANSPARENT)
                 .showMyLocation(true);
 
-        List<String> spotNames = provider.getAllNames();
         map.showMapText(false);
         map.setMapStatusLimits(new LatLngBounds(southwest, northeast));
         map.setLocationSource(this);
         map.setMyLocationStyle(locationStyle);
         map.setMyLocationEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(false);
-        for (String s : spotNames) {
-            OverlayHelper.drawMarker(provider.getPosByName(s));
-            OverlayHelper.drawText(provider.getPosByName(s), s);
+
+        List<String> spotNames = provider.getAllNames();
+        for (String n : spotNames) {
+            runOnUiThread(() -> {
+                OverlayHelper.drawMarker(provider.getPosByName(n));
+                OverlayHelper.drawText(provider.getPosByName(n), n);
+            });
         }
     }
 

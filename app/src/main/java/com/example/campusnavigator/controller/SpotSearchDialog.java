@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
-import com.example.campusnavigator.model.PositionProvider;
+import com.example.campusnavigator.model.SpotProvider;
 import com.example.campusnavigator.utility.adapters.SpotSearchAdapter;
 import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
 import com.example.campusnavigator.utility.structures.List;
@@ -29,7 +29,7 @@ import com.lxj.xpopup.core.BottomPopupView;
  */
 public class SpotSearchDialog extends BottomPopupView {
     private Context context;
-    private PositionProvider provider;
+    private SpotProvider provider;
     private SpotSearchAdapter adapter;
     private SingleSelectListener listener;
     private String selectResult;
@@ -43,7 +43,7 @@ public class SpotSearchDialog extends BottomPopupView {
     public SpotSearchDialog(
             @NonNull Context context,
             Mode mode,
-            PositionProvider provider,
+            SpotProvider provider,
             SingleSelectListener listener,
             Position... selectedSpot) {
         super(context);

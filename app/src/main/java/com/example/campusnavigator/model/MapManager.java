@@ -138,6 +138,7 @@ public class MapManager extends Map {
             }
             visited[v] = true;
             for (int i = 0; i < size; i++) {
+                // TODO 加入计数器，每选到一个点，计数器清空，下一次选择计数器值大的点
                 if (map[v][i].dist != INF && !visited[i]) { // 若v到i有路径并且i未访问过
                     if (type == PriorityType.DISTANCE && cost[v] + map[v][i].dist < cost[i]) { // 距离最小
                         cost[i] = cost[v] + map[v][i].dist;

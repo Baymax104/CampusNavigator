@@ -54,6 +54,11 @@ public class List<T> implements Iterable<T>, Stackable<T> {
         }
     }
 
+    @Override
+    public T top() {
+        return size == 0 ? null : array[size - 1];
+    }
+
     public int length() {
         return size;
     }
@@ -86,8 +91,9 @@ public class List<T> implements Iterable<T>, Stackable<T> {
     @NonNull
     @Override
     public Iterator<T> iterator() {
-        return new Iterator<T>() {
+        return new Iterator<>() {
             int cur = 0;
+
             @Override
             public boolean hasNext() {
                 return cur < size;

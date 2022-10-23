@@ -10,4 +10,5 @@ package com.example.campusnavigator.utility.interfaces;
 public interface Stackable<E> {
     void push(E e);
     void pop();
+    E top();
 }

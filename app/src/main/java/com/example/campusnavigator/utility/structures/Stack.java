@@ -47,6 +47,7 @@ public class Stack<T> implements Stackable<T> {
         size--;
     }
 
+    @Override
     public T top() {
         if (size == 0) {
             return null;

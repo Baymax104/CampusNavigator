@@ -10,18 +10,18 @@ import com.example.campusnavigator.utility.structures.Stack;
  * @Date 2022/8/31 9:47
  * @Version 1
  */
-public class PositionProvider extends Map {
+public class SpotProvider extends Map {
 
     private Stack<Position> spotBuffer;
-    private static PositionProvider obj;
+    private static SpotProvider obj;
 
-    private PositionProvider() {
+    private SpotProvider() {
         spotBuffer = new Stack<>();
     }
 
-    public static PositionProvider getInstance() {
+    public static SpotProvider getInstance() {
         if (obj == null) {
-            obj = new PositionProvider();
+            obj = new SpotProvider();
         }
         return obj;
     }
@@ -62,6 +62,13 @@ public class PositionProvider extends Map {
         if (spotBuffer != null) {
             spotBuffer.push(position);
         }
+    }
+
+    public Position bufferTop() {
+        if (spotBuffer != null) {
+            return spotBuffer.top();
+        }
+        return null;
     }
 
     public void popBuffer() {
