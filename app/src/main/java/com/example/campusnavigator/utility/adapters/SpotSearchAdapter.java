@@ -54,7 +54,7 @@ public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String name = data.get(position);
         holder.spotName.setText(name);
-        holder.itemView.setOnClickListener(view -> itemClickListener.onItemClicked(position));
+        holder.itemView.setOnClickListener(view -> itemClickListener.onItemClicked(name));
     }
 
     @Override

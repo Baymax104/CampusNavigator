@@ -8,5 +8,5 @@ package com.example.campusnavigator.utility.interfaces;
  * @Version 1
  */
 public interface ItemClickedListener {
-    void onItemClicked(int position);
+    void onItemClicked(String name);
 }

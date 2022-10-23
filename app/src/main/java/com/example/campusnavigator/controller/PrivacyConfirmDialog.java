@@ -32,8 +32,8 @@ public class PrivacyConfirmDialog extends CenterPopupView {
     @Override
     protected void onCreate() {
         super.onCreate();
-        TextView confirm = findViewById(R.id.privacy_confirm);
-        TextView cancel = findViewById(R.id.privacy_cancel);
+        TextView confirm = findViewById(R.id.dialog_privacy_confirm);
+        TextView cancel = findViewById(R.id.dialog_privacy_cancel);
         confirm.setOnClickListener(view -> {
             MapsInitializer.updatePrivacyAgree(context, true);
             dismiss();

@@ -13,7 +13,7 @@
         <com.google.android.material.card.MaterialCardView
                 android:layout_width="110dp"
                 android:layout_height="45dp"
-                android:id="@+id/select_spot_card"
+                android:id="@+id/dialog_search_select_spot"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="7dp"
@@ -69,14 +69,22 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:id="@+id/spot_edit"
+                    android:id="@+id/dialog_search_spot_edit"
                     android:hint="@string/input_destination"
                     android:textSize="15sp"
                     android:gravity="center_vertical"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     />
+            <ImageView
+                    android:layout_width="23dp"
+                    android:layout_height="23dp"
+                    android:src="@drawable/clean_button"
+                    android:id="@+id/dialog_search_clean_button"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="10dp"
+                    tools:ignore="ContentDescription"
+                    android:visibility="invisible"/>
             <Button
                     android:layout_width="75dp"
                     android:layout_height="40dp"
@@ -85,12 +93,12 @@
                     android:background="@drawable/selector_route_button"
                     android:text="@string/route"
                     android:textColor="@color/white"
-                    android:id="@+id/single_route_button"/>
+                    android:id="@+id/dialog_search_route_button"/>
         </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="280dp"
-                android:id="@+id/list_spot"
+                android:id="@+id/dialog_search_spot_list"
                 tools:listitem="@layout/layout_search_spot_item"/>
     </LinearLayout>
 
