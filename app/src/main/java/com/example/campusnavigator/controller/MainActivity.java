@@ -376,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 }
             }
 
-            filterPlan(); // 选取最优的三个方案
+//            filterPlan(); // 选取最优的三个方案
 
             // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
             List<List<Position>> routes = Route.extractRoute(routeResults);
@@ -389,7 +389,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             // 展示
             singleRouteWindow.displayPlan(routes, 0, myLocation);
             // 更换布局
-            Window.transition(searchWindow, singleRouteWindow);
+            if (searchWindow.isOpen()) {
+                Window.transition(searchWindow, singleRouteWindow);
+            } else if (singleSelectWindow.isOpen()) {
+                Window.transition(singleSelectWindow, singleRouteWindow);
+            }
             singleRouteWindow.openPlanBox();
             mode = Mode.SINGLE_ROUTE_OPEN;
         } catch (Exception e) {

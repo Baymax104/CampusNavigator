@@ -16,6 +16,7 @@ public abstract class Window {
     protected Context context;
     protected ViewGroup parent;
     protected View rootView;
+    protected boolean isOpen = false;
 
     public Window(int rootViewId, Context context, ViewGroup parent) {
         this.context = context;
@@ -26,13 +27,19 @@ public abstract class Window {
     public void open() {
         if (rootView != null) {
             parent.addView(rootView);
+            isOpen = true;
         }
     }
 
     public void close() {
         if (rootView != null) {
             parent.removeView(rootView);
+            isOpen = false;
         }
+    }
+
+    public boolean isOpen() {
+        return isOpen;
     }
 
     public static void transition(Window close, Window open) {
