@@ -199,8 +199,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        Stack<Position> buffer = manager.getBuffer();
-                        manager.calculateRoutePlan(buffer, true, this);
+                        manager.calculateRoutePlan(true, this);
                         mode = Mode.MULTI_ROUTE_OPEN;
                     } catch (Exception e) {
                         String msg = "计算错误：" + e.getMessage();
@@ -373,8 +372,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     manager.pushBuffer(attach);
                     manager.pushBuffer(dest);
                     // 对于每一对起点和终点有2种方案
-                    Stack<Position> buffer = manager.getBuffer();
-                    manager.calculateRoutePlan(buffer, false, this);
+                    manager.calculateRoutePlan(false, this);
                 }
             }
 

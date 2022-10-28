@@ -44,9 +44,9 @@ public class MapManager extends Map {
                 result.getDist() != null && !result.getDist().isInfinite();
     }
 
-    public void calculateRoutePlan(Stack<Position> spotBuffer, boolean isMultiSpot, RouteResultReceiver receiver) throws Exception {
+    public void calculateRoutePlan(boolean isMultiSpot, RouteResultReceiver receiver) throws Exception {
         if (isMultiSpot) {
-            List<Route> results = getMultiDestRoute(spotBuffer);
+            List<Route> results = getMultiDestRoute();
             for (Route result : results) {
                 if (!checkResult(result)) {
                     throw new Exception("多点结果错误");
@@ -57,10 +57,10 @@ public class MapManager extends Map {
         }
         PriorityType[] types = PriorityType.values();
         List<Route> results = new List<>();
-        Position to = spotBuffer.top();
-        spotBuffer.pop();
-        Position from = spotBuffer.top();
-        spotBuffer.pop();
+        Position to = positionBuffer.top();
+        positionBuffer.pop();
+        Position from = positionBuffer.top();
+        positionBuffer.pop();
         for (PriorityType type : types) {
             Route result = getSingleDestRoute(from, to, type);
             if (!checkResult(result)) {
@@ -71,14 +71,14 @@ public class MapManager extends Map {
         receiver.onSingleRouteReceive(results);
     }
 
-    public List<Route> getMultiDestRoute(Stack<Position> spotBuffer) {
+    public List<Route> getMultiDestRoute() {
         List<Route> results = new List<>();
-        Position to = spotBuffer.top();
-        spotBuffer.pop();
+        Position to = positionBuffer.top();
+        positionBuffer.pop();
 
-        while (!spotBuffer.isEmpty()) {
-            Position from = spotBuffer.top();
-            spotBuffer.pop();
+        while (!positionBuffer.isEmpty()) {
+            Position from = positionBuffer.top();
+            positionBuffer.pop();
             Route singleDestRoute = getSingleDestRoute(from, to, PriorityType.DISTANCE);
             results.push(singleDestRoute);
             to = from;
@@ -207,10 +207,6 @@ public class MapManager extends Map {
         double angle = dot / (modFirst * modSecond);
 
         return angle >= 0;
-    }
-
-    public Stack<Position> getBuffer() {
-        return positionBuffer;
     }
 
     public void pushBuffer(Position position) {
