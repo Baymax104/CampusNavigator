@@ -36,26 +36,19 @@ public class Map {
         public final int from;
         public final int to;
         protected double dist;
-        protected double time;
         protected Path(int from, int to) {
             this.from = from;
             this.to = to;
         }
-        protected Path(int from, int to, double dist, double time) {
+        protected Path(int from, int to, double dist) {
             this.from = from;
             this.to = to;
-            this.time = time;
             this.dist = dist;
         }
     }
     protected static Path[][] map;
 
-    protected static final double SPEED_WALK = 5; // 4km/h
-    protected static final double SPEED_CYCLING = 18; // 18km/h
-    public enum PriorityType {
-        TIME,
-        DISTANCE
-    }
+    protected static final double SPEED_WALK = 4.0 * 50 / 3; // 4km/h
 
     protected Map() {
     }
@@ -102,7 +95,7 @@ public class Map {
                     if (i == j) {
                         map[i][j] = new Path(i, j);
                     } else {
-                        map[i][j] = new Path(i, j, INF, INF);
+                        map[i][j] = new Path(i, j, INF);
                     }
                 }
             }
@@ -116,13 +109,6 @@ public class Map {
                 double distance = getDistanceById(from, to);
                 map[from][to].dist = distance;
                 map[to][from].dist = distance;
-
-                int randomFactor = (int) (Math.random() * 5 - 2); // uniform(-2,2)
-                // 初始为步行
-                double speed = (SPEED_WALK + randomFactor) * 50 / 3; // km/h -> m/min
-                double time = distance / speed;
-                map[from][to].time = time;
-                map[to][from].time = time;
             }
 
             // 获取crossings

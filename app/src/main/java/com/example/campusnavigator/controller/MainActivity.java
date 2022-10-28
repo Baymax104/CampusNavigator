@@ -334,16 +334,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         mode = Mode.DEFAULT; // 恢复到初始状态
     }
 
-    private void filterPlan() {
-        // TODO 过滤算法
-        List.sort(routeResults);
-        List<Route> results = new List<>();
-        results.push(routeResults.get(0));
-        results.push(routeResults.get(1));
-        results.push(routeResults.get(2));
-        routeResults = results;
-    }
-
     private void calculateSingleRoute(Position destPosition) {
         try {
             // 判断当前定位点是否存在
@@ -375,8 +365,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     manager.calculateRoutePlan(false, this);
                 }
             }
-
-//            filterPlan(); // 选取最优的三个方案
 
             // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
             List<List<Position>> routes = Route.extractRoute(routeResults);
