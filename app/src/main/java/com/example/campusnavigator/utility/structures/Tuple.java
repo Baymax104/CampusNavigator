@@ -7,11 +7,11 @@ package com.example.campusnavigator.utility.structures;
  * @Date 2022/9/21 16:22
  * @Version 1
  */
-public class Tuple<T1, T2> {
-    public final T1 first;
-    public final T2 second;
+public class Tuple<E1, E2> {
+    public final E1 first;
+    public final E2 second;
 
-    public Tuple(T1 first, T2 second) {
+    public Tuple(E1 first, E2 second) {
         this.first = first;
         this.second = second;
     }

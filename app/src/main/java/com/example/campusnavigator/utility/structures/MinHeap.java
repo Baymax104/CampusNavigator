@@ -1,8 +1,6 @@
 package com.example.campusnavigator.utility.structures;
 
 
-import java.lang.reflect.Array;
-
 /**
  * @Description
  * @Author John
@@ -10,36 +8,21 @@ import java.lang.reflect.Array;
  * @Date 2022/9/1 19:13
  * @Version 1
  */
-public class MinHeap<T1, T2 extends Comparable<T2>> {
+public class MinHeap<E extends Comparable<E>> {
     private static final int MAX_SIZE = 80;
-    public class Entry {
-        private T1 v;
-        private T2 priority;
-        public Entry(T1 v, T2 priority) {
-            this.v = v;
-            this.priority = priority;
-        }
-        public T1 first() {
-            return v;
-        }
-        public T2 second() {
-            return priority;
-        }
-    }
     private int size;
-    private Entry[] array;
+    private E[] array;
 
     @SuppressWarnings("unchecked")
     public MinHeap() {
-        array = (Entry[]) Array.newInstance(Entry.class, MAX_SIZE);
+        array = (E[]) new Comparable[MAX_SIZE];
     }
 
-    public boolean push(T1 t1, T2 t2) {
+    public boolean push(E e) {
         if (size == MAX_SIZE) {
             return false;
         }
-        Entry entry = new Entry(t1, t2);
-        array[size] = entry;
+        array[size] = e;
         size++;
         shiftUp(size - 1);
         return true;
@@ -55,7 +38,7 @@ public class MinHeap<T1, T2 extends Comparable<T2>> {
         return true;
     }
 
-    public Entry top() {
+    public E top() {
         return array[0];
     }
 
@@ -63,13 +46,13 @@ public class MinHeap<T1, T2 extends Comparable<T2>> {
         int index = 0;
         int child = 1;
         while (child < size) {
-            if (child + 1 < size && array[child].priority.compareTo(array[child + 1].priority) > 0) {
+            if (child + 1 < size && array[child].compareTo(array[child + 1]) > 0) {
                 child++;
             }
-            if (array[index].priority.compareTo(array[child].priority) <= 0) {
+            if (array[index].compareTo(array[child]) <= 0) {
                 break;
             }
-            Entry temp = array[index];
+            E temp = array[index];
             array[index] = array[child];
             array[child] = temp;
             index = child;
@@ -80,10 +63,10 @@ public class MinHeap<T1, T2 extends Comparable<T2>> {
     private void shiftUp(int index) {
         int parent = (index - 1) / 2;
         while (parent >= 0) {
-            if (array[parent].priority.compareTo(array[index].priority) <= 0) {
+            if (array[parent].compareTo(array[index]) <= 0) {
                 break;
             }
-            Entry temp = array[parent];
+            E temp = array[parent];
             array[parent] = array[index];
             array[index] = temp;
             index = parent;

@@ -10,7 +10,7 @@ import com.example.campusnavigator.utility.interfaces.Stackable;
  * @Date 2022/9/1 14:15
  * @Version 1
  */
-public class Stack<T> implements Stackable<T> {
+public class Stack<E> implements Stackable<E> {
     private static class Node<T> {
         private T value;
         private Node<T> pre;
@@ -22,16 +22,16 @@ public class Stack<T> implements Stackable<T> {
         }
     }
 
-    private Node<T> head = new Node<>();
-    private Node<T> tail = head;
+    private Node<E> head = new Node<>();
+    private Node<E> tail = head;
     private int size = 0;
 
     public Stack() {
     }
 
     @Override
-    public void push(T value) {
-        Node<T> node = new Node<>(value);
+    public void push(E value) {
+        Node<E> node = new Node<>(value);
         tail.next = node;
         node.pre = tail;
         tail = tail.next;
@@ -48,7 +48,7 @@ public class Stack<T> implements Stackable<T> {
     }
 
     @Override
-    public T top() {
+    public E top() {
         if (size == 0) {
             return null;
         }
@@ -68,9 +68,9 @@ public class Stack<T> implements Stackable<T> {
         return size;
     }
 
-    public List<T> toList(boolean reverse) {
-        List<T> list = new List<>();
-        Node<T> cur = reverse ? head.next : tail;
+    public List<E> toList(boolean reverse) {
+        List<E> list = new List<>();
+        Node<E> cur = reverse ? head.next : tail;
         for (int l = size; l > 0; l--) {
             list.push(cur.value);
             cur = reverse ? cur.next : cur.pre;

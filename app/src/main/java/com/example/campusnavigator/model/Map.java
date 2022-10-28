@@ -3,6 +3,8 @@ package com.example.campusnavigator.model;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.utility.structures.HashMap;
@@ -106,7 +108,7 @@ public class Map {
                 JSONObject path = pathArray.getJSONObject(j);
                 int from = path.getInt("from") - 1;
                 int to = path.getInt("to") - 1;
-                double distance = getDistanceById(from, to);
+                double distance = getDistance(from, to);
                 map[from][to].dist = distance;
                 map[to][from].dist = distance;
             }
@@ -134,13 +136,13 @@ public class Map {
         }
     }
 
-    protected static double getDistanceById(int p1, int p2) {
+    protected static double getDistance(int p1, int p2) {
         LatLng l1 = positions[p1].getLatLng();
         LatLng l2 = positions[p2].getLatLng();
         return AMapUtils.calculateLineDistance(l1, l2);
     }
 
-    protected static double getDistanceByPosition(Position p1, Position p2) {
+    protected static double getDistance(@NonNull Position p1, @NonNull Position p2) {
         LatLng l1 = p1.getLatLng();
         LatLng l2 = p2.getLatLng();
         return AMapUtils.calculateLineDistance(l1, l2);

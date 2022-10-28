@@ -114,30 +114,49 @@ public class MapManager extends Map {
     public Tuple<Double, Double> Astar(int source, int dest, @NonNull int[] paths) {
         double[] cost = new double[size];
 
+        class Status implements Comparable<Status> {
+            int v;
+            double p;
+            Status pre;
+
+            public Status() {
+            }
+
+            public Status(int v, double p, Status pre) {
+                this.v = v;
+                this.p = p;
+                this.pre = pre;
+            }
+
+            @Override
+            public int compareTo(Status o) {
+                return (int) (p - o.p);
+            }
+        }
+
         int v = source;
-        MinHeap<Integer, Double> heap = new MinHeap<>();
+        MinHeap<Status> heap = new MinHeap<>();
 
         // 初始化
         Arrays.fill(cost, INF);
         cost[v] = 0;
         paths[v] = -1;
-        heap.push(v, 0.0);
+        heap.push(new Status(v, 0.0, null));
 
         while (!heap.isEmpty()) {
-            v = heap.top().first();
+            v = heap.top().v;
             heap.pop();
             if (v == dest) { // 查找到目的地直接退出
                 break;
             }
             visited[v] = true;
             for (int i = 0; i < size; i++) {
-                // TODO 加入计数器，每选到一个点，计数器清空，下一次选择计数器值大的点
                 if (map[v][i].dist != INF && !visited[i]) { // 若v到i有路径并且i未访问过
                     if (cost[v] + map[v][i].dist < cost[i]) { // 距离最小
                         cost[i] = cost[v] + map[v][i].dist;
-                        double h = getDistanceById(i, dest); // 启发式信息为i到dest的直线距离
+                        double h = getDistance(i, dest); // 启发式信息为i到dest的直线距离
                         double priority = cost[i] + h; // f(i) = g(i) + h(i)
-                        heap.push(i, priority);
+                        heap.push(new Status(i, priority, null));
                         paths[i] = v;
                     }
                 }
@@ -157,19 +176,34 @@ public class MapManager extends Map {
     public List<Position> attachToMap(Position myPosition, Position destPosition) {
         List<Position> attachPositions = new List<>();
 
-        // 使用最小堆取距离最小的两个点
-        MinHeap<Integer, Double> minDist = new MinHeap<>();
-        for (int i = 0; i < size; i++) {
-            if (checkDirection(myPosition, positions[i], destPosition)) {
-                double distance = getDistanceByPosition(myPosition, positions[i]);
-                minDist.push(i, distance);
+        final class Entry implements Comparable<Entry>{
+            final int v;
+            final double dist;
+
+            Entry(int v, double dist) {
+                this.v = v;
+                this.dist = dist;
+            }
+
+            @Override
+            public int compareTo(Entry o) {
+                return (int) (dist - o.dist);
             }
         }
-        int min1 = minDist.top().first();
+
+        // 使用最小堆取距离最小的两个点
+        MinHeap<Entry> minDist = new MinHeap<>();
+        for (int i = 0; i < size; i++) {
+            if (checkDirection(myPosition, positions[i], destPosition)) {
+                double dist = getDistance(myPosition, positions[i]);
+                minDist.push(new Entry(i, dist));
+            }
+        }
+        int min1 = minDist.top().v;
         minDist.pop();
-        int min2 = minDist.top().first();
+        int min2 = minDist.top().v;
         minDist.pop();
-        int min3 = minDist.top().first();
+        int min3 = minDist.top().v;
         attachPositions.push(positions[min1]);
         attachPositions.push(positions[min2]);
         attachPositions.push(positions[min3]);

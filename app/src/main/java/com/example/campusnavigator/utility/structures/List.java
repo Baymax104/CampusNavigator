@@ -15,24 +15,24 @@ import java.util.Iterator;
  * @Date 2022/9/1 13:45
  * @Version 1
  */
-public class List<T> implements Iterable<T>, Stackable<T> {
+public class List<E> implements Iterable<E>, Stackable<E> {
     private static final int MAX_SIZE = 80;
     @SuppressWarnings("unchecked")
-    private T[] array = (T[]) new Object[MAX_SIZE];
+    private E[] array = (E[]) new Object[MAX_SIZE];
     private int size = 0;
 
 
     public List() {
     }
 
-    public List(List<T> other) {
+    public List(List<E> other) {
         // 只需要复制数组内对象的引用
         System.arraycopy(other.array, 0, this.array, 0, other.size);
         this.size = other.size;
     }
 
     @Override
-    public void push(T value) {
+    public void push(E value) {
         if (size == MAX_SIZE) {
             grow(); // 当存满时进行扩容
         }
@@ -40,7 +40,7 @@ public class List<T> implements Iterable<T>, Stackable<T> {
         size++;
     }
 
-    public T get(int i) {
+    public E get(int i) {
         if (i < 0 || i >= MAX_SIZE) {
             return null;
         }
@@ -55,7 +55,7 @@ public class List<T> implements Iterable<T>, Stackable<T> {
     }
 
     @Override
-    public T top() {
+    public E top() {
         return size == 0 ? null : array[size - 1];
     }
 
@@ -90,7 +90,7 @@ public class List<T> implements Iterable<T>, Stackable<T> {
 
     @NonNull
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<E> iterator() {
         return new Iterator<>() {
             int cur = 0;
 
@@ -100,7 +100,7 @@ public class List<T> implements Iterable<T>, Stackable<T> {
             }
 
             @Override
-            public T next() {
+            public E next() {
                 return array[cur++];
             }
         };
