@@ -108,7 +108,7 @@ public class OverlayHelper {
     public static void onSpotRemoved(Position spot) {
         String markerId = spot.getMarkerId();
         Marker marker = markerBuffer.top();
-
+        // TODO 动画恢复bug
         // 根据buffer内当前marker的个数判断状态
         int count = markerMap.get(markerId);
         if (count == 1) { // 若当前marker为buffer内最后一个

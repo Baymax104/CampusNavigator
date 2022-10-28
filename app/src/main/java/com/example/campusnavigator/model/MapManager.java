@@ -40,8 +40,8 @@ public class MapManager extends Map {
     private boolean checkResult(Route result) {
         return result != null &&
                 result.getRoute() != null && result.getRoute().length() != 0 &&
-                result.getTime() != null && !result.getTime().isInfinite() &&
-                result.getDist() != null && !result.getDist().isInfinite();
+                result.getTime() != null && !result.getTime().equals(INF) &&
+                result.getDist() != null && !result.getDist().equals(INF);
     }
 
     public void calculateRoutePlan(boolean isMultiSpot, RouteResultReceiver receiver) throws Exception {

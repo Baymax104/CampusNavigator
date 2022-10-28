@@ -29,7 +29,7 @@ public class Map {
     protected static Position[] positions; // 路口采点
     protected static int size;
     protected static int sizeOfSpot;
-    protected static final int INF = 65535;
+    protected static final double INF = 65535;
     public static HashMap<Position, List<Position>> spotAttached; // 每个地点的入口点
 
     public static class Path {
