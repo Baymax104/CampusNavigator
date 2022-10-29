@@ -98,7 +98,7 @@ public class MapManager extends Map {
         Position from = positionBuffer.top();
         positionBuffer.pop();
 
-        for (int i = 0, k = 1; i < 3; i++, k += 2) {
+        for (int i = 0, k = 1; i < 3; i++, k++) {
             Route result = singleDestRoute(from, to, k);
             if (!checkResult(result)) {
                 throw new Exception("单点结果错误");
@@ -164,11 +164,13 @@ public class MapManager extends Map {
             }
 
             for (int i = 0; i < size; i++) {
-                if (map[v][i].dist != INF) { // 若v到i有路径
-                    double d = s.d + map[v][i].dist;
-                    double p = d + dist[i];
-                    Status next = new Status(i, d, p, s);
-                    heap.push(next);
+                if (v != i &&map[v][i].dist != INF) { // 若v到i有路径
+                    if (s.pre == null || s.pre.v != i) {
+                        double d = s.d + map[v][i].dist;
+                        double p = d + dist[i];
+                        Status next = new Status(i, d, p, s);
+                        heap.push(next);
+                    }
                 }
             }
         }
