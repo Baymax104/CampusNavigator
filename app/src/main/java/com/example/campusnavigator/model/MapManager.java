@@ -22,11 +22,47 @@ import java.util.Arrays;
 public class MapManager extends Map {
 
     private Stack<Position> positionBuffer;
-    private boolean[] visited;
+    private int[] visited;
+    private double[] dist;
     private static MapManager obj;
 
+    private static class Status implements Comparable<Status> {
+        int v;
+        double d;
+        double p;
+        Status pre;
+
+        public Status(int v, double d, double p, Status pre) {
+            this.v = v;
+            this.d = d;
+            this.p = p;
+            this.pre = pre;
+        }
+
+        @Override
+        public int compareTo(Status o) {
+            return Double.compare(p, o.p);
+        }
+    }
+
+    private static class Entry implements Comparable<Entry>{
+        final int v;
+        final double dist;
+
+        Entry(int v, double dist) {
+            this.v = v;
+            this.dist = dist;
+        }
+
+        @Override
+        public int compareTo(Entry o) {
+            return Double.compare(dist, o.dist);
+        }
+    }
+
+
     private MapManager() {
-        visited = new boolean[size + 1];
+        visited = new int[size + 1];
         positionBuffer = new Stack<>();
     }
 
@@ -44,9 +80,9 @@ public class MapManager extends Map {
                 result.getDist() != null && !result.getDist().equals(INF);
     }
 
-    public void calculateRoutePlan(boolean isMultiSpot, RouteResultReceiver receiver) throws Exception {
+    public void calculate(boolean isMultiSpot, RouteResultReceiver receiver) throws Exception {
         if (isMultiSpot) {
-            List<Route> results = getMultiDestRoute();
+            List<Route> results = multiDestRoute();
             for (Route result : results) {
                 if (!checkResult(result)) {
                     throw new Exception("多点结果错误");
@@ -55,20 +91,25 @@ public class MapManager extends Map {
             receiver.onMultiRouteReceive(results);
             return;
         }
+
         List<Route> results = new List<>();
         Position to = positionBuffer.top();
         positionBuffer.pop();
         Position from = positionBuffer.top();
         positionBuffer.pop();
-        Route result = getSingleDestRoute(from, to);
-        if (!checkResult(result)) {
-            throw new Exception("单点结果错误");
+
+        for (int i = 0, k = 1; i < 3; i++, k += 2) {
+            Route result = singleDestRoute(from, to, k);
+            if (!checkResult(result)) {
+                throw new Exception("单点结果错误");
+            }
+            results.push(result);
         }
-        results.push(result);
+
         receiver.onSingleRouteReceive(results);
     }
 
-    public List<Route> getMultiDestRoute() {
+    public List<Route> multiDestRoute() {
         List<Route> results = new List<>();
         Position to = positionBuffer.top();
         positionBuffer.pop();
@@ -76,7 +117,7 @@ public class MapManager extends Map {
         while (!positionBuffer.isEmpty()) {
             Position from = positionBuffer.top();
             positionBuffer.pop();
-            Route singleDestRoute = getSingleDestRoute(from, to);
+            Route singleDestRoute = singleDestRoute(from, to, 1);
             results.push(singleDestRoute);
             to = from;
         }
@@ -84,112 +125,105 @@ public class MapManager extends Map {
         return results;
     }
 
-    public Route getSingleDestRoute(@NonNull Position from, @NonNull Position to) {
-        List<Position> route = new List<>();
-        int[] paths = new int[size];
-        Arrays.fill(paths, -1);
+    public Route singleDestRoute(@NonNull Position from, @NonNull Position to, int k) {
 
         int fromId = from.getId();
         int toId = to.getId();
 
-        Tuple<Double, Double> timeAndDist = Astar(fromId, toId, paths);
+        Tuple<List<Position>, Double> result = Astar(fromId, toId, k);
 
-        double time = timeAndDist.first;
-        double dist = timeAndDist.second;
-
-        // 生成的路线为逆序
-        Path path = map[toId][paths[toId]];
-        Position startPoint = positions[path.from];
-        route.push(startPoint);
-        while (paths[toId] != -1) {
-            path = map[toId][paths[toId]];
-            Position p = positions[path.to];
-            route.push(p);
-            toId = paths[toId];
-        }
+        List<Position> route = result.first;
+        double dist = result.second;
+        double time = dist / SPEED_WALK;
 
         return new Route(route, time, dist);
     }
 
-    public Tuple<Double, Double> Astar(int source, int dest, @NonNull int[] paths) {
-        double[] cost = new double[size];
+    public Tuple<List<Position>, Double> Astar(int source, int dest, int k) {
 
-        class Status implements Comparable<Status> {
-            int v;
-            double p;
-            Status pre;
+        Dijkstra(dest, source);
 
-            public Status() {
+        List<Position> route = new List<>();
+        MinHeap<Status> heap = new MinHeap<>();
+
+        int v = source;
+        Status s = new Status(v, 0, dist[v], null);
+        heap.push(s);
+
+        while (!heap.isEmpty()) {
+            s = heap.top();
+            v = s.v;
+            heap.pop();
+
+            visited[v]++;
+            if (v == dest && visited[v] == k) { // 查找到目的地直接退出
+                break;
+            }
+            if (visited[v] > k) {
+                continue;
             }
 
-            public Status(int v, double p, Status pre) {
-                this.v = v;
-                this.p = p;
-                this.pre = pre;
-            }
-
-            @Override
-            public int compareTo(Status o) {
-                return (int) (p - o.p);
+            for (int i = 0; i < size; i++) {
+                if (map[v][i].dist != INF) { // 若v到i有路径
+                    double d = s.d + map[v][i].dist;
+                    double p = d + dist[i];
+                    Status next = new Status(i, d, p, s);
+                    heap.push(next);
+                }
             }
         }
 
-        int v = source;
-        MinHeap<Status> heap = new MinHeap<>();
+        double dist = s.p;
+        Position pos = positions[s.v];
+        route.push(pos);
+        Status cur = s.pre;
+        while (cur != null) {
+            pos = positions[cur.v];
+            route.push(pos);
+            cur = cur.pre;
+        }
 
-        // 初始化
-        Arrays.fill(cost, INF);
-        cost[v] = 0;
-        paths[v] = -1;
-        heap.push(new Status(v, 0.0, null));
+        refreshVisited();
+        return new Tuple<>(route, dist);
+    }
+
+    private void Dijkstra(int s, int t) {
+        boolean[] vis = new boolean[size];
+        dist = new double[size];
+        Arrays.fill(dist, INF);
+        dist[s] = 0;
+
+        int v = s;
+        MinHeap<Entry> heap = new MinHeap<>();
+        heap.push(new Entry(v, 0));
 
         while (!heap.isEmpty()) {
             v = heap.top().v;
             heap.pop();
-            if (v == dest) { // 查找到目的地直接退出
+            vis[v] = true;
+            if (v == t) {
                 break;
             }
-            visited[v] = true;
             for (int i = 0; i < size; i++) {
-                if (map[v][i].dist != INF && !visited[i]) { // 若v到i有路径并且i未访问过
-                    if (cost[v] + map[v][i].dist < cost[i]) { // 距离最小
-                        cost[i] = cost[v] + map[v][i].dist;
-                        double h = getDistance(i, dest); // 启发式信息为i到dest的直线距离
-                        double priority = cost[i] + h; // f(i) = g(i) + h(i)
-                        heap.push(new Status(i, priority, null));
-                        paths[i] = v;
+                if (map[v][i].dist != INF && !vis[i]) {
+                    if (dist[v] + map[v][i].dist < dist[i]) {
+                        dist[i] = dist[v] + map[v][i].dist;
+                        Entry e = new Entry(i, dist[i]);
+                        heap.push(e);
                     }
                 }
             }
         }
-        refreshVisited();
-        Double time = cost[dest] / SPEED_WALK;
-        return new Tuple<>(time, cost[dest]);
     }
 
     private void refreshVisited() {
         for (int i = 0; i < size; i++) {
-            visited[i] = false;
+            visited[i] = 0;
         }
     }
 
     public List<Position> attachToMap(Position myPosition, Position destPosition) {
         List<Position> attachPositions = new List<>();
-
-        final class Entry implements Comparable<Entry>{
-            final int v;
-            final double dist;
-
-            Entry(int v, double dist) {
-                this.v = v;
-                this.dist = dist;
-            }
-
-            @Override
-            public int compareTo(Entry o) {
-                return (int) (dist - o.dist);
-            }
-        }
 
         // 使用最小堆取距离最小的两个点
         MinHeap<Entry> minDist = new MinHeap<>();

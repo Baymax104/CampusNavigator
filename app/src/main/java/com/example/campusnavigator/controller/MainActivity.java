@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        manager.calculateRoutePlan(true, this);
+                        manager.calculate(true, this);
                         mode = Mode.MULTI_ROUTE_OPEN;
                     } catch (Exception e) {
                         String msg = "计算错误：" + e.getMessage();
@@ -354,17 +354,23 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             routeResults.clear();
 
             // 计算连接点到目的地的路径方案，共有2nm种方案
-            for (Position attach : attachPos) {
-                for (Position dest : spotAttached) {
-                    if (attach == null || dest == null) {
-                        throw new Exception("连接点错误");
-                    }
-                    manager.pushBuffer(attach);
-                    manager.pushBuffer(dest);
-                    // 对于每一对起点和终点有2种方案
-                    manager.calculateRoutePlan(false, this);
-                }
-            }
+//            for (Position attach : attachPos) {
+//                for (Position dest : spotAttached) {
+//                    if (attach == null || dest == null) {
+//                        throw new Exception("连接点错误");
+//                    }
+//                    manager.pushBuffer(attach);
+//                    manager.pushBuffer(dest);
+//                    // 对于每一对起点和终点有2种方案
+//                    manager.calculate(false, this);
+//                }
+//            }
+
+            Position attach = attachPos.get(0);
+            Position dest = spotAttached.get(0);
+            manager.pushBuffer(attach);
+            manager.pushBuffer(dest);
+            manager.calculate(false, this);
 
             // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
             List<List<Position>> routes = Route.extractRoute(routeResults);
