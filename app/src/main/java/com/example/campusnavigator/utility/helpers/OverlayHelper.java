@@ -80,9 +80,7 @@ public class OverlayHelper {
     public static void drawMarker(Position position) {
         Marker marker = map.addMarker(markerOptions.position(position.getLatLng()));
 
-        // 当前marker为关闭状态，设置下一次的动画为开启动画
         markerMap.put(marker.getId(), 0);
-        marker.setAnimation(openAnimation);
         // position与marker绑定
         position.setMarkerId(marker.getId());
     }
@@ -92,28 +90,22 @@ public class OverlayHelper {
     }
 
     public static void onMarkerClicked(Marker marker) {
-        // 根据marker状态设置动画
-        int count = markerMap.get(marker.getId());
-
-        // 当前marker已经开启，重新设置开启动画
-        if (count != 0) {
-            marker.setAnimation(openAnimation);
-        }
+        marker.setAnimation(openAnimation);
         marker.startAnimation();
-        marker.setAnimation(closeAnimation);
         markerBuffer.push(marker);
+        int count = markerMap.get(marker.getId());
         markerMap.put(marker.getId(), count + 1);
     }
 
     public static void onSpotRemoved(Position spot) {
         String markerId = spot.getMarkerId();
         Marker marker = markerBuffer.top();
-        // TODO 动画恢复bug
+
         // 根据buffer内当前marker的个数判断状态
         int count = markerMap.get(markerId);
         if (count == 1) { // 若当前marker为buffer内最后一个
+            marker.setAnimation(closeAnimation);
             marker.startAnimation();
-            marker.setAnimation(openAnimation);
         }
         markerBuffer.pop();
         markerMap.put(markerId, count - 1);
@@ -121,8 +113,8 @@ public class OverlayHelper {
 
     public static void initAllMarkers() {
         for (Marker marker : markerBuffer) {
+            marker.setAnimation(closeAnimation);
             marker.startAnimation();
-            marker.setAnimation(openAnimation);
         }
         markerBuffer.clear();
     }
