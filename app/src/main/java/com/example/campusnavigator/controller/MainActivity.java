@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     break;
                 case MULTI_SELECT:
                     try {
-                        List<Position> spotAttachList = Map.spotAttached.get(spot);
+                        List<Position> spotAttachList = manager.getSpotAttached(spot);
                         // 检查地点连接点空指针
                         if (spotAttachList == null) {
                             throw new Exception("地点选择错误，请重新选择");
@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             // 计算距定位点最近的连接点，定位点邻接点表attachPos
             List<Position> attachPos = manager.attachToMap(myLocation, destPosition);
             // 获取目的地邻接点，目的地邻接点表spotAttached
-            List<Position> spotAttached = Map.spotAttached.get(destPosition);
+            List<Position> spotAttached = manager.getSpotAttached(destPosition);
             if (attachPos == null || attachPos.length() == 0 ||
                     spotAttached == null || spotAttached.length() == 0) {
                 throw new Exception("连接点错误");

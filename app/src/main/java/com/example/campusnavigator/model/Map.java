@@ -32,23 +32,9 @@ public class Map {
     protected static int size;
     protected static int sizeOfSpot;
     protected static final double INF = 65535;
-    public static HashMap<Position, List<Position>> spotAttached; // 每个地点的入口点
+    protected static HashMap<Position, List<Position>> spotAttached; // 每个地点的入口点
 
-    public static class Path {
-        public final int from;
-        public final int to;
-        protected double dist;
-        protected Path(int from, int to) {
-            this.from = from;
-            this.to = to;
-        }
-        protected Path(int from, int to, double dist) {
-            this.from = from;
-            this.to = to;
-            this.dist = dist;
-        }
-    }
-    protected static Path[][] map;
+    protected static double[][] map;
 
     protected static final double SPEED_WALK = 4.0 * 50 / 3; // 4km/h
 
@@ -91,13 +77,13 @@ public class Map {
             }
 
             // 解析文件创建map
-            map = new Path[size][size];
+            map = new double[size][size];
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
                     if (i == j) {
-                        map[i][j] = new Path(i, j);
+                        map[i][j] = 0;
                     } else {
-                        map[i][j] = new Path(i, j, INF);
+                        map[i][j] = INF;
                     }
                 }
             }
@@ -109,8 +95,8 @@ public class Map {
                 int from = path.getInt("from") - 1;
                 int to = path.getInt("to") - 1;
                 double distance = getDistance(from, to);
-                map[from][to].dist = distance;
-                map[to][from].dist = distance;
+                map[from][to] = distance;
+                map[to][from] = distance;
             }
 
             // 获取crossings

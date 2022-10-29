@@ -1,5 +1,7 @@
 package com.example.campusnavigator.model;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.amap.api.maps.model.LatLng;
@@ -9,6 +11,7 @@ import com.example.campusnavigator.utility.structures.MinHeap;
 import com.example.campusnavigator.utility.structures.Stack;
 import com.example.campusnavigator.utility.structures.Tuple;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -169,12 +172,12 @@ public class MapManager extends Map {
 
             for (int i = 0; i < size; i++) {
                 // 遍历v的邻接点
-                if (vi != i &&map[vi][i].dist != INF) {
+                if (vi != i &&map[vi][i] != INF) {
                     // 无向图中需要假定 v.pre 到 v 为单向的，即 v.pre -> v
                     // 则下一个选择的 i != v.pre，防止算法困在 v 和 v.pre 之间
                     if (v.pre == null || v.pre.v != i) {
                         // d为实际距离，p为移动代价
-                        double d = v.d + map[vi][i].dist;
+                        double d = v.d + map[vi][i];
                         double p = d + dist[i];
                         Status next = new Status(i, d, p, v);
                         heap.push(next);
@@ -183,6 +186,7 @@ public class MapManager extends Map {
             }
         }
 
+        // TODO 合理方案筛选
         // pre回溯状态
         double dist = v.p;
         Position pos = positions[v.v];
@@ -215,9 +219,9 @@ public class MapManager extends Map {
                 break;
             }
             for (int i = 0; i < size; i++) {
-                if (map[v][i].dist != INF && !vis[i]) {
-                    if (dist[v] + map[v][i].dist < dist[i]) {
-                        dist[i] = dist[v] + map[v][i].dist;
+                if (map[v][i] != INF && !vis[i]) {
+                    if (dist[v] + map[v][i] < dist[i]) {
+                        dist[i] = dist[v] + map[v][i];
                         Entry e = new Entry(i, dist[i]);
                         heap.push(e);
                     }
@@ -240,11 +244,8 @@ public class MapManager extends Map {
         int min1 = minDist.top().v;
         minDist.pop();
         int min2 = minDist.top().v;
-        minDist.pop();
-        int min3 = minDist.top().v;
         attachPositions.push(positions[min1]);
         attachPositions.push(positions[min2]);
-        attachPositions.push(positions[min3]);
         return attachPositions;
     }
 
@@ -266,6 +267,10 @@ public class MapManager extends Map {
         double angle = dot / (modFirst * modSecond);
 
         return angle >= 0;
+    }
+
+    public List<Position> getSpotAttached(Position spot) {
+        return spotAttached.get(spot);
     }
 
     public void pushBuffer(Position position) {
