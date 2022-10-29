@@ -22,7 +22,6 @@ import java.util.Arrays;
 public class MapManager extends Map {
 
     private Stack<Position> positionBuffer;
-    private int[] visited;
     private double[] dist;
     private static MapManager obj;
 
@@ -62,7 +61,6 @@ public class MapManager extends Map {
 
 
     private MapManager() {
-        visited = new int[size + 1];
         positionBuffer = new Stack<>();
     }
 
@@ -141,51 +139,61 @@ public class MapManager extends Map {
 
     public Tuple<List<Position>, Double> Astar(int source, int dest, int k) {
 
+        // 通过Dijkstra计算dest到source的最短路径树
+        // 其中dist[i]表示从dest到i的距离，将该距离作为A*的估计代价
         Dijkstra(dest, source);
 
         List<Position> route = new List<>();
         MinHeap<Status> heap = new MinHeap<>();
+        int[] visited = new int[size];
 
-        int v = source;
-        Status s = new Status(v, 0, dist[v], null);
-        heap.push(s);
+        int vi = source;
+        Status v = new Status(vi, 0, dist[vi], null);
+        heap.push(v);
 
         while (!heap.isEmpty()) {
-            s = heap.top();
-            v = s.v;
+            v = heap.top();
+            vi = v.v;
             heap.pop();
 
-            visited[v]++;
-            if (v == dest && visited[v] == k) { // 查找到目的地直接退出
+            // visited[v]记录到达v的次数
+            visited[vi]++;
+            // 每次走代价值最小的顶点，当第k次到达dest时，走过的路径就是k短路
+            if (vi == dest && visited[vi] == k) {
                 break;
             }
-            if (visited[v] > k) {
+            // 限制到达非dest顶点的次数，防止算法困在环中
+            if (visited[vi] > k) {
                 continue;
             }
 
             for (int i = 0; i < size; i++) {
-                if (v != i &&map[v][i].dist != INF) { // 若v到i有路径
-                    if (s.pre == null || s.pre.v != i) {
-                        double d = s.d + map[v][i].dist;
+                // 遍历v的邻接点
+                if (vi != i &&map[vi][i].dist != INF) {
+                    // 无向图中需要假定 v.pre 到 v 为单向的，即 v.pre -> v
+                    // 则下一个选择的 i != v.pre，防止算法困在 v 和 v.pre 之间
+                    if (v.pre == null || v.pre.v != i) {
+                        // d为实际距离，p为移动代价
+                        double d = v.d + map[vi][i].dist;
                         double p = d + dist[i];
-                        Status next = new Status(i, d, p, s);
+                        Status next = new Status(i, d, p, v);
                         heap.push(next);
                     }
                 }
             }
         }
 
-        double dist = s.p;
-        Position pos = positions[s.v];
+        // pre回溯状态
+        double dist = v.p;
+        Position pos = positions[v.v];
         route.push(pos);
-        Status cur = s.pre;
+        Status cur = v.pre;
         while (cur != null) {
             pos = positions[cur.v];
             route.push(pos);
             cur = cur.pre;
         }
 
-        refreshVisited();
         return new Tuple<>(route, dist);
     }
 
@@ -215,12 +223,6 @@ public class MapManager extends Map {
                     }
                 }
             }
-        }
-    }
-
-    private void refreshVisited() {
-        for (int i = 0; i < size; i++) {
-            visited[i] = 0;
         }
     }
 
