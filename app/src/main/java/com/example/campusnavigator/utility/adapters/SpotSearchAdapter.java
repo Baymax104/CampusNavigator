@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
-import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.interfaces.ItemClickedListener;
+import com.example.campusnavigator.utility.structures.List;
 
 /**
  * @Description
@@ -24,7 +24,7 @@ public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.Vi
     private ItemClickedListener itemClickListener;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView spotName;
+        final TextView spotName;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             spotName = itemView.findViewById(R.id.search_spot_name);

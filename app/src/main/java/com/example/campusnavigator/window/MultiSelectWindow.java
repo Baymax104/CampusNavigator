@@ -24,11 +24,11 @@ import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
  * @Version 1
  */
 public class MultiSelectWindow extends Window {
-    private Button routeButton;
-    private TextView selectNumber;
-    private ImageView removeButton;
-    private RecyclerView spotRecyclerView;
-    private MultiSelectAdapter adapter;
+    private final Button routeButton;
+    private final TextView selectNumber;
+    private final ImageView removeButton;
+    private final RecyclerView spotRecyclerView;
+    private final MultiSelectAdapter adapter;
 
     public MultiSelectWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_multi_select_window, context, parent);

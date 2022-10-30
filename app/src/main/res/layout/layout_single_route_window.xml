@@ -18,7 +18,6 @@
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
-                android:id="@+id/route_info"
                 tools:ignore="UselessParent">
             <include
                     layout="@layout/layout_single_route_info_box"

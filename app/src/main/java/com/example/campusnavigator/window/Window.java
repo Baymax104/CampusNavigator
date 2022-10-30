@@ -13,9 +13,9 @@ import android.view.ViewGroup;
  * @Version 1
  */
 public abstract class Window {
-    protected Context context;
-    protected ViewGroup parent;
-    protected View rootView;
+    protected final Context context;
+    protected final ViewGroup parent;
+    protected final View rootView;
     protected boolean isOpen = false;
 
     public Window(int rootViewId, Context context, ViewGroup parent) {

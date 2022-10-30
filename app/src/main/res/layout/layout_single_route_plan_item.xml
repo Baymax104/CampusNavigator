@@ -3,8 +3,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@drawable/shape_plan_item_bg_normal"
-        android:id="@+id/route_plan_item">
+        android:background="@drawable/shape_plan_item_bg_normal">
     <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"

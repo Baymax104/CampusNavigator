@@ -30,8 +30,8 @@ import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Map;
 import com.example.campusnavigator.model.MapManager;
 import com.example.campusnavigator.model.Position;
-import com.example.campusnavigator.model.SpotProvider;
 import com.example.campusnavigator.model.Route;
+import com.example.campusnavigator.model.SpotProvider;
 import com.example.campusnavigator.utility.helpers.DialogHelper;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
 import com.example.campusnavigator.utility.interfaces.RouteResultReceiver;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private AMapLocationClient locationClient; // 定位启动和销毁类
 
     // 路径计算结果
-    private List<Route> routeResults = new List<>();
+    private final List<Route> routeResults = new List<>();
 
 
     @Override
@@ -96,35 +96,33 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         map.setOnMarkerClickListener(marker -> {
             String markerId = marker.getId();
             Position spot = provider.getPosByMarkerId(markerId);
+            if (spot == null) {
+                return false;
+            }
             switch (mode) {
                 case SINGLE_SELECT:
                     // 选择点后唤起对话框
                     DialogHelper.showSpotSearchDialog(this, mode, provider, this, spot);
                     break;
                 case MULTI_SELECT:
-                    try {
-                        List<Position> spotAttachList = manager.getSpotAttached(spot);
-                        // 检查地点连接点空指针
-                        if (spotAttachList == null) {
-                            throw new Exception("地点选择错误，请重新选择");
-                        }
-
-                        Position spotAttach = spotAttachList.get(0);
-                        // 检查重复输入
-                        if (!manager.isBufferEmpty() && spotAttach.equals(manager.bufferTop())) {
-                            throw new Exception("选择重复");
-                        }
-
-                        // 检查通过，将入口和目的地压入栈中
-                        manager.pushBuffer(spotAttach);
-                        provider.pushBuffer(spot);
-                        multiSelectWindow.addPosition(spot);
-                        OverlayHelper.onMarkerClicked(marker);
-
-                    } catch (Exception e) {
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e("CamNav-MultiSelectError", e.getMessage());
+                    List<Position> spotAttachList = manager.getSpotAttached(spot);
+                    // 检查地点连接点空指针，不进行处理
+                    if (spotAttachList == null) {
+                        return false;
                     }
+
+                    Position spotAttach = spotAttachList.get(0);
+                    // 检查重复输入
+                    if (!manager.isBufferEmpty() && spotAttach.equals(manager.bufferTop())) {
+                        Toast.makeText(this, "选择重复", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
+                    // 检查通过，将入口和目的地压入栈中
+                    manager.pushBuffer(spotAttach);
+                    provider.pushBuffer(spot);
+                    multiSelectWindow.addPosition(spot);
+                    OverlayHelper.onMarkerClicked(marker);
                     break;
                 default:
                     break;
@@ -308,8 +306,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         List<String> spotNames = provider.allNames();
         for (String n : spotNames) {
             runOnUiThread(() -> {
-                OverlayHelper.drawMarker(provider.getPosByName(n));
-                OverlayHelper.drawText(provider.getPosByName(n), n);
+                OverlayHelper.drawMarker(provider.getPosition(n));
+                OverlayHelper.drawText(provider.getPosition(n), n);
             });
         }
     }
@@ -322,19 +320,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
-    public void onDestReceiveSuccess(Position dest) {
+    public void onDestReceive(Position dest) {
         calculateSingleRoute(dest);
     }
 
-    @Override
-    public void onDestReceiveError(Exception e) {
-        String msg = "单点选择错误：" + e.getMessage();
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        Log.e("CamNav-SingleSelectError", msg);
-        mode = Mode.DEFAULT; // 恢复到初始状态
-    }
-
-    private void calculateSingleRoute(Position destPosition) {
+    private void calculateSingleRoute(@NonNull Position destPosition) {
         try {
             // 判断当前定位点是否存在
             if (myLocation == null) {
@@ -345,26 +335,12 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             List<Position> attachPos = manager.attachToMap(myLocation, destPosition);
             // 获取目的地邻接点，目的地邻接点表spotAttached
             List<Position> spotAttached = manager.getSpotAttached(destPosition);
-            if (attachPos == null || attachPos.length() == 0 ||
-                    spotAttached == null || spotAttached.length() == 0) {
+            if (attachPos.length() == 0 || spotAttached == null || spotAttached.length() == 0) {
                 throw new Exception("连接点错误");
             }
 
             // 清空先前的结果
             routeResults.clear();
-
-            // 计算连接点到目的地的路径方案，共有2nm种方案
-//            for (Position attach : attachPos) {
-//                for (Position dest : spotAttached) {
-//                    if (attach == null || dest == null) {
-//                        throw new Exception("连接点错误");
-//                    }
-//                    manager.pushBuffer(attach);
-//                    manager.pushBuffer(dest);
-//                    // 对于每一对起点和终点有2种方案
-//                    manager.calculate(false, this);
-//                }
-//            }
 
             Position attach = attachPos.get(0);
             Position dest = spotAttached.get(0);
@@ -399,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     @Override
-    public void onSingleRouteReceive(List<Route> results) {
+    public void onSingleRouteReceive(@NonNull List<Route> results) {
         // 每一对起点和终点返回2种方案，向容器中添加方案
         for (int i = 0; i < results.length(); i++) {
             Route result = results.get(i);
@@ -523,6 +499,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 }
                 myLocation.setLat(lat);
                 myLocation.setLng(lng);
+
             } else {
                 String errText = "定位失败," + aMapLocation.getErrorCode()+ ": " + aMapLocation.getErrorInfo();
                 Log.e("MapLocation",errText);

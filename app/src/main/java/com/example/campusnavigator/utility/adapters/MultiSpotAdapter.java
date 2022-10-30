@@ -24,8 +24,8 @@ public class MultiSpotAdapter extends RecyclerView.Adapter<MultiSpotAdapter.View
     private List<Item> data;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView spotName;
-        TextView spotInfo;
+        final TextView spotName;
+        final TextView spotInfo;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             spotName = itemView.findViewById(R.id.multi_route_spot_name);
@@ -34,9 +34,9 @@ public class MultiSpotAdapter extends RecyclerView.Adapter<MultiSpotAdapter.View
     }
 
     public static class Item {
-        private String name;
-        private Double time;
-        private Double dist;
+        private final String name;
+        private final Double time;
+        private final Double dist;
 
         public Item(String name, Double time, Double dist) {
             this.name = name;

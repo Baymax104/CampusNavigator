@@ -20,10 +20,10 @@ import com.example.campusnavigator.utility.structures.List;
  * @Version 1
  */
 public class MultiSelectAdapter extends RecyclerView.Adapter<MultiSelectAdapter.ViewHolder> {
-    private List<Position> data = new List<>(); // 初始总为空
+    private final List<Position> data = new List<>(); // 初始总为空
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView spotName;
+        final TextView spotName;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             spotName = itemView.findViewById(R.id.multi_select_spot_name);

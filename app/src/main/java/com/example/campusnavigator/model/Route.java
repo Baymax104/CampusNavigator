@@ -12,9 +12,9 @@ import java.util.Objects;
  * @Version 1
  */
 public class Route implements Comparable<Route> {
-    private List<Position> route;
-    private Double time;
-    private Double dist;
+    private final List<Position> route;
+    private final Double time;
+    private final Double dist;
 
     public Route(List<Position> route, Double time, Double dist) {
         this.route = route;

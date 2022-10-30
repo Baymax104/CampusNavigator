@@ -11,6 +11,5 @@ import com.example.campusnavigator.model.Position;
  */
 public interface SingleSelectListener {
     void onSingleSelect();
-    void onDestReceiveSuccess(Position dest);
-    void onDestReceiveError(Exception e);
+    void onDestReceive(Position dest);
 }

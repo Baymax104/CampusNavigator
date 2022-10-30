@@ -11,7 +11,7 @@ package com.example.campusnavigator.utility.structures;
 public class MinHeap<E extends Comparable<E>> {
     private static final int MAX_SIZE = 80;
     private int size;
-    private E[] array;
+    private final E[] array;
 
     @SuppressWarnings("unchecked")
     public MinHeap() {

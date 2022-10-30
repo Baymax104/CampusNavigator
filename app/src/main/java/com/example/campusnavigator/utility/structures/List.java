@@ -25,12 +25,6 @@ public class List<E> implements Iterable<E>, Stackable<E> {
     public List() {
     }
 
-    public List(List<E> other) {
-        // 只需要复制数组内对象的引用
-        System.arraycopy(other.array, 0, this.array, 0, other.size);
-        this.size = other.size;
-    }
-
     @Override
     public void push(E value) {
         if (size == MAX_SIZE) {
@@ -82,10 +76,6 @@ public class List<E> implements Iterable<E>, Stackable<E> {
             i++;
             j--;
         }
-    }
-
-    public static <T> void sort(List<T> list) {
-        Arrays.sort(list.array, 0, list.size);
     }
 
     @NonNull

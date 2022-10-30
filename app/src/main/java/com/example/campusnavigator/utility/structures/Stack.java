@@ -22,7 +22,7 @@ public class Stack<E> implements Stackable<E> {
         }
     }
 
-    private Node<E> head = new Node<>();
+    private final Node<E> head = new Node<>();
     private Node<E> tail = head;
     private int size = 0;
 

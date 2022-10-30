@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
@@ -45,7 +47,7 @@ public class OverlayHelper {
     private OverlayHelper() {
     }
 
-    public static void bind(AMap amap, MapView mapView, Context context) {
+    public static void bind(@NonNull AMap amap, @NonNull MapView mapView, @NonNull Context context) {
         map = amap;
         lineBuffer = new List<>();
         markerBuffer = new List<>();
@@ -71,13 +73,13 @@ public class OverlayHelper {
         closeAnimation.setDuration(0);
     }
 
-    public static void drawLine(Position ...destination) {
+    public static void drawLine(@NonNull Position ...destination) {
         for (Position p : destination) {
             Polyline polyline = map.addPolyline(lineStyle.add(p.getLatLng()));
             lineBuffer.push(polyline);
         }
     }
-    public static void drawMarker(Position position) {
+    public static void drawMarker(@NonNull Position position) {
         Marker marker = map.addMarker(markerOptions.position(position.getLatLng()));
 
         markerMap.put(marker.getId(), 0);
@@ -85,11 +87,11 @@ public class OverlayHelper {
         position.setMarkerId(marker.getId());
     }
 
-    public static void drawText(Position position, String text) {
+    public static void drawText(@NonNull Position position, @NonNull String text) {
         map.addText(textOptions.position(position.getLatLng()).text(text));
     }
 
-    public static void onMarkerClicked(Marker marker) {
+    public static void onMarkerClicked(@NonNull Marker marker) {
         marker.setAnimation(openAnimation);
         marker.startAnimation();
         markerBuffer.push(marker);
@@ -97,7 +99,7 @@ public class OverlayHelper {
         markerMap.put(marker.getId(), count + 1);
     }
 
-    public static void onSpotRemoved(Position spot) {
+    public static void onSpotRemoved(@NonNull Position spot) {
         String markerId = spot.getMarkerId();
         Marker marker = markerBuffer.top();
 

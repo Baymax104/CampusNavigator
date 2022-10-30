@@ -30,7 +30,7 @@ import com.lxj.xpopup.core.BottomPopupView;
  * @Version 1
  */
 public class SpotSearchDialog extends BottomPopupView {
-    private Context context;
+    private final Context context;
     private SpotProvider provider;
     private SpotSearchAdapter adapter;
     private SingleSelectListener listener;
@@ -44,8 +44,8 @@ public class SpotSearchDialog extends BottomPopupView {
 
     public SpotSearchDialog(
             @NonNull Context context,
-            Mode mode,
-            SpotProvider provider,
+            @NonNull Mode mode,
+            @NonNull SpotProvider provider,
             SingleSelectListener listener,
             Position... selectedSpot) {
         super(context);
@@ -138,13 +138,13 @@ public class SpotSearchDialog extends BottomPopupView {
                 Toast.makeText(context, "输入不能为空", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Position spot = provider.getPosByName(content);
+            Position spot = provider.getPosition(content);
             if (spot == null) {
                 Toast.makeText(context, "找不到该地点", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            dismissWith(() -> listener.onDestReceiveSuccess(spot));
+            dismissWith(() -> listener.onDestReceive(spot));
         });
     }
 

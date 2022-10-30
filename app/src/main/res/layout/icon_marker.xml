@@ -3,7 +3,6 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="27dp"
         android:layout_height="27dp"
-        android:id="@+id/marker_view"
         android:src="@drawable/location_marker"
         android:elevation="10dp"
         tools:ignore="ContentDescription">

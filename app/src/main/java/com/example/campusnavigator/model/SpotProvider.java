@@ -1,13 +1,9 @@
 package com.example.campusnavigator.model;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.Stack;
-
-import java.util.Arrays;
 
 /**
  * @Description 提供外部查找Position的方法类
@@ -18,7 +14,7 @@ import java.util.Arrays;
  */
 public class SpotProvider extends Map {
 
-    private Stack<Position> spotBuffer;
+    private final Stack<Position> spotBuffer;
     private static SpotProvider obj;
 
     private SpotProvider() {
@@ -40,7 +36,7 @@ public class SpotProvider extends Map {
         return list;
     }
 
-    public Position getPosByName(String name) {
+    public Position getPosition(@NonNull String name) {
         for (int i = 0; i < sizeOfSpot; i++) {
             Position spot = spots[i];
             if (spot.getName() != null && spot.getName().equals(name)) {
@@ -50,7 +46,7 @@ public class SpotProvider extends Map {
         return null;
     }
 
-    public Position getPosByMarkerId(String markerId) {
+    public Position getPosByMarkerId(@NonNull String markerId) {
         for (int i = 0; i < sizeOfSpot; i++) {
             Position spot = spots[i];
             if (spot.getMarkerId().equals(markerId)) {
@@ -60,6 +56,7 @@ public class SpotProvider extends Map {
         return null;
     }
 
+    @NonNull
     public List<Position> fuzzyQuery(@NonNull String name) {
         // 将字符串处理为正则表达式
         char[] nameArray = name.toCharArray();
@@ -95,28 +92,19 @@ public class SpotProvider extends Map {
         return spotBuffer;
     }
 
-    public void pushBuffer(Position position) {
-        if (spotBuffer != null) {
-            spotBuffer.push(position);
-        }
+    public void pushBuffer(@NonNull Position position) {
+        spotBuffer.push(position);
     }
 
     public Position bufferTop() {
-        if (spotBuffer != null) {
-            return spotBuffer.top();
-        }
-        return null;
+        return spotBuffer.top();
     }
 
     public void popBuffer() {
-        if (spotBuffer != null) {
-            spotBuffer.pop();
-        }
+        spotBuffer.pop();
     }
 
     public void popBufferAll() {
-        if (spotBuffer != null) {
-            spotBuffer.popAll();
-        }
+        spotBuffer.popAll();
     }
 }

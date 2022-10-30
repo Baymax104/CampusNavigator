@@ -39,7 +39,6 @@ public class MultiRouteWindow extends Window {
 
     // 下方地点列表
     private View multiSpotBox;
-    private RecyclerView multiSpotList;
     private MultiSpotAdapter adapter;
 
     public MultiRouteWindow(Context context, ViewGroup parent) {
@@ -51,8 +50,8 @@ public class MultiRouteWindow extends Window {
         expendButton = multiRouteContainer.findViewById(R.id.expend_button);
 
         multiSpotBox = LayoutInflater.from(context).inflate(R.layout.layout_multi_route_spot_box, parent, false);
-        multiSpotList = multiSpotBox.findViewById(R.id.multi_route_spot_list);
 
+        RecyclerView multiSpotList = multiSpotBox.findViewById(R.id.multi_route_spot_list);
         adapter = new MultiSpotAdapter();
         multiSpotList.setAdapter(adapter);
         LinearLayoutManager manager = new LinearLayoutManager(context);

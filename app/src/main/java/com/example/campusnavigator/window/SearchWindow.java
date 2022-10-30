@@ -18,8 +18,8 @@ import com.google.android.material.card.MaterialCardView;
  * @Version 1
  */
 public class SearchWindow extends Window {
-    private TextView searchField;
-    private MaterialCardView multiSelectEntry;
+    private final TextView searchField;
+    private final MaterialCardView multiSelectEntry;
 
     public SearchWindow(@NonNull Context context, @NonNull ViewGroup parent) {
         super(R.layout.layout_search_window, context, parent);

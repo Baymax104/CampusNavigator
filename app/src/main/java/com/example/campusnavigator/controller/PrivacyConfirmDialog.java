@@ -17,7 +17,7 @@ import com.lxj.xpopup.core.CenterPopupView;
  * @Version 1
  */
 public class PrivacyConfirmDialog extends CenterPopupView {
-    private Context context;
+    private final Context context;
 
     public PrivacyConfirmDialog(@NonNull Context context) {
         super(context);

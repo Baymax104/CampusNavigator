@@ -1,7 +1,5 @@
 package com.example.campusnavigator.model;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.amap.api.maps.model.LatLng;
@@ -11,7 +9,6 @@ import com.example.campusnavigator.utility.structures.MinHeap;
 import com.example.campusnavigator.utility.structures.Stack;
 import com.example.campusnavigator.utility.structures.Tuple;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -24,15 +21,15 @@ import java.util.Arrays;
  */
 public class MapManager extends Map {
 
-    private Stack<Position> positionBuffer;
+    private final Stack<Position> positionBuffer;
     private double[] dist;
     private static MapManager obj;
 
     private static class Status implements Comparable<Status> {
-        int v;
-        double d;
-        double p;
-        Status pre;
+        final int v;
+        final double d;
+        final double p;
+        final Status pre;
 
         public Status(int v, double d, double p, Status pre) {
             this.v = v;
@@ -74,14 +71,13 @@ public class MapManager extends Map {
         return obj;
     }
 
-    private boolean checkResult(Route result) {
-        return result != null &&
-                result.getRoute() != null && result.getRoute().length() != 0 &&
+    private boolean checkResult(@NonNull Route result) {
+        return result.getRoute() != null && result.getRoute().length() != 0 &&
                 result.getTime() != null && !result.getTime().equals(INF) &&
                 result.getDist() != null && !result.getDist().equals(INF);
     }
 
-    public void calculate(boolean isMultiSpot, RouteResultReceiver receiver) throws Exception {
+    public void calculate(boolean isMultiSpot, @NonNull RouteResultReceiver receiver) throws Exception {
         if (isMultiSpot) {
             List<Route> results = multiDestRoute();
             for (Route result : results) {
@@ -110,6 +106,7 @@ public class MapManager extends Map {
         receiver.onSingleRouteReceive(results);
     }
 
+    @NonNull
     public List<Route> multiDestRoute() {
         List<Route> results = new List<>();
         Position to = positionBuffer.top();
@@ -126,6 +123,7 @@ public class MapManager extends Map {
         return results;
     }
 
+    @NonNull
     public Route singleDestRoute(@NonNull Position from, @NonNull Position to, int k) {
 
         int fromId = from.getId();
@@ -140,6 +138,7 @@ public class MapManager extends Map {
         return new Route(route, time, dist);
     }
 
+    @NonNull
     public Tuple<List<Position>, Double> Astar(int source, int dest, int k) {
 
         // 通过Dijkstra计算dest到source的最短路径树
@@ -230,7 +229,8 @@ public class MapManager extends Map {
         }
     }
 
-    public List<Position> attachToMap(Position myPosition, Position destPosition) {
+    @NonNull
+    public List<Position> attachToMap(@NonNull Position myPosition, Position destPosition) {
         List<Position> attachPositions = new List<>();
 
         // 使用最小堆取距离最小的两个点
@@ -269,46 +269,31 @@ public class MapManager extends Map {
         return angle >= 0;
     }
 
-    public List<Position> getSpotAttached(Position spot) {
+    public List<Position> getSpotAttached(@NonNull Position spot) {
         return spotAttached.get(spot);
     }
 
     public void pushBuffer(Position position) {
-        if (positionBuffer != null) {
-            positionBuffer.push(position);
-        }
+        positionBuffer.push(position);
     }
 
     public void popBuffer() {
-        if (positionBuffer != null) {
-            positionBuffer.pop();
-        }
+        positionBuffer.pop();
     }
 
     public void popBufferAll() {
-        if (positionBuffer != null) {
-            positionBuffer.popAll();
-        }
+        positionBuffer.popAll();
     }
 
     public boolean isBufferEmpty() {
-        if (positionBuffer != null) {
-            return positionBuffer.isEmpty();
-        }
-        return true;
+        return positionBuffer.isEmpty();
     }
 
     public Position bufferTop() {
-        if (positionBuffer != null) {
-            return positionBuffer.top();
-        }
-        return null;
+        return positionBuffer.top();
     }
 
     public int bufferSize() {
-        if (positionBuffer != null) {
-            return positionBuffer.size();
-        }
-        return 0;
+        return positionBuffer.size();
     }
 }

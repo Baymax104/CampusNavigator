@@ -23,7 +23,7 @@ public class HashMap<K, V> {
     }
 
     @SuppressWarnings("unchecked")
-    private Entry<K, V>[] table = (Entry<K, V>[]) new Entry[MAX_SIZE];
+    private final Entry<K, V>[] table = (Entry<K, V>[]) new Entry[MAX_SIZE];
 
     private static int hash(Object obj) {
         int h;

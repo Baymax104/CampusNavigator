@@ -48,7 +48,6 @@
             <View
                     android:layout_width="0.1dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/separator"
                     android:background="#d6d6d6" />
             <TextView
                     android:layout_width="0dp"

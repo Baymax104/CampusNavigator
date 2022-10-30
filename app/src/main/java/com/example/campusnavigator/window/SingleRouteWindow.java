@@ -26,15 +26,15 @@ import java.util.Locale;
  * @Version 1
  */
 public class SingleRouteWindow extends Window {
-    private LinearLayout routeContainer;
+    private final LinearLayout routeContainer;
 
     // 上方信息窗口
-    private ImageView expendButton; // 窗口展开/关闭按钮
-    private TextView destTxt; // 目的地名TextView
+    private final ImageView expendButton; // 窗口展开/关闭按钮
+    private final TextView destTxt; // 目的地名TextView
 
     // 下方方案窗口
-    private View routePlanBox; // 方案外层布局
-    private GridLayout planGroup; // 方案容器
+    private final View routePlanBox; // 方案外层布局
+    private final GridLayout planGroup; // 方案容器
     private int selected; // 当前选中的方案索引
     private View selectedPlanView; // 当前选中的方案布局
 
