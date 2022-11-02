@@ -53,11 +53,11 @@ public class MultiSelectWindow extends Window {
         return locationOnScreen[1];
     }
 
-    public void setRouteButtonListener(View.OnClickListener listener) {
+    public void setButtonListener(View.OnClickListener listener) {
         routeButton.setOnClickListener(listener);
     }
 
-    public void setSelectRemoveListener(View.OnClickListener listener) {
+    public void setRemoveListener(View.OnClickListener listener) {
         removeButton.setOnClickListener(listener);
     }
 

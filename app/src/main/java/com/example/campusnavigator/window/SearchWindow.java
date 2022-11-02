@@ -27,11 +27,11 @@ public class SearchWindow extends Window {
         multiSelectEntry = rootView.findViewById(R.id.multi_select_entry);
     }
 
-    public void setSearchFieldListener(View.OnClickListener listener) {
+    public void setSearchListener(View.OnClickListener listener) {
         searchField.setOnClickListener(listener);
     }
 
-    public void setMultiSelectEntryListener(View.OnClickListener listener) {
+    public void setEntryListener(View.OnClickListener listener) {
         multiSelectEntry.setOnClickListener(listener);
     }
 }

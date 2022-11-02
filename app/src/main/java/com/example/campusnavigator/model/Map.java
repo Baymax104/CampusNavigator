@@ -36,7 +36,7 @@ public class Map {
 
     protected static double[][] map;
 
-    protected static final double SPEED_WALK = 4.0 * 50 / 3; // 4km/h
+    public static final double SPEED_WALK = 4.0 * 50 / 3; // 4km/h
 
     protected Map() {
     }

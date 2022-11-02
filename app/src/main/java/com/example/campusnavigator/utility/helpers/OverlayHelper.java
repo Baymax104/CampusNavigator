@@ -81,7 +81,7 @@ public class OverlayHelper {
     }
     public static void drawMarker(@NonNull Position position) {
         Marker marker = map.addMarker(markerOptions.position(position.getLatLng()));
-
+        marker.setAnimation(openAnimation);
         markerMap.put(marker.getId(), 0);
         // position与marker绑定
         position.setMarkerId(marker.getId());
