@@ -47,12 +47,6 @@ public class MultiSelectWindow extends Window {
         spotRecyclerView.setItemAnimator(new SlideInRightAnimator());
     }
 
-    public int getWindowY() {
-        int[] locationOnScreen = new int[2];
-        rootView.getLocationOnScreen(locationOnScreen);
-        return locationOnScreen[1];
-    }
-
     public void setButtonListener(View.OnClickListener listener) {
         routeButton.setOnClickListener(listener);
     }

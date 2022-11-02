@@ -42,6 +42,12 @@ public abstract class Window {
         return isOpen;
     }
 
+    public int getWindowY() {
+        int[] locationOnScreen = new int[2];
+        rootView.getLocationOnScreen(locationOnScreen);
+        return locationOnScreen[1];
+    }
+
     public static void transition(Window close, Window open) {
         close.close();
         open.open();

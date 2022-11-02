@@ -17,6 +17,7 @@ import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.adapters.MultiSpotAdapter;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
+import com.example.campusnavigator.utility.interfaces.RouteWindow;
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.Stack;
 
@@ -29,7 +30,7 @@ import java.util.Locale;
  * @Date 2022/9/26 10:57
  * @Version 1
  */
-public class MultiRouteWindow extends Window {
+public class MultiRouteWindow extends Window implements RouteWindow {
     private LinearLayout multiRouteContainer;
 
     // 上方信息窗口
@@ -58,16 +59,11 @@ public class MultiRouteWindow extends Window {
         multiSpotList.setLayoutManager(manager);
     }
 
-    public int getWindowY() {
-        int[] locationOnScreen = new int[2];
-        rootView.getLocationOnScreen(locationOnScreen);
-        return locationOnScreen[1];
-    }
-
     public void setExpendButtonListener(View.OnClickListener listener) {
         expendButton.setOnClickListener(listener);
     }
 
+    @Override
     public void setExpendButtonUp(boolean isUp) {
         if (isUp) {
             expendButton.setImageResource(R.drawable.expend_arrow_up);
@@ -116,13 +112,15 @@ public class MultiRouteWindow extends Window {
         adapter.notifyDataSetChanged();
     }
 
-    public void openSpotBox() {
+    @Override
+    public void openBox() {
         if (multiSpotBox != null && multiRouteContainer.findViewById(R.id.multi_route_spot_box) == null) {
             multiRouteContainer.addView(multiSpotBox);
         }
     }
 
-    public void closeSpotBox() {
+    @Override
+    public void closeBox() {
         if (multiSpotBox != null && multiRouteContainer.findViewById(R.id.multi_route_spot_box) != null) {
             multiRouteContainer.removeView(multiSpotBox);
         }

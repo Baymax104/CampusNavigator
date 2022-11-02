@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 case S_ROUTE_OPEN: // 单点路径弹窗处于打开状态
                     // 触摸起始点位于弹窗外侧，关闭弹窗
                     if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < routeWindowY) {
-                        singleRouteWindow.closePlanBox();
+                        singleRouteWindow.closeBox();
                         singleRouteWindow.setExpendButtonUp(true);
                         map.getUiSettings().setAllGesturesEnabled(true);
                         mode.change(Mode.M.S_ROUTE_CLOSE);
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     break;
                 case M_ROUTE_OPEN: // 多点路径弹窗打开状态
                     if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < multiRouteWindowY) {
-                        multiRouteWindow.closeSpotBox();
+                        multiRouteWindow.closeBox();
                         multiRouteWindow.setExpendButtonUp(true);
                         map.getUiSettings().setAllGesturesEnabled(true);
                         mode.change(Mode.M.M_ROUTE_CLOSE);
@@ -248,11 +248,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // 单点路径结果弹窗监听
         singleRouteWindow.setExpendButtonListener(view -> {
             if (mode.is(Mode.M.S_ROUTE_OPEN)) { // 处于打开状态，关闭planBox
-                singleRouteWindow.closePlanBox();
+                singleRouteWindow.closeBox();
                 singleRouteWindow.setExpendButtonUp(true);
                 mode.change(Mode.M.S_ROUTE_CLOSE);
             } else if (mode.is(Mode.M.S_ROUTE_CLOSE)) { // 处于关闭状态，打开planBox
-                singleRouteWindow.openPlanBox();
+                singleRouteWindow.openBox();
                 singleRouteWindow.setExpendButtonUp(false);
                 mode.change(Mode.M.S_ROUTE_OPEN);
             }
@@ -271,11 +271,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // 多点路径弹窗监听
         multiRouteWindow.setExpendButtonListener(v -> {
             if (mode.is(Mode.M.M_ROUTE_OPEN)) {
-                multiRouteWindow.closeSpotBox();
+                multiRouteWindow.closeBox();
                 multiRouteWindow.setExpendButtonUp(true);
                 mode.change(Mode.M.M_ROUTE_CLOSE);
             } else if (mode.is(Mode.M.M_ROUTE_CLOSE)) {
-                multiRouteWindow.openSpotBox();
+                multiRouteWindow.openBox();
                 multiRouteWindow.setExpendButtonUp(false);
                 mode.change(Mode.M.M_ROUTE_OPEN);
             }
@@ -396,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 Window.transition(selectClickWindow, singleRouteWindow);
             }
 
-            singleRouteWindow.openPlanBox();
+            singleRouteWindow.openBox();
             mode.change(Mode.M.S_ROUTE_OPEN);
         } catch (Exception e) {
             mode.change(Mode.M.DEFAULT);
@@ -431,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         provider.popBufferAll();
         // 更换布局
         Window.transition(multiSelectWindow, multiRouteWindow);
-        multiRouteWindow.openSpotBox();
+        multiRouteWindow.openBox();
     }
 
     @Override

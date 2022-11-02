@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
+import com.example.campusnavigator.utility.interfaces.RouteWindow;
 import com.example.campusnavigator.utility.structures.List;
 
 import java.util.Locale;
@@ -25,7 +26,7 @@ import java.util.Locale;
  * @Date 2022/9/26 9:58
  * @Version 1
  */
-public class SingleRouteWindow extends Window {
+public class SingleRouteWindow extends Window implements RouteWindow {
     private final LinearLayout routeContainer;
 
     // 上方信息窗口
@@ -55,16 +56,11 @@ public class SingleRouteWindow extends Window {
         selectedPlanView.setBackgroundResource(R.drawable.shape_plan_item_bg_selected);
     }
 
-    public int getWindowY() {
-        int[] locationOnScreen = new int[2];
-        rootView.getLocationOnScreen(locationOnScreen);
-        return locationOnScreen[1];
-    }
-
     public void setExpendButtonListener(View.OnClickListener listener) {
         expendButton.setOnClickListener(listener);
     }
 
+    @Override
     public void setExpendButtonUp(boolean isUp) {
         if (isUp) {
             expendButton.setImageResource(R.drawable.expend_arrow_up);
@@ -79,13 +75,15 @@ public class SingleRouteWindow extends Window {
         }
     }
 
-    public void openPlanBox() {
+    @Override
+    public void openBox() {
         if (routePlanBox != null && routeContainer.findViewById(R.id.route_plan_box) == null) {
             routeContainer.addView(routePlanBox);
         }
     }
 
-    public void closePlanBox() {
+    @Override
+    public void closeBox() {
         if (routePlanBox != null && routeContainer.findViewById(R.id.route_plan_box) != null) {
             routeContainer.removeView(routePlanBox);
         }

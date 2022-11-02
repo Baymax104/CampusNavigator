@@ -37,12 +37,6 @@ public class SingleSelectClickWindow extends Window {
         button = rootView.findViewById(R.id.select_click_button);
     }
 
-    public int getWindowY() {
-        int[] locationOnScreen = new int[2];
-        rootView.getLocationOnScreen(locationOnScreen);
-        return locationOnScreen[1];
-    }
-
     public void setButtonListener(View.OnClickListener listener) {
         button.setOnClickListener(listener);
     }
