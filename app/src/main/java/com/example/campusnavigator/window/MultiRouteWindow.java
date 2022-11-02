@@ -31,16 +31,16 @@ import java.util.Locale;
  * @Version 1
  */
 public class MultiRouteWindow extends Window implements RouteWindow {
-    private LinearLayout multiRouteContainer;
+    private final LinearLayout multiRouteContainer;
 
     // 上方信息窗口
-    private TextView timeInfo;
-    private TextView distanceInfo;
-    private ImageView expendButton;
+    private final TextView timeInfo;
+    private final TextView distanceInfo;
+    private final ImageView expendButton;
 
     // 下方地点列表
-    private View multiSpotBox;
-    private MultiSpotAdapter adapter;
+    private final View multiSpotBox;
+    private final MultiSpotAdapter adapter;
 
     public MultiRouteWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_multi_route_window, context, parent);

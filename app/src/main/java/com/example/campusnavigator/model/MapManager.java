@@ -71,6 +71,7 @@ public class MapManager extends Map {
         return obj;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean checkResult(@NonNull Route result) {
         return result.getRoute() != null && result.getRoute().length() != 0 &&
                 result.getTime() != null && !result.getTime().equals(INF) &&

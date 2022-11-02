@@ -18,6 +18,7 @@ public class MinHeap<E extends Comparable<E>> {
         array = (E[]) new Comparable[MAX_SIZE];
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean push(E e) {
         if (size == MAX_SIZE) {
             return false;
@@ -28,6 +29,7 @@ public class MinHeap<E extends Comparable<E>> {
         return true;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean pop() {
         if (size == 0) {
             return false;
@@ -74,6 +76,7 @@ public class MinHeap<E extends Comparable<E>> {
         }
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isEmpty() {
         return size == 0;
     }

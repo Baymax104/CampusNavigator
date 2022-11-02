@@ -43,10 +43,6 @@ public class Position {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public void setLat(double lat) {
         this.lat = lat;
     }
@@ -57,10 +53,6 @@ public class Position {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public LatLng getLatLng() {
