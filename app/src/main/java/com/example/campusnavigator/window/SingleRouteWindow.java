@@ -2,6 +2,7 @@ package com.example.campusnavigator.window;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
@@ -11,7 +12,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.amap.api.maps.AMap;
 import com.example.campusnavigator.R;
+import com.example.campusnavigator.controller.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
 import com.example.campusnavigator.utility.interfaces.RouteWindow;
@@ -66,6 +69,23 @@ public class SingleRouteWindow extends Window implements RouteWindow {
             expendButton.setImageResource(R.drawable.expend_arrow_up);
         } else {
             expendButton.setImageResource(R.drawable.expend_arrow_down);
+        }
+    }
+
+    @Override
+    public void autoGestureControl(@NonNull MotionEvent latLng, AMap map, Mode mode) {
+        float touchY = latLng.getRawY();
+        int windowY = getWindowY();
+        // 触摸起始点位于弹窗外侧，关闭弹窗
+        if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < windowY) {
+            closeBox();
+            setExpendButtonUp(true);
+            map.getUiSettings().setAllGesturesEnabled(true);
+            mode.change(Mode.M.S_ROUTE_CLOSE);
+
+        } else if (touchY >= windowY) { // 触摸点位于弹窗内侧
+            // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
+            map.getUiSettings().setAllGesturesEnabled(false);
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.campusnavigator.window;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,7 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.amap.api.maps.AMap;
 import com.example.campusnavigator.R;
+import com.example.campusnavigator.controller.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.adapters.MultiSpotAdapter;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
@@ -72,7 +75,24 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         }
     }
 
-    public void setRouteInfo(Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
+    @Override
+    public void autoGestureControl(@NonNull MotionEvent latLng, AMap map, Mode mode) {
+        float touchY = latLng.getRawY();
+        int windowY = getWindowY();
+        // 触摸起始点位于弹窗外侧，关闭弹窗
+        if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < windowY) {
+            closeBox();
+            setExpendButtonUp(true);
+            map.getUiSettings().setAllGesturesEnabled(true);
+            mode.change(Mode.M.M_ROUTE_CLOSE);
+
+        } else if (touchY >= windowY) { // 触摸点位于弹窗内侧
+            // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
+            map.getUiSettings().setAllGesturesEnabled(false);
+        }
+    }
+
+    public void setRouteInfo(@NonNull Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
         List<Position> dests = destBuffer.toList(true);
         List.reverse(times);
         List.reverse(dists);

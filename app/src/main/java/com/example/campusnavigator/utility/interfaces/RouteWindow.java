@@ -1,5 +1,10 @@
 package com.example.campusnavigator.utility.interfaces;
 
+import android.view.MotionEvent;
+
+import com.amap.api.maps.AMap;
+import com.example.campusnavigator.controller.Mode;
+
 /**
  * @Description
  * @Author John
@@ -11,4 +16,5 @@ public interface RouteWindow {
     void openBox();
     void closeBox();
     void setExpendButtonUp(boolean isUp);
+    void autoGestureControl(MotionEvent latLng, AMap map, Mode mode);
 }

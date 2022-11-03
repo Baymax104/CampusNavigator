@@ -22,7 +22,12 @@ public class Mode {
         M_ROUTE_OPEN, // 多点显示路径，结果弹窗打开
         M_ROUTE_CLOSE // 多点显示路径，结果弹窗关闭
     }
-    private M mode = M.DEFAULT;
+    private M mode;
+
+    public Mode() {
+        mode = M.DEFAULT;
+        log();
+    }
 
     public void change(M mode) {
         this.mode = mode;

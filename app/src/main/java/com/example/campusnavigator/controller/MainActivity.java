@@ -3,7 +3,6 @@ package com.example.campusnavigator.controller;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -152,29 +151,10 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     map.getUiSettings().setAllGesturesEnabled(true);
                     break;
                 case S_ROUTE_OPEN: // 单点路径弹窗处于打开状态
-                    // 触摸起始点位于弹窗外侧，关闭弹窗
-                    if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < routeWindowY) {
-                        singleRouteWindow.closeBox();
-                        singleRouteWindow.setExpendButtonUp(true);
-                        map.getUiSettings().setAllGesturesEnabled(true);
-                        mode.change(Mode.M.S_ROUTE_CLOSE);
-
-                    } else if (touchY >= routeWindowY) { // 触摸点位于弹窗内侧
-                        // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
-                        map.getUiSettings().setAllGesturesEnabled(false);
-                    }
+                    singleRouteWindow.autoGestureControl(latLng, map, mode);
                     break;
                 case M_ROUTE_OPEN: // 多点路径弹窗打开状态
-                    if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < multiRouteWindowY) {
-                        multiRouteWindow.closeBox();
-                        multiRouteWindow.setExpendButtonUp(true);
-                        map.getUiSettings().setAllGesturesEnabled(true);
-                        mode.change(Mode.M.M_ROUTE_CLOSE);
-
-                    } else if (touchY >= multiRouteWindowY) { // 触摸点位于弹窗内侧
-                        // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
-                        map.getUiSettings().setAllGesturesEnabled(false);
-                    }
+                    multiRouteWindow.autoGestureControl(latLng, map, mode);
                     break;
                 case S_ROUTE_CLOSE: // 单点路径弹窗处于关闭状态，触摸点位于外侧开启手势，位于内侧关闭手势
                     map.getUiSettings().setAllGesturesEnabled(touchY < routeWindowY);
