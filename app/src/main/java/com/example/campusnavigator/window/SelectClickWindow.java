@@ -23,14 +23,14 @@ import java.util.Locale;
  * @Date 2022/10/31 10:59
  * @Version 1
  */
-public class SingleSelectClickWindow extends Window {
+public class SelectClickWindow extends Window {
 
     private final TextView nameTxt;
     private final TextView infoTxt;
     private final Button button;
     private Position selected;
 
-    public SingleSelectClickWindow(Context context, ViewGroup parent) {
+    public SelectClickWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_single_select_click_window, context, parent);
         nameTxt = rootView.findViewById(R.id.select_click_name);
         infoTxt = rootView.findViewById(R.id.select_click_info);

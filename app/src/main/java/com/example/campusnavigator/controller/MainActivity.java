@@ -41,8 +41,8 @@ import com.example.campusnavigator.utility.structures.Stack;
 import com.example.campusnavigator.window.MultiRouteWindow;
 import com.example.campusnavigator.window.MultiSelectWindow;
 import com.example.campusnavigator.window.SearchWindow;
+import com.example.campusnavigator.window.SelectClickWindow;
 import com.example.campusnavigator.window.SingleRouteWindow;
-import com.example.campusnavigator.window.SingleSelectClickWindow;
 import com.example.campusnavigator.window.SingleSelectWindow;
 import com.example.campusnavigator.window.Window;
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private MultiRouteWindow multiRouteWindow;
     private SingleRouteWindow singleRouteWindow;
     private SingleSelectWindow singleSelectWindow;
-    private SingleSelectClickWindow selectClickWindow;
+    private SelectClickWindow selectClickWindow;
 
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
@@ -177,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 } else {
                     try {
                         manager.calculate(true, this);
-                        mode.changeTo(M.M_ROUTE_OPEN);
                     } catch (Exception e) {
                         String msg = "计算错误：" + e.getMessage();
                         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
@@ -211,11 +210,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         singleRouteWindow.setExpendButtonListener(view -> {
             if (mode.is(M.S_ROUTE_OPEN)) { // 处于打开状态，关闭planBox
                 singleRouteWindow.closeBox();
-                singleRouteWindow.setExpendButtonUp(true);
                 mode.changeTo(M.S_ROUTE_CLOSE);
             } else if (mode.is(M.S_ROUTE_CLOSE)) { // 处于关闭状态，打开planBox
                 singleRouteWindow.openBox();
-                singleRouteWindow.setExpendButtonUp(false);
                 mode.changeTo(M.S_ROUTE_OPEN);
             }
         });
@@ -234,11 +231,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         multiRouteWindow.setExpendButtonListener(v -> {
             if (mode.is(M.M_ROUTE_OPEN)) {
                 multiRouteWindow.closeBox();
-                multiRouteWindow.setExpendButtonUp(true);
                 mode.changeTo(M.M_ROUTE_CLOSE);
             } else if (mode.is(M.M_ROUTE_CLOSE)) {
                 multiRouteWindow.openBox();
-                multiRouteWindow.setExpendButtonUp(false);
                 mode.changeTo(M.M_ROUTE_OPEN);
             }
         });
@@ -268,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         multiRouteWindow = new MultiRouteWindow(this, container);
         singleRouteWindow = new SingleRouteWindow(this, container);
         singleSelectWindow = new SingleSelectWindow(this, container);
-        selectClickWindow = new SingleSelectClickWindow(this, container);
+        selectClickWindow = new SelectClickWindow(this, container);
 
         M.DEFAULT.setWindow(searchWindow);
         M.S_SELECT.setWindow(singleSelectWindow);
@@ -359,17 +354,14 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             singleRouteWindow.displayPlan(routes, 0, myLocation);
 
             // 更换布局
-            if (searchWindow.isOpen()) {
-                Window.transition(searchWindow, singleRouteWindow);
-            } else if (singleSelectWindow.isOpen()) {
-                Window.transition(singleSelectWindow, singleRouteWindow);
-            } else if (selectClickWindow.isOpen()) {
-                Window.transition(selectClickWindow, singleRouteWindow);
-            }
+            Window current = mode.mode().getWindow();
+            Window.transition(current, singleRouteWindow);
 
             singleRouteWindow.openBox();
             mode.changeTo(M.S_ROUTE_OPEN);
         } catch (Exception e) {
+            Window current = mode.mode().getWindow();
+            Window.transition(current, M.DEFAULT.getWindow());
             mode.changeTo(M.DEFAULT);
             String msg = "计算错误：" + e.getMessage();
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
@@ -403,6 +395,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // 更换布局
         Window.transition(multiSelectWindow, multiRouteWindow);
         multiRouteWindow.openBox();
+        mode.changeTo(M.M_ROUTE_OPEN);
     }
 
     @Override
@@ -421,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
             Window current = mode.mode().getWindow();
             Window.transition(current, M.DEFAULT.getWindow());
-            mode.setDefault();
+            mode.changeTo(M.DEFAULT);
         }
     }
 

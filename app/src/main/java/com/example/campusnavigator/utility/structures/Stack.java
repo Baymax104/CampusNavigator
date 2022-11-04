@@ -1,8 +1,6 @@
 package com.example.campusnavigator.utility.structures;
 
 
-import com.example.campusnavigator.utility.interfaces.Stackable;
-
 /**
  * @Description 栈的双向链表实现类
  * @Author John
@@ -10,7 +8,7 @@ import com.example.campusnavigator.utility.interfaces.Stackable;
  * @Date 2022/9/1 14:15
  * @Version 1
  */
-public class Stack<E> implements Stackable<E> {
+public class Stack<E> {
     private static class Node<T> {
         private T value;
         private Node<T> pre;
@@ -29,7 +27,6 @@ public class Stack<E> implements Stackable<E> {
     public Stack() {
     }
 
-    @Override
     public void push(E value) {
         Node<E> node = new Node<>(value);
         tail.next = node;
@@ -38,7 +35,6 @@ public class Stack<E> implements Stackable<E> {
         size++;
     }
 
-    @Override
     public void pop() {
         if (size == 0) {
             return;
@@ -47,7 +43,6 @@ public class Stack<E> implements Stackable<E> {
         size--;
     }
 
-    @Override
     public E top() {
         if (size == 0) {
             return null;

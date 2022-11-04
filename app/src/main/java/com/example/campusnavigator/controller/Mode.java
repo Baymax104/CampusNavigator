@@ -44,9 +44,4 @@ public class Mode {
         return mode == M.M_ROUTE_OPEN || mode == M.M_ROUTE_CLOSE;
     }
 
-    public void setDefault() {
-        mode = M.DEFAULT;
-        log();
-    }
-
 }

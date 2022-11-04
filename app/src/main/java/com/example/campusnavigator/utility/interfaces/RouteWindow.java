@@ -15,6 +15,5 @@ import com.example.campusnavigator.controller.Mode;
 public interface RouteWindow {
     void openBox();
     void closeBox();
-    void setExpendButtonUp(boolean isUp);
     void autoGestureControl(MotionEvent latLng, AMap map, Mode mode);
 }

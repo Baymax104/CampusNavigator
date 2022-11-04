@@ -3,8 +3,6 @@ package com.example.campusnavigator.utility.structures;
 
 import androidx.annotation.NonNull;
 
-import com.example.campusnavigator.utility.interfaces.Stackable;
-
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -15,7 +13,7 @@ import java.util.Iterator;
  * @Date 2022/9/1 13:45
  * @Version 1
  */
-public class List<E> implements Iterable<E>, Stackable<E> {
+public class List<E> implements Iterable<E> {
     private static final int MAX_SIZE = 80;
     @SuppressWarnings("unchecked")
     private E[] array = (E[]) new Object[MAX_SIZE];
@@ -25,7 +23,6 @@ public class List<E> implements Iterable<E>, Stackable<E> {
     public List() {
     }
 
-    @Override
     public void push(E value) {
         if (size == MAX_SIZE) {
             grow(); // 当存满时进行扩容
@@ -41,14 +38,12 @@ public class List<E> implements Iterable<E>, Stackable<E> {
         return array[i];
     }
 
-    @Override
     public void pop() {
         if (size > 0) {
             size--;
         }
     }
 
-    @Override
     public E top() {
         return size == 0 ? null : array[size - 1];
     }

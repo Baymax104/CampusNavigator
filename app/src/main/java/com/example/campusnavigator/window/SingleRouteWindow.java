@@ -65,22 +65,12 @@ public class SingleRouteWindow extends Window implements RouteWindow {
     }
 
     @Override
-    public void setExpendButtonUp(boolean isUp) {
-        if (isUp) {
-            expendButton.setImageResource(R.drawable.expend_arrow_up);
-        } else {
-            expendButton.setImageResource(R.drawable.expend_arrow_down);
-        }
-    }
-
-    @Override
     public void autoGestureControl(@NonNull MotionEvent latLng, AMap map, Mode mode) {
         float touchY = latLng.getRawY();
         int windowY = getWindowY();
         // 触摸起始点位于弹窗外侧，关闭弹窗
         if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < windowY) {
             closeBox();
-            setExpendButtonUp(true);
             map.getUiSettings().setAllGesturesEnabled(true);
             mode.changeTo(M.S_ROUTE_CLOSE);
 
@@ -101,6 +91,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         if (routePlanBox != null && routeContainer.findViewById(R.id.route_plan_box) == null) {
             routeContainer.addView(routePlanBox);
         }
+        expendButton.setImageResource(R.drawable.expend_arrow_down);
     }
 
     @Override
@@ -108,6 +99,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         if (routePlanBox != null && routeContainer.findViewById(R.id.route_plan_box) != null) {
             routeContainer.removeView(routePlanBox);
         }
+        expendButton.setImageResource(R.drawable.expend_arrow_up);
     }
 
     public int getPlanCount() {
