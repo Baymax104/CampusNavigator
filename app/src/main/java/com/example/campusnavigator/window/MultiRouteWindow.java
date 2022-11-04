@@ -46,7 +46,7 @@ public class MultiRouteWindow extends Window implements RouteWindow {
     private final View multiSpotBox;
     private final MultiSpotAdapter adapter;
 
-    public MultiRouteWindow(Context context, ViewGroup parent) {
+    private MultiRouteWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_multi_route_window, context, parent);
         multiRouteContainer = rootView.findViewById(R.id.multi_route_container);
 
@@ -61,6 +61,13 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         multiSpotList.setAdapter(adapter);
         LinearLayoutManager manager = new LinearLayoutManager(context);
         multiSpotList.setLayoutManager(manager);
+    }
+
+    public static MultiRouteWindow newInstance(Context context, ViewGroup parent) {
+        MultiRouteWindow window = new MultiRouteWindow(context, parent);
+        M.M_ROUTE_OPEN.setWindow(window);
+        M.M_ROUTE_CLOSE.setWindow(window);
+        return window;
     }
 
     public void setExpendButtonListener(View.OnClickListener listener) {

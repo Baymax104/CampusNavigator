@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.ViewGroup;
 
 import com.example.campusnavigator.R;
+import com.example.campusnavigator.controller.M;
 
 /**
  * @Description
@@ -14,7 +15,13 @@ import com.example.campusnavigator.R;
  */
 public class SingleSelectWindow extends Window {
 
-    public SingleSelectWindow(Context context, ViewGroup parent) {
+    private SingleSelectWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_single_select_window, context, parent);
+    }
+
+    public static SingleSelectWindow newInstance(Context context, ViewGroup parent) {
+        SingleSelectWindow window = new SingleSelectWindow(context, parent);
+        M.S_SELECT.setWindow(window);
+        return window;
     }
 }

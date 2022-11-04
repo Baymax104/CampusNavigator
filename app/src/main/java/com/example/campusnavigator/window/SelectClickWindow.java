@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.R;
+import com.example.campusnavigator.controller.M;
 import com.example.campusnavigator.model.Map;
 import com.example.campusnavigator.model.Position;
 
@@ -30,11 +31,17 @@ public class SelectClickWindow extends Window {
     private final Button button;
     private Position selected;
 
-    public SelectClickWindow(Context context, ViewGroup parent) {
+    private SelectClickWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_single_select_click_window, context, parent);
         nameTxt = rootView.findViewById(R.id.select_click_name);
         infoTxt = rootView.findViewById(R.id.select_click_info);
         button = rootView.findViewById(R.id.select_click_button);
+    }
+
+    public static SelectClickWindow newInstance(Context context, ViewGroup parent) {
+        SelectClickWindow window = new SelectClickWindow(context, parent);
+        M.S_SELECT_CLICK.setWindow(window);
+        return window;
     }
 
     public void setButtonListener(View.OnClickListener listener) {

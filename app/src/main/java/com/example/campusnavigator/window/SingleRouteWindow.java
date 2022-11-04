@@ -44,7 +44,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
     private View selectedPlanView; // 当前选中的方案布局
 
 
-    public SingleRouteWindow(Context context, ViewGroup parent) {
+    private SingleRouteWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_single_route_window, context, parent);
         routeContainer = rootView.findViewById(R.id.route_container);
         // 获取布局对象
@@ -58,6 +58,13 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         selected = -1;
         selectedPlanView = planGroup.getChildAt(0);
         selectedPlanView.setBackgroundResource(R.drawable.shape_plan_item_bg_selected);
+    }
+
+    public static SingleRouteWindow newInstance(Context context, ViewGroup parent) {
+        SingleRouteWindow window = new SingleRouteWindow(context, parent);
+        M.S_ROUTE_OPEN.setWindow(window);
+        M.S_ROUTE_CLOSE.setWindow(window);
+        return window;
     }
 
     public void setExpendButtonListener(View.OnClickListener listener) {

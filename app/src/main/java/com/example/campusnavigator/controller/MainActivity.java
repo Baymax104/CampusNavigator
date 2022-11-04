@@ -258,21 +258,12 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         CoordinatorLayout container = findViewById(R.id.view_container);
-        searchWindow = new SearchWindow(this, container);
-        multiSelectWindow = new MultiSelectWindow(this, container);
-        multiRouteWindow = new MultiRouteWindow(this, container);
-        singleRouteWindow = new SingleRouteWindow(this, container);
-        singleSelectWindow = new SingleSelectWindow(this, container);
-        selectClickWindow = new SelectClickWindow(this, container);
-
-        M.DEFAULT.setWindow(searchWindow);
-        M.S_SELECT.setWindow(singleSelectWindow);
-        M.S_ROUTE_OPEN.setWindow(singleRouteWindow);
-        M.S_ROUTE_CLOSE.setWindow(singleRouteWindow);
-        M.S_SELECT_CLICK.setWindow(selectClickWindow);
-        M.M_SELECT.setWindow(multiSelectWindow);
-        M.M_ROUTE_OPEN.setWindow(multiRouteWindow);
-        M.M_ROUTE_CLOSE.setWindow(multiRouteWindow);
+        searchWindow = SearchWindow.newInstance(this, container);
+        multiSelectWindow = MultiSelectWindow.newInstance(this, container);
+        multiRouteWindow = MultiRouteWindow.newInstance(this, container);
+        singleRouteWindow = SingleRouteWindow.newInstance(this, container);
+        singleSelectWindow = SingleSelectWindow.newInstance(this, container);
+        selectClickWindow = SelectClickWindow.newInstance(this, container);
 
         searchWindow.open();
     }

@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.campusnavigator.R;
+import com.example.campusnavigator.controller.M;
 import com.google.android.material.card.MaterialCardView;
 
 /**
@@ -21,10 +22,16 @@ public class SearchWindow extends Window {
     private final TextView searchField;
     private final MaterialCardView multiSelectEntry;
 
-    public SearchWindow(@NonNull Context context, @NonNull ViewGroup parent) {
+    private SearchWindow(@NonNull Context context, @NonNull ViewGroup parent) {
         super(R.layout.layout_search_window, context, parent);
         searchField = rootView.findViewById(R.id.search_field);
         multiSelectEntry = rootView.findViewById(R.id.multi_select_entry);
+    }
+
+    public static SearchWindow newInstance(Context context, ViewGroup parent) {
+        SearchWindow window = new SearchWindow(context, parent);
+        M.DEFAULT.setWindow(window);
+        return window;
     }
 
     public void setSearchListener(View.OnClickListener listener) {
