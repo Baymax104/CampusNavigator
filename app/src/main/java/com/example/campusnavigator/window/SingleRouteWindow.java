@@ -67,8 +67,16 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         return window;
     }
 
-    public void setExpendButtonListener(View.OnClickListener listener) {
-        expendButton.setOnClickListener(listener);
+    public void bindExpendListener(Mode mode) {
+        expendButton.setOnClickListener(v -> {
+            if (mode.is(M.S_ROUTE_OPEN)) { // 处于打开状态，关闭planBox
+                closeBox();
+                mode.changeTo(M.S_ROUTE_CLOSE);
+            } else if (mode.is(M.S_ROUTE_CLOSE)) { // 处于关闭状态，打开planBox
+                openBox();
+                mode.changeTo(M.S_ROUTE_OPEN);
+            }
+        });
     }
 
     @Override

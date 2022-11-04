@@ -24,7 +24,7 @@ public class Mode {
         log();
     }
 
-    public M mode() {
+    public M getState() {
         return mode;
     }
 
@@ -44,4 +44,7 @@ public class Mode {
         return mode == M.M_ROUTE_OPEN || mode == M.M_ROUTE_CLOSE;
     }
 
+    public boolean isRouteOpen() {
+        return mode == M.S_ROUTE_OPEN || mode == M.M_ROUTE_OPEN;
+    }
 }

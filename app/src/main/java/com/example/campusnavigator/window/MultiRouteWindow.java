@@ -70,8 +70,16 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         return window;
     }
 
-    public void setExpendButtonListener(View.OnClickListener listener) {
-        expendButton.setOnClickListener(listener);
+    public void bindExpendListener(Mode mode) {
+        expendButton.setOnClickListener(v -> {
+            if (mode.is(M.M_ROUTE_OPEN)) {
+                closeBox();
+                mode.changeTo(M.M_ROUTE_CLOSE);
+            } else if (mode.is(M.M_ROUTE_CLOSE)) {
+                openBox();
+                mode.changeTo(M.M_ROUTE_OPEN);
+            }
+        });
     }
 
     @Override

@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             if (spot == null) {
                 return false;
             }
-            switch (mode.mode()) {
+            switch (mode.getState()) {
                 case DEFAULT:
                     selectClickWindow.setMarkerInfo(spot, myLocation);
                     Window.transition(searchWindow, selectClickWindow);
@@ -145,12 +145,14 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             float touchY = latLng.getRawY();
             if (mode.is(M.DEFAULT)) {
                 map.getUiSettings().setAllGesturesEnabled(true);
-            } else if (mode.is(M.S_ROUTE_OPEN) || mode.is(M.M_ROUTE_OPEN)) {
-                Window w = mode.mode().getWindow();
+
+            } else if (mode.isRouteOpen()) {
+                Window w = mode.getState().getWindow();
                 RouteWindow routeWindow = (RouteWindow) w;
                 routeWindow.autoGestureControl(latLng, map, mode);
+
             } else {
-                int windowY = mode.mode().getWindow().getWindowY();
+                int windowY = mode.getState().getWindow().getWindowY();
                 map.getUiSettings().setAllGesturesEnabled(touchY < windowY);
             }
         });
@@ -206,16 +208,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
 
-        // 单点路径结果弹窗监听
-        singleRouteWindow.setExpendButtonListener(view -> {
-            if (mode.is(M.S_ROUTE_OPEN)) { // 处于打开状态，关闭planBox
-                singleRouteWindow.closeBox();
-                mode.changeTo(M.S_ROUTE_CLOSE);
-            } else if (mode.is(M.S_ROUTE_CLOSE)) { // 处于关闭状态，打开planBox
-                singleRouteWindow.openBox();
-                mode.changeTo(M.S_ROUTE_OPEN);
-            }
-        });
+        // 单点路径结果弹窗监听绑定
+        singleRouteWindow.bindExpendListener(mode);
 
         int count = singleRouteWindow.getPlanCount();
         for (int i = 0; i < count; i++) {
@@ -227,16 +221,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             });
         }
 
-        // 多点路径弹窗监听
-        multiRouteWindow.setExpendButtonListener(v -> {
-            if (mode.is(M.M_ROUTE_OPEN)) {
-                multiRouteWindow.closeBox();
-                mode.changeTo(M.M_ROUTE_CLOSE);
-            } else if (mode.is(M.M_ROUTE_CLOSE)) {
-                multiRouteWindow.openBox();
-                mode.changeTo(M.M_ROUTE_OPEN);
-            }
-        });
+        // 多点路径弹窗监听绑定
+        multiRouteWindow.bindExpendListener(mode);
     }
 
     private void privacyCompliance() {
@@ -345,13 +331,13 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             singleRouteWindow.displayPlan(routes, 0, myLocation);
 
             // 更换布局
-            Window current = mode.mode().getWindow();
+            Window current = mode.getState().getWindow();
             Window.transition(current, singleRouteWindow);
 
             singleRouteWindow.openBox();
             mode.changeTo(M.S_ROUTE_OPEN);
         } catch (Exception e) {
-            Window current = mode.mode().getWindow();
+            Window current = mode.getState().getWindow();
             Window.transition(current, M.DEFAULT.getWindow());
             mode.changeTo(M.DEFAULT);
             String msg = "计算错误：" + e.getMessage();
@@ -403,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 manager.popBufferAll();
                 multiSelectWindow.removeAllPosition();
             }
-            Window current = mode.mode().getWindow();
+            Window current = mode.getState().getWindow();
             Window.transition(current, M.DEFAULT.getWindow());
             mode.changeTo(M.DEFAULT);
         }
