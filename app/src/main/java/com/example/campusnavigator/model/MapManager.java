@@ -25,13 +25,13 @@ public class MapManager extends Map {
     private double[] dist;
     private static MapManager obj;
 
-    private static class Status implements Comparable<Status> {
+    private static class State implements Comparable<State> {
         final int v;
         final double d;
         final double p;
-        final Status pre;
+        final State pre;
 
-        public Status(int v, double d, double p, Status pre) {
+        public State(int v, double d, double p, State pre) {
             this.v = v;
             this.d = d;
             this.p = p;
@@ -39,7 +39,7 @@ public class MapManager extends Map {
         }
 
         @Override
-        public int compareTo(Status o) {
+        public int compareTo(State o) {
             return Double.compare(p, o.p);
         }
     }
@@ -147,11 +147,11 @@ public class MapManager extends Map {
         Dijkstra(dest, source);
 
         List<Position> route = new List<>();
-        MinHeap<Status> heap = new MinHeap<>();
+        MinHeap<State> heap = new MinHeap<>();
         int[] visited = new int[size];
 
         int vi = source;
-        Status v = new Status(vi, 0, dist[vi], null);
+        State v = new State(vi, 0, dist[vi], null);
         heap.push(v);
 
         while (!heap.isEmpty()) {
@@ -179,7 +179,7 @@ public class MapManager extends Map {
                         // d为实际距离，p为移动代价
                         double d = v.d + map[vi][i];
                         double p = d + dist[i];
-                        Status next = new Status(i, d, p, v);
+                        State next = new State(i, d, p, v);
                         heap.push(next);
                     }
                 }
@@ -191,7 +191,7 @@ public class MapManager extends Map {
         double dist = v.p;
         Position pos = positions[v.v];
         route.push(pos);
-        Status cur = v.pre;
+        State cur = v.pre;
         while (cur != null) {
             pos = positions[cur.v];
             route.push(pos);

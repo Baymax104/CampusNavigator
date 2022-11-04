@@ -28,7 +28,7 @@ public class SingleSelectClickWindow extends Window {
     private final TextView nameTxt;
     private final TextView infoTxt;
     private final Button button;
-    public Position selected;
+    private Position selected;
 
     public SingleSelectClickWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_single_select_click_window, context, parent);
@@ -39,6 +39,10 @@ public class SingleSelectClickWindow extends Window {
 
     public void setButtonListener(View.OnClickListener listener) {
         button.setOnClickListener(listener);
+    }
+
+    public Position getSelected() {
+        return selected;
     }
 
     public void setMarkerInfo(@NonNull Position position, @NonNull Position myPosition) {

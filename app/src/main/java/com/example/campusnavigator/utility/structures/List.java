@@ -61,6 +61,10 @@ public class List<E> implements Iterable<E>, Stackable<E> {
         size = 0;
     }
 
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
     private void grow() {
         int newCapacity = size + (size >> 1); // 扩容为1.5倍
         array = Arrays.copyOf(array, newCapacity);

@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         selectClickWindow.setButtonListener(v -> {
-            Position position = selectClickWindow.selected;
+            Position position = selectClickWindow.getSelected();
             if (position != null) {
                 calculateSingleRoute(position);
             }
@@ -341,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             List<Position> attachPos = manager.attachToMap(myLocation, destPosition);
             // 获取目的地邻接点，目的地邻接点表spotAttached
             List<Position> spotAttached = manager.getSpotAttached(destPosition);
-            if (attachPos.length() == 0 || spotAttached == null || spotAttached.length() == 0) {
+            if (attachPos.isEmpty() || spotAttached == null || spotAttached.isEmpty()) {
                 throw new Exception("连接点错误");
             }
 
