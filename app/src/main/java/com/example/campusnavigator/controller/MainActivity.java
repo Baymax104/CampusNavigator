@@ -34,6 +34,7 @@ import com.example.campusnavigator.model.SpotProvider;
 import com.example.campusnavigator.utility.helpers.DialogHelper;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
 import com.example.campusnavigator.utility.interfaces.RouteResultReceiver;
+import com.example.campusnavigator.utility.interfaces.RouteWindow;
 import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
 import com.example.campusnavigator.utility.structures.List;
 import com.example.campusnavigator.utility.structures.Stack;
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 case DEFAULT:
                     selectClickWindow.setMarkerInfo(spot, myLocation);
                     Window.transition(searchWindow, selectClickWindow);
-                    mode.change(Mode.M.S_SELECT_CLICK);
+                    mode.changeTo(M.S_SELECT_CLICK);
                     break;
                 case S_SELECT_CLICK:
                     selectClickWindow.setMarkerInfo(spot, myLocation);
@@ -141,61 +142,42 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         // 地图触摸监听，控制弹窗区域手势不生效，地图区域手势生效
         map.setOnMapTouchListener(latLng -> {
-            int routeWindowY = singleRouteWindow.getWindowY();
-            int multiRouteWindowY = multiRouteWindow.getWindowY();
-            int multiSelectWindowY = multiSelectWindow.getWindowY();
-            int selectClickWindowY = selectClickWindow.getWindowY();
             float touchY = latLng.getRawY();
-            switch (mode.mode()) {
-                case DEFAULT:
-                    map.getUiSettings().setAllGesturesEnabled(true);
-                    break;
-                case S_ROUTE_OPEN: // 单点路径弹窗处于打开状态
-                    singleRouteWindow.autoGestureControl(latLng, map, mode);
-                    break;
-                case M_ROUTE_OPEN: // 多点路径弹窗打开状态
-                    multiRouteWindow.autoGestureControl(latLng, map, mode);
-                    break;
-                case S_ROUTE_CLOSE: // 单点路径弹窗处于关闭状态，触摸点位于外侧开启手势，位于内侧关闭手势
-                    map.getUiSettings().setAllGesturesEnabled(touchY < routeWindowY);
-                    break;
-                case M_ROUTE_CLOSE:
-                    map.getUiSettings().setAllGesturesEnabled(touchY < multiRouteWindowY);
-                    break;
-                case M_SELECT:
-                    map.getUiSettings().setAllGesturesEnabled(touchY < multiSelectWindowY);
-                    break;
-                case S_SELECT_CLICK:
-                    map.getUiSettings().setAllGesturesEnabled(touchY < selectClickWindowY);
-                    break;
-                default:
-                    break;
+            if (mode.is(M.DEFAULT)) {
+                map.getUiSettings().setAllGesturesEnabled(true);
+            } else if (mode.is(M.S_ROUTE_OPEN) || mode.is(M.M_ROUTE_OPEN)) {
+                Window w = mode.mode().getWindow();
+                RouteWindow routeWindow = (RouteWindow) w;
+                routeWindow.autoGestureControl(latLng, map, mode);
+            } else {
+                int windowY = mode.mode().getWindow().getWindowY();
+                map.getUiSettings().setAllGesturesEnabled(touchY < windowY);
             }
         });
 
         // searchWindow对象监听
         searchWindow.setSearchListener(view -> {
-            if (mode.is(Mode.M.DEFAULT)) {
+            if (mode.is(M.DEFAULT)) {
                 DialogHelper.showSpotSearchDialog(this, mode, provider, this);
             }
         });
 
         searchWindow.setEntryListener(view -> {
-            if (mode.is(Mode.M.DEFAULT)) { // 由初始状态切换到多点选择状态
+            if (mode.is(M.DEFAULT)) { // 由初始状态切换到多点选择状态
                 Window.transition(searchWindow, multiSelectWindow);
-                mode.change(Mode.M.M_SELECT);
+                mode.changeTo(M.M_SELECT);
             }
         });
 
         // 多点选择地点监听
         multiSelectWindow.setButtonListener(view -> {
-            if (mode.is(Mode.M.M_SELECT)) {
+            if (mode.is(M.M_SELECT)) {
                 if (manager.bufferSize() < 2) {
                     Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
                         manager.calculate(true, this);
-                        mode.change(Mode.M.M_ROUTE_OPEN);
+                        mode.changeTo(M.M_ROUTE_OPEN);
                     } catch (Exception e) {
                         String msg = "计算错误：" + e.getMessage();
                         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
@@ -227,14 +209,14 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         // 单点路径结果弹窗监听
         singleRouteWindow.setExpendButtonListener(view -> {
-            if (mode.is(Mode.M.S_ROUTE_OPEN)) { // 处于打开状态，关闭planBox
+            if (mode.is(M.S_ROUTE_OPEN)) { // 处于打开状态，关闭planBox
                 singleRouteWindow.closeBox();
                 singleRouteWindow.setExpendButtonUp(true);
-                mode.change(Mode.M.S_ROUTE_CLOSE);
-            } else if (mode.is(Mode.M.S_ROUTE_CLOSE)) { // 处于关闭状态，打开planBox
+                mode.changeTo(M.S_ROUTE_CLOSE);
+            } else if (mode.is(M.S_ROUTE_CLOSE)) { // 处于关闭状态，打开planBox
                 singleRouteWindow.openBox();
                 singleRouteWindow.setExpendButtonUp(false);
-                mode.change(Mode.M.S_ROUTE_OPEN);
+                mode.changeTo(M.S_ROUTE_OPEN);
             }
         });
 
@@ -250,14 +232,14 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         // 多点路径弹窗监听
         multiRouteWindow.setExpendButtonListener(v -> {
-            if (mode.is(Mode.M.M_ROUTE_OPEN)) {
+            if (mode.is(M.M_ROUTE_OPEN)) {
                 multiRouteWindow.closeBox();
                 multiRouteWindow.setExpendButtonUp(true);
-                mode.change(Mode.M.M_ROUTE_CLOSE);
-            } else if (mode.is(Mode.M.M_ROUTE_CLOSE)) {
+                mode.changeTo(M.M_ROUTE_CLOSE);
+            } else if (mode.is(M.M_ROUTE_CLOSE)) {
                 multiRouteWindow.openBox();
                 multiRouteWindow.setExpendButtonUp(false);
-                mode.change(Mode.M.M_ROUTE_OPEN);
+                mode.changeTo(M.M_ROUTE_OPEN);
             }
         });
     }
@@ -287,6 +269,15 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         singleRouteWindow = new SingleRouteWindow(this, container);
         singleSelectWindow = new SingleSelectWindow(this, container);
         selectClickWindow = new SingleSelectClickWindow(this, container);
+
+        M.DEFAULT.setWindow(searchWindow);
+        M.S_SELECT.setWindow(singleSelectWindow);
+        M.S_ROUTE_OPEN.setWindow(singleRouteWindow);
+        M.S_ROUTE_CLOSE.setWindow(singleRouteWindow);
+        M.S_SELECT_CLICK.setWindow(selectClickWindow);
+        M.M_SELECT.setWindow(multiSelectWindow);
+        M.M_ROUTE_OPEN.setWindow(multiRouteWindow);
+        M.M_ROUTE_CLOSE.setWindow(multiRouteWindow);
 
         searchWindow.open();
     }
@@ -322,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     public void onSingleSelect() {
         Toast.makeText(this, "请选择你想去的地点~，按返回键返回", Toast.LENGTH_SHORT).show();
         Window.transition(searchWindow, singleSelectWindow);
-        mode.change(Mode.M.S_SELECT);
+        mode.changeTo(M.S_SELECT);
     }
 
     @Override
@@ -377,9 +368,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
 
             singleRouteWindow.openBox();
-            mode.change(Mode.M.S_ROUTE_OPEN);
+            mode.changeTo(M.S_ROUTE_OPEN);
         } catch (Exception e) {
-            mode.change(Mode.M.DEFAULT);
+            mode.changeTo(M.DEFAULT);
             String msg = "计算错误：" + e.getMessage();
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
             Log.e("CamNav-CalculateError", msg);
@@ -416,33 +407,21 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onBackPressed() {
-        if (mode.is(Mode.M.S_SELECT)) {
-            Window.transition(singleSelectWindow, searchWindow);
-            mode.setDefault();
-
-        } else if (mode.isSingleRoute()) { // 若当前处于单点路径结果弹窗
-            Window.transition(singleRouteWindow, searchWindow);
-            OverlayHelper.removeAllLines();
-            mode.setDefault();
-
-        } else if (mode.is(Mode.M.M_SELECT)) { // 若当前处于多点路径选择状态
-            manager.popBufferAll();
-            multiSelectWindow.removeAllPosition();
-            Window.transition(multiSelectWindow, searchWindow);
-            mode.setDefault();
-
-        } else if (mode.isMultiRoute()) { // 若当前处于多点路径结果弹窗
-            Window.transition(multiRouteWindow, searchWindow);
-            OverlayHelper.removeAllLines();
-            OverlayHelper.initAllMarkers();
-            mode.setDefault();
-
-        } else if (mode.is(Mode.M.S_SELECT_CLICK)) {
-            Window.transition(selectClickWindow, searchWindow);
-            mode.setDefault();
-
-        } else {
+        if (mode.is(M.DEFAULT)) {
             super.onBackPressed();
+        } else {
+            if (mode.isSingleRoute()) {
+                OverlayHelper.removeAllLines();
+            } else if (mode.isMultiRoute()) {
+                OverlayHelper.removeAllLines();
+                OverlayHelper.initAllMarkers();
+            } else if (mode.is(M.M_SELECT)) {
+                manager.popBufferAll();
+                multiSelectWindow.removeAllPosition();
+            }
+            Window current = mode.mode().getWindow();
+            Window.transition(current, M.DEFAULT.getWindow());
+            mode.setDefault();
         }
     }
 

@@ -119,9 +119,9 @@ public class SpotSearchDialog extends BottomPopupView {
 
         // 地图选点监听
         mapSelectButton.setOnClickListener(view -> {
-            if (modeContext.is(Mode.M.DEFAULT)) {
+            if (modeContext.is(M.DEFAULT)) {
                 dismissWith(() -> listener.onSingleSelect());
-            } else if (modeContext.is(Mode.M.S_SELECT)) {
+            } else if (modeContext.is(M.S_SELECT)) {
                 // 若当前处于地图选点状态，则直接关闭，继续选点
                 dismiss();
             }

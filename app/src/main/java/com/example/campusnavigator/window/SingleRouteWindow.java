@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 
 import com.amap.api.maps.AMap;
 import com.example.campusnavigator.R;
+import com.example.campusnavigator.controller.M;
 import com.example.campusnavigator.controller.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
@@ -81,7 +82,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
             closeBox();
             setExpendButtonUp(true);
             map.getUiSettings().setAllGesturesEnabled(true);
-            mode.change(Mode.M.S_ROUTE_CLOSE);
+            mode.changeTo(M.S_ROUTE_CLOSE);
 
         } else if (touchY >= windowY) { // 触摸点位于弹窗内侧
             // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态

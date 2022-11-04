@@ -12,16 +12,6 @@ import androidx.annotation.NonNull;
  * @Version 1
  */
 public class Mode {
-    public enum M {
-        DEFAULT, // 初始状态
-        S_SELECT, // 单点地图选点
-        S_SELECT_CLICK, // Marker点击单点选点
-        S_ROUTE_OPEN, // 单点显示路径，结果弹窗打开
-        S_ROUTE_CLOSE, // 单点显示路径，结果弹窗关闭
-        M_SELECT, // 多点地图选点
-        M_ROUTE_OPEN, // 多点显示路径，结果弹窗打开
-        M_ROUTE_CLOSE // 多点显示路径，结果弹窗关闭
-    }
     private M mode;
 
     public Mode() {
@@ -29,7 +19,7 @@ public class Mode {
         log();
     }
 
-    public void change(M mode) {
+    public void changeTo(M mode) {
         this.mode = mode;
         log();
     }
@@ -42,8 +32,8 @@ public class Mode {
         Log.i("CamNav-Mode", "Current Mode=" + mode);
     }
 
-    public boolean is(@NonNull Mode.M m) {
-        return m == this.mode;
+    public boolean is(@NonNull M m) {
+        return mode == m;
     }
 
     public boolean isSingleRoute() {
