@@ -118,8 +118,8 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         int t = td.intValue();
         int d = dd.intValue();
         if (timeInfo != null && distanceInfo != null) {
-            timeInfo.setText(String.format(Locale.CHINA, "%d分钟", t));
-            distanceInfo.setText(String.format(Locale.CHINA, "%d米", d));
+            timeInfo.setText(String.format(Locale.CHINA, "预计步行%d分钟", t));
+            distanceInfo.setText(String.format(Locale.CHINA, "总距离：%d米", d));
         }
     }
 

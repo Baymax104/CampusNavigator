@@ -32,6 +32,8 @@ public class Map {
     protected static int size;
     protected static int sizeOfSpot;
     protected static final double INF = 65535;
+    protected static final int INITIAL_SPOT_SIZE = 30;
+    protected static final int INITIAL_POSITION_SIZE = 100;
     protected static HashMap<Position, List<Position>> spotAttached; // 每个地点的入口点
 
     protected static double[][] map;
@@ -54,7 +56,7 @@ public class Map {
             // 解析文件
             JSONObject jsonObject = new JSONObject(builder.toString());
             // 获取position
-            spots = new Position[20];
+            spots = new Position[INITIAL_SPOT_SIZE];
             JSONArray spotArray = jsonObject.getJSONArray("spots");
             sizeOfSpot = spotArray.length();
             for (int i = 0; i < sizeOfSpot; i++) {
@@ -66,7 +68,7 @@ public class Map {
             }
 
             // 获取positions
-            positions = new Position[80];
+            positions = new Position[INITIAL_POSITION_SIZE];
             JSONArray positionArray = jsonObject.getJSONArray("positions");
             size = positionArray.length();
             for (int i = 0; i < size; i++) {
