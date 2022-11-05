@@ -70,7 +70,7 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         return window;
     }
 
-    public void bindExpendListener(Mode mode) {
+    public void bindExpendMode(Mode mode) {
         expendButton.setOnClickListener(v -> {
             if (mode.is(M.M_ROUTE_OPEN)) {
                 closeBox();

@@ -200,21 +200,18 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
 
-        selectClickWindow.setButtonListener(v -> {
-            Position position = selectClickWindow.getSelected();
-            if (position != null) {
-                calculateSingleRoute(position);
+        selectClickWindow.setButtonListener(selected -> {
+            if (selected != null) {
+                calculateSingleRoute(selected);
             }
         });
 
-
         // 单点路径结果弹窗监听绑定
-        singleRouteWindow.bindExpendListener(mode);
+        singleRouteWindow.bindExpendMode(mode);
 
         int count = singleRouteWindow.getPlanCount();
         for (int i = 0; i < count; i++) {
-            final int selected = i;
-            singleRouteWindow.setPlanListener(i, v -> {
+            singleRouteWindow.setPlanListener(i, selected -> {
                 singleRouteWindow.refreshSelected();
                 List<List<Position>> route = Route.extractRoute(routeResults);
                 singleRouteWindow.displayPlan(route, selected, myLocation);
@@ -222,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         }
 
         // 多点路径弹窗监听绑定
-        multiRouteWindow.bindExpendListener(mode);
+        multiRouteWindow.bindExpendMode(mode);
     }
 
     private void privacyCompliance() {

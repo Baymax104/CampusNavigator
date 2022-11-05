@@ -21,9 +21,9 @@
                     android:layout_height="match_parent"
                     android:id="@+id/select_click_name"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:gravity="center_vertical"
-                    android:layout_marginStart="15dp"
+                    android:layout_marginStart="20dp"
                     android:layout_alignParentStart="true"
                     tools:ignore="RelativeOverlap" />
 
@@ -39,8 +39,6 @@
                     android:background="@drawable/selector_route_button"
                     android:textColor="@color/white"/>
 
-
-
         </RelativeLayout>
         <TextView
                 android:layout_width="match_parent"
@@ -49,7 +47,7 @@
                 android:textSize="15sp"
                 android:textColor="@color/black"
                 android:gravity="center_vertical"
-                android:layout_marginStart="15dp"/>
+                android:layout_marginStart="20dp"/>
                 
     </LinearLayout>
 

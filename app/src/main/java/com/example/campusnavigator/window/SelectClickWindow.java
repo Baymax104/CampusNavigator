@@ -1,7 +1,6 @@
 package com.example.campusnavigator.window;
 
 import android.content.Context;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
@@ -31,8 +30,12 @@ public class SelectClickWindow extends Window {
     private final Button button;
     private Position selected;
 
+    public interface ButtonClickListener {
+        void onClick(Position selected);
+    }
+
     private SelectClickWindow(Context context, ViewGroup parent) {
-        super(R.layout.layout_single_select_click_window, context, parent);
+        super(R.layout.layout_select_click_window, context, parent);
         nameTxt = rootView.findViewById(R.id.select_click_name);
         infoTxt = rootView.findViewById(R.id.select_click_info);
         button = rootView.findViewById(R.id.select_click_button);
@@ -44,12 +47,8 @@ public class SelectClickWindow extends Window {
         return window;
     }
 
-    public void setButtonListener(View.OnClickListener listener) {
-        button.setOnClickListener(listener);
-    }
-
-    public Position getSelected() {
-        return selected;
+    public void setButtonListener(ButtonClickListener listener) {
+        button.setOnClickListener(v -> listener.onClick(selected));
     }
 
     public void setMarkerInfo(@NonNull Position position, @NonNull Position myPosition) {

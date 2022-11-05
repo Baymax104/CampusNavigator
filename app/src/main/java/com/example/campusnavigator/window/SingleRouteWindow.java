@@ -43,6 +43,10 @@ public class SingleRouteWindow extends Window implements RouteWindow {
     private int selected; // 当前选中的方案索引
     private View selectedPlanView; // 当前选中的方案布局
 
+    public interface PlanSelectedListener {
+        void onSelect(int selected);
+    }
+
 
     private SingleRouteWindow(Context context, ViewGroup parent) {
         super(R.layout.layout_single_route_window, context, parent);
@@ -67,7 +71,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         return window;
     }
 
-    public void bindExpendListener(Mode mode) {
+    public void bindExpendMode(Mode mode) {
         expendButton.setOnClickListener(v -> {
             if (mode.is(M.S_ROUTE_OPEN)) { // 处于打开状态，关闭planBox
                 closeBox();
@@ -125,9 +129,9 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         this.selected = -1;
     }
 
-    public void setPlanListener(int i, View.OnClickListener listener) {
+    public void setPlanListener(int i, PlanSelectedListener listener) {
         View child = planGroup.getChildAt(i);
-        child.setOnClickListener(listener);
+        child.setOnClickListener(v -> listener.onSelect(i));
     }
 
     public void setRouteInfo(@NonNull List<Double> times, @NonNull List<Double> distances) {
