@@ -249,11 +249,20 @@ public class MapManager extends Map {
             heap.push(route);
         }
         result.clear();
-        result.push(heap.top());
+        Route first = heap.top();
+        result.push(first);
         heap.pop();
-        result.push(heap.top());
+        Route second = heap.top();
+        result.push(second);
         heap.pop();
-        result.push(heap.top());
+        // 对第三个方案判断是否是不合理方案
+        Route third = heap.top();
+        // 若第三个方案的总距离>=第一个方案的2倍，可以判定为不合理方案
+        if (third.getDist() >= first.getDist() * 2) {
+            result.push(second);
+        } else {
+            result.push(third);
+        }
     }
 
     private boolean checkDirection(Position myPosition, Position position, Position destPosition) {
