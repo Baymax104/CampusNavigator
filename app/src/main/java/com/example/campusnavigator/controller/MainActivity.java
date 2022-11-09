@@ -171,6 +171,12 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
 
+        searchWindow.setSpotTypeListener(view -> {
+            if (mode.is(M.DEFAULT)) {
+                DialogHelper.showBuildingDialog(this, view);
+            }
+        });
+
         // 多点选择地点监听
         multiSelectWindow.setButtonListener(view -> {
             if (mode.is(M.M_SELECT)) {

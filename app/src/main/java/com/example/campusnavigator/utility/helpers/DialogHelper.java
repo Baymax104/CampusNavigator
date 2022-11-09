@@ -1,10 +1,12 @@
 package com.example.campusnavigator.utility.helpers;
 
 import android.content.Context;
+import android.view.View;
 
 import com.example.campusnavigator.controller.Mode;
 import com.example.campusnavigator.controller.PrivacyConfirmDialog;
 import com.example.campusnavigator.controller.SpotSearchDialog;
+import com.example.campusnavigator.controller.BuildingDialog;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.SpotProvider;
 import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
@@ -37,6 +39,15 @@ public class DialogHelper {
         new XPopup.Builder(context)
                 .isDestroyOnDismiss(true)
                 .asCustom(new PrivacyConfirmDialog(context))
+                .show();
+    }
+
+    public static void showBuildingDialog(Context context, View attachView) {
+        new XPopup.Builder(context)
+                .atView(attachView)
+                .hasShadowBg(false)
+                .isTouchThrough(true)
+                .asCustom(new BuildingDialog(context))
                 .show();
     }
 }

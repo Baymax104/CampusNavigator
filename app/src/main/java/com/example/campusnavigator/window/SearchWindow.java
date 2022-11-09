@@ -21,13 +21,17 @@ import com.google.android.material.card.MaterialCardView;
 public class SearchWindow extends Window {
     private final TextView searchField;
     private final MaterialCardView multiSelectEntry;
+    private final MaterialCardView buildingEntry;
+
 
     private SearchWindow(@NonNull Context context, @NonNull ViewGroup parent) {
         super(R.layout.layout_search_window, context, parent);
         searchField = rootView.findViewById(R.id.search_field);
-        multiSelectEntry = rootView.findViewById(R.id.multi_select_entry);
+        multiSelectEntry = rootView.findViewById(R.id.search_multi_select_entry);
+        buildingEntry = rootView.findViewById(R.id.search_building_entry);
     }
 
+    @NonNull
     public static SearchWindow newInstance(Context context, ViewGroup parent) {
         SearchWindow window = new SearchWindow(context, parent);
         M.DEFAULT.setWindow(window);
@@ -40,5 +44,9 @@ public class SearchWindow extends Window {
 
     public void setEntryListener(View.OnClickListener listener) {
         multiSelectEntry.setOnClickListener(listener);
+    }
+
+    public void setSpotTypeListener(View.OnClickListener listener) {
+        buildingEntry.setOnClickListener(listener);
     }
 }

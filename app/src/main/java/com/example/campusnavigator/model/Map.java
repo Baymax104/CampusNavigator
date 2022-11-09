@@ -119,12 +119,12 @@ public class Map {
             }
 
             // 设置spot类型
-            Class<?> cl = PosType.class;
+            Class<?> cl = BuildingType.class;
             Object[] instances = cl.getEnumConstants();
             if (instances != null) {
                 JSONObject spotType = jsonObject.getJSONObject("spotType");
                 for (Object instance : instances) {
-                    PosType type = (PosType) instance;
+                    BuildingType type = (BuildingType) instance;
                     JSONArray posArray = spotType.getJSONArray(type.name());
                     for (int i = 0; i < posArray.length(); i++) {
                         int pos = posArray.getInt(i);

@@ -11,4 +11,5 @@
     <string name="my_position">我的位置</string>
     <string name="multi_spot_select">多地点寻路</string>
     <string name="single_selecting">地图选点中…</string>
+    <string name="building">基础设施</string>
 </resources>

@@ -7,7 +7,7 @@ package com.example.campusnavigator.model;
  * @Date 2022/11/9 14:36
  * @Version 1
  */
-public enum PosType {
+public enum BuildingType {
     TEACHING,
     SPORT,
     CANTEEN,

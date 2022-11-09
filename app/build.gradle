@@ -49,5 +49,4 @@ dependencies {
     implementation 'com.amap.api:search:latest.integration'
     implementation 'com.github.li-xiaojun:XPopup:2.7.7'
     implementation 'jp.wasabeef:recyclerview-animators:4.0.2'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
