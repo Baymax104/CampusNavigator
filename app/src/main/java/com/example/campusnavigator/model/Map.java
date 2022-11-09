@@ -118,6 +118,21 @@ public class Map {
                 spotAttached.put(spot, attachList);
             }
 
+            // 设置spot类型
+            Class<?> cl = PosType.class;
+            Object[] instances = cl.getEnumConstants();
+            if (instances != null) {
+                JSONObject spotType = jsonObject.getJSONObject("spotType");
+                for (Object instance : instances) {
+                    PosType type = (PosType) instance;
+                    JSONArray posArray = spotType.getJSONArray(type.name());
+                    for (int i = 0; i < posArray.length(); i++) {
+                        int pos = posArray.getInt(i);
+                        spots[pos].setType(type);
+                    }
+                }
+            }
+
         } catch (IOException | JSONException e) {
             Log.e("MapGenerateError", e.getMessage());
             e.printStackTrace();

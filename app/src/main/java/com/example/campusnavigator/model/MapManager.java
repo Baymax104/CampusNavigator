@@ -72,7 +72,7 @@ public class MapManager extends Map {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean checkResult(@NonNull Route result) {
+    private boolean isResultValid(@NonNull Route result) {
         return result.getRoute() != null && result.getRoute().length() != 0 &&
                 result.getTime() != null && !result.getTime().equals(INF) &&
                 result.getDist() != null && !result.getDist().equals(INF);
@@ -82,7 +82,7 @@ public class MapManager extends Map {
         if (isMultiSpot) {
             List<Route> results = multiDestRoute();
             for (Route result : results) {
-                if (!checkResult(result)) {
+                if (!isResultValid(result)) {
                     throw new Exception("多点结果错误");
                 }
             }
@@ -98,7 +98,7 @@ public class MapManager extends Map {
 
         for (int i = 0, k = 1; i < 3; i++, k++) {
             Route result = singleDestRoute(from, to, k);
-            if (!checkResult(result)) {
+            if (!isResultValid(result)) {
                 throw new Exception("单点结果错误");
             }
             results.push(result);

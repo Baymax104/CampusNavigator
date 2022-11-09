@@ -17,6 +17,7 @@ public class Position {
     private double lng;
     private String name;
     private String markerId;
+    private PosType type = null;
 
     public Position() {
     }
@@ -44,6 +45,14 @@ public class Position {
 
     public void setLng(double lng) {
         this.lng = lng;
+    }
+
+    public void setType(PosType type) {
+        this.type = type;
+    }
+
+    public PosType getType() {
+        return type;
     }
 
     public String getName() {
