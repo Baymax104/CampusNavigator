@@ -298,21 +298,24 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
 
             // 计算距定位点最近的连接点，定位点邻接点表attachPos
-            List<Position> attachPos = manager.attachToMap(myLocation, destPosition);
+            Position attach = manager.attachToMap(myLocation, destPosition);
             // 获取目的地邻接点，目的地邻接点表spotAttached
             List<Position> spotAttached = manager.getSpotAttached(destPosition);
-            if (attachPos.isEmpty() || spotAttached == null || spotAttached.isEmpty()) {
+            if (spotAttached == null || spotAttached.isEmpty()) {
                 throw new Exception("连接点错误");
             }
 
             // 清空先前的结果
             routeResults.clear();
 
-            Position attach = attachPos.get(0);
-            Position dest = spotAttached.get(0);
-            manager.pushBuffer(attach);
-            manager.pushBuffer(dest);
-            manager.calculate(false, this);
+            for (Position dest : spotAttached) {
+                manager.pushBuffer(attach);
+                manager.pushBuffer(dest);
+                manager.calculate(false, this);
+            }
+
+            // 筛选最优方案
+            manager.filter(routeResults);
 
             // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
             List<List<Position>> routes = Route.extractRoute(routeResults);
@@ -345,7 +348,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onSingleRouteReceive(@NonNull List<Route> results) {
-        // 每一对起点和终点返回2种方案，向容器中添加方案
         for (int i = 0; i < results.length(); i++) {
             Route result = results.get(i);
             routeResults.push(result);

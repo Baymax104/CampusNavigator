@@ -186,7 +186,6 @@ public class MapManager extends Map {
             }
         }
 
-        // TODO 合理方案筛选
         // pre回溯状态
         double dist = v.p;
         Position pos = positions[v.v];
@@ -231,10 +230,8 @@ public class MapManager extends Map {
     }
 
     @NonNull
-    public List<Position> attachToMap(@NonNull Position myPosition, Position destPosition) {
-        List<Position> attachPositions = new List<>();
-
-        // 使用最小堆取距离最小的两个点
+    public Position attachToMap(@NonNull Position myPosition, Position destPosition) {
+        // 使用最小堆取距离最小的点
         MinHeap<Entry> minDist = new MinHeap<>();
         for (int i = 0; i < size; i++) {
             if (checkDirection(myPosition, positions[i], destPosition)) {
@@ -242,12 +239,21 @@ public class MapManager extends Map {
                 minDist.push(new Entry(i, dist));
             }
         }
-        int min1 = minDist.top().v;
-        minDist.pop();
-        int min2 = minDist.top().v;
-        attachPositions.push(positions[min1]);
-        attachPositions.push(positions[min2]);
-        return attachPositions;
+        int min = minDist.top().v;
+        return positions[min];
+    }
+
+    public void filter(List<Route> result) {
+        MinHeap<Route> heap = new MinHeap<>();
+        for (Route route : result) {
+            heap.push(route);
+        }
+        result.clear();
+        result.push(heap.top());
+        heap.pop();
+        result.push(heap.top());
+        heap.pop();
+        result.push(heap.top());
     }
 
     private boolean checkDirection(Position myPosition, Position position, Position destPosition) {
