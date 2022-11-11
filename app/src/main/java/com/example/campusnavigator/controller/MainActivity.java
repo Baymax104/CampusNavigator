@@ -214,10 +214,10 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         // 单点路径结果弹窗监听绑定
-        singleRouteWindow.startExpendListener(mode);
+        singleRouteWindow.startExpendListener();
 
         singleRouteWindow.setWayChangeListener((dest, group, checkedId) -> {
-            if (mode.isSingleRoute()) {
+            if (mode.is(M.S_ROUTE)) {
                 if (checkedId == R.id.segment_footway) {
                     calculateSingleRoute(dest, Map.FOOT_PASS);
                 } else if (checkedId == R.id.segment_driveway) {
@@ -305,8 +305,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             Window current = mode.getState().getWindow();
             Window.transition(current, singleRouteWindow);
 
-            singleRouteWindow.openBox();
-            mode.changeTo(M.S_ROUTE_OPEN);
+            mode.changeTo(M.S_ROUTE);
         } catch (Exception e) {
             Window current = mode.getState().getWindow();
             Window.transition(current, M.DEFAULT.getWindow());
@@ -345,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         if (mode.is(M.DEFAULT)) {
             super.onBackPressed();
         } else {
-            if (mode.isSingleRoute()) {
+            if (mode.is(M.S_ROUTE)) {
                 OverlayHelper.removeAllLines();
             } else if (mode.isMultiRoute()) {
                 OverlayHelper.removeAllLines();

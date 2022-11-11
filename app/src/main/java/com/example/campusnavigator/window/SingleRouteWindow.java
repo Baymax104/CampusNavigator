@@ -70,6 +70,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         routePlanBox = LayoutInflater.from(context).inflate(R.layout.box_single_route_plan, routeContainer, false);
         planGroup = routePlanBox.findViewById(R.id.route_plan_group);
         routeContainer.addView(routePlanBox);
+        boxOpened = true;
 
         selected = -1;
         selectedPlanView = planGroup.getChildAt(0);
@@ -78,19 +79,16 @@ public class SingleRouteWindow extends Window implements RouteWindow {
 
     public static SingleRouteWindow newInstance(Context context, ViewGroup parent) {
         SingleRouteWindow window = new SingleRouteWindow(context, parent);
-        M.S_ROUTE_OPEN.setWindow(window);
-        M.S_ROUTE_CLOSE.setWindow(window);
+        M.S_ROUTE.setWindow(window);
         return window;
     }
 
-    public void startExpendListener(Mode mode) {
+    public void startExpendListener() {
         expendButton.setOnClickListener(v -> {
-            if (mode.is(M.S_ROUTE_OPEN)) { // 处于打开状态，关闭planBox
+            if (boxOpened) { // 处于打开状态，关闭planBox
                 closeBox();
-                mode.changeTo(M.S_ROUTE_CLOSE);
-            } else if (mode.is(M.S_ROUTE_CLOSE)) { // 处于关闭状态，打开planBox
+            } else { // 处于关闭状态，打开planBox
                 openBox();
-                mode.changeTo(M.S_ROUTE_OPEN);
             }
         });
     }
@@ -118,7 +116,6 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < windowY) {
             closeBox();
             map.getUiSettings().setAllGesturesEnabled(true);
-            mode.changeTo(M.S_ROUTE_CLOSE);
 
         } else if (touchY >= windowY) { // 触摸点位于弹窗内侧
             // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
@@ -138,16 +135,17 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         setRouteInfo(times, distances);
         displayPlan(0, myPosition);
         startPlanListener(myPosition);
+        startExpendListener();
     }
 
-    public void setDestPosition(Position destPosition) {
+    private void setDestPosition(Position destPosition) {
         this.destPosition = destPosition;
         if (destTxt != null) {
             destTxt.setText(destPosition.getName());
         }
     }
 
-    public void setRouteInfo(@NonNull List<Double> times, @NonNull List<Double> distances) {
+    private void setRouteInfo(@NonNull List<Double> times, @NonNull List<Double> distances) {
         if (times.length() == 0 || distances.length() == 0) {
             return;
         }
@@ -162,7 +160,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         }
     }
 
-    public void displayPlan(int selected, @NonNull Position myLocation) {
+    private void displayPlan(int selected, @NonNull Position myLocation) {
         if (this.selected != selected) { // 若新选中的方案与当前选中不相同，则更新
             this.selected = selected;
             // 设置选中按钮
@@ -197,6 +195,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
             routeContainer.addView(routePlanBox);
         }
         expendButton.setImageResource(R.drawable.expend_arrow_down);
+        boxOpened = true;
     }
 
     @Override
@@ -205,9 +204,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
             routeContainer.removeView(routePlanBox);
         }
         expendButton.setImageResource(R.drawable.expend_arrow_up);
+        boxOpened = false;
     }
 
-    public int getPlanCount() {
-        return planGroup.getChildCount();
-    }
 }
