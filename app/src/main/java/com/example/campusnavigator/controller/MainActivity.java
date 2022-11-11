@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
             if (mode.is(M.DEFAULT)) {
                 selectClickWindow.setMarkerInfo(spot, myLocation);
-                Window.transition(searchWindow, selectClickWindow);
                 mode.changeTo(M.S_SELECT_CLICK);
 
             } else if (mode.is(M.S_SELECT_CLICK)) {
@@ -164,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         searchWindow.setEntryListener(view -> {
             if (mode.is(M.DEFAULT)) { // 由初始状态切换到多点选择状态
-                Window.transition(searchWindow, multiSelectWindow);
                 mode.changeTo(M.M_SELECT);
             }
         });
@@ -252,11 +250,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         searchWindow.open();
     }
 
-
     @Override
     public void onSingleSelect() {
         Toast.makeText(this, "请选择你想去的地点~，按返回键返回", Toast.LENGTH_SHORT).show();
-        Window.transition(searchWindow, singleSelectWindow);
         mode.changeTo(M.S_SELECT);
     }
 
@@ -293,18 +289,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
             // 筛选最优方案
             manager.filter(routeResults);
-
             // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
             singleRouteWindow.set(routeResults, destPosition, myLocation);
-
-            // 更换布局
-            Window current = mode.getState().getWindow();
-            Window.transition(current, singleRouteWindow);
-
             mode.changeTo(M.S_ROUTE);
+
         } catch (Exception e) {
-            Window current = mode.getState().getWindow();
-            Window.transition(current, M.DEFAULT.getWindow());
             mode.changeTo(M.DEFAULT);
             String msg = "计算错误：" + e.getMessage();
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
@@ -328,10 +317,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // 清空展示之前的临时数据
         multiSelectWindow.removeAllPosition();
         provider.popBufferAll();
-        // 更换布局
-        Window current = mode.getState().getWindow();
-        Window.transition(current, multiRouteWindow);
-        multiRouteWindow.openBox();
         mode.changeTo(M.M_ROUTE);
     }
 
@@ -349,8 +334,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 manager.popBufferAll();
                 multiSelectWindow.removeAllPosition();
             }
-            Window current = mode.getState().getWindow();
-            Window.transition(current, M.DEFAULT.getWindow());
             mode.changeTo(M.DEFAULT);
         }
     }

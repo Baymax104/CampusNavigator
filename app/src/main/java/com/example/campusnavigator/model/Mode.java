@@ -4,6 +4,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.campusnavigator.window.Window;
+
 /**
  * @Description
  * @Author John
@@ -20,6 +22,7 @@ public class Mode {
     }
 
     public void changeTo(M mode) {
+        Window.transition(this.mode.getWindow(), mode.getWindow());
         this.mode = mode;
         log();
     }
