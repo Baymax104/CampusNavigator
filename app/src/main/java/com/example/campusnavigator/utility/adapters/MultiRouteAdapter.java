@@ -20,7 +20,7 @@ import java.util.Locale;
  * @Date 2022/10/2 14:42
  * @Version 1
  */
-public class MultiSpotAdapter extends RecyclerView.Adapter<MultiSpotAdapter.ViewHolder> {
+public class MultiRouteAdapter extends RecyclerView.Adapter<MultiRouteAdapter.ViewHolder> {
     private List<Item> data;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -45,7 +45,7 @@ public class MultiSpotAdapter extends RecyclerView.Adapter<MultiSpotAdapter.View
         }
     }
 
-    public MultiSpotAdapter() {
+    public MultiRouteAdapter() {
     }
 
     public void setData(List<Item> data) {
@@ -65,12 +65,12 @@ public class MultiSpotAdapter extends RecyclerView.Adapter<MultiSpotAdapter.View
         holder.spotName.setText(item.name);
         int dist = item.dist.intValue();
         int time = item.time.intValue();
-        if (dist == 0 && time == 0) {
+        if (dist == -1 && time == -1) {
             holder.spotInfo.setText("起点");
         } else{
             String info = String.format(
                     Locale.CHINA,
-                    "步行%d米，在%d分钟后到达",
+                    "移动%d米，在%d分钟后到达",
                     dist, time);
             holder.spotInfo.setText(info);
         }

@@ -18,7 +18,7 @@ import com.example.campusnavigator.utility.structures.List;
  * @Date 2022/9/5 15:25
  * @Version 1
  */
-public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.ViewHolder> {
+public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
     private List<String> data;
     public interface ItemClickedListener {
         void onItemClicked(String name);
@@ -33,7 +33,7 @@ public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.Vi
         }
     }
 
-    public SpotSearchAdapter(List<String> data) {
+    public SearchAdapter(List<String> data) {
         this.data = data;
     }
 

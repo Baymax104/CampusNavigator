@@ -39,7 +39,6 @@ import com.example.campusnavigator.utility.interfaces.RouteResultReceiver;
 import com.example.campusnavigator.utility.interfaces.RouteWindow;
 import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
 import com.example.campusnavigator.utility.structures.List;
-import com.example.campusnavigator.utility.structures.Stack;
 import com.example.campusnavigator.window.MultiRouteWindow;
 import com.example.campusnavigator.window.MultiSelectWindow;
 import com.example.campusnavigator.window.SearchWindow;

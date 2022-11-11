@@ -18,7 +18,7 @@ import com.example.campusnavigator.model.M;
 import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.SpotProvider;
-import com.example.campusnavigator.utility.adapters.SpotSearchAdapter;
+import com.example.campusnavigator.utility.adapters.SearchAdapter;
 import com.example.campusnavigator.utility.interfaces.SingleSelectListener;
 import com.example.campusnavigator.utility.structures.List;
 import com.google.android.material.card.MaterialCardView;
@@ -34,7 +34,7 @@ import com.lxj.xpopup.core.BottomPopupView;
 public class SpotSearchDialog extends BottomPopupView {
     private final Context context;
     private SpotProvider provider;
-    private SpotSearchAdapter adapter;
+    private SearchAdapter adapter;
     private SingleSelectListener listener;
     private String selectResult;
     private Mode modeContext;
@@ -75,7 +75,7 @@ public class SpotSearchDialog extends BottomPopupView {
         ImageView cleanButton = findViewById(R.id.dialog_search_clean_button);
 
         List<String> spotNames = provider.allNames();
-        adapter = new SpotSearchAdapter(spotNames);
+        adapter = new SearchAdapter(spotNames);
         spotsRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         spotsRecyclerView.setLayoutManager(layoutManager);
