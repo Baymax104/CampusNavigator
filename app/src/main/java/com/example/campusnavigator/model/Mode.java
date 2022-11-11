@@ -36,11 +36,7 @@ public class Mode {
         return mode == m;
     }
 
-    public boolean isMultiRoute() {
-        return mode == M.M_ROUTE_OPEN || mode == M.M_ROUTE_CLOSE;
-    }
-
     public boolean isRouteOpen() {
-        return mode == M.S_ROUTE || mode == M.M_ROUTE_OPEN;
+        return mode == M.S_ROUTE || mode == M.M_ROUTE;
     }
 }

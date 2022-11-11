@@ -83,7 +83,13 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         return window;
     }
 
-    public void startExpendListener() {
+    public void setWayChangeListener(WayChangeListener listener) {
+        waySegment.setOnCheckedChangeListener((group, checkedId) -> {
+            listener.onWayChange(destPosition, group, checkedId);
+        });
+    }
+
+    private void startExpendListener() {
         expendButton.setOnClickListener(v -> {
             if (boxOpened) { // 处于打开状态，关闭planBox
                 closeBox();
@@ -93,33 +99,12 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         });
     }
 
-    public void setWayChangeListener(WayChangeListener listener) {
-        waySegment.setOnCheckedChangeListener((group, checkedId) -> {
-            listener.onWayChange(destPosition, group, checkedId);
-        });
-    }
-
-    public void startPlanListener(Position myPosition) {
+    private void startPlanListener(Position myPosition) {
         int count = planGroup.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = planGroup.getChildAt(i);
             final int selected = i;
             child.setOnClickListener(v -> displayPlan(selected, myPosition));
-        }
-    }
-
-    @Override
-    public void autoGestureControl(@NonNull MotionEvent latLng, AMap map, Mode mode) {
-        float touchY = latLng.getRawY();
-        int windowY = getWindowY();
-        // 触摸起始点位于弹窗外侧，关闭弹窗
-        if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < windowY) {
-            closeBox();
-            map.getUiSettings().setAllGesturesEnabled(true);
-
-        } else if (touchY >= windowY) { // 触摸点位于弹窗内侧
-            // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
-            map.getUiSettings().setAllGesturesEnabled(false);
         }
     }
 
@@ -134,6 +119,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         setDestPosition(dest);
         setRouteInfo(times, distances);
         displayPlan(0, myPosition);
+        // 开启窗口监听
         startPlanListener(myPosition);
         startExpendListener();
     }

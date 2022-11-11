@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,8 @@ import com.example.campusnavigator.utility.structures.Stack;
 
 import java.util.Locale;
 
+import info.hoang8f.android.segmented.SegmentedGroup;
+
 /**
  * @Description 多点路径结果弹窗对象
  * @Author John
@@ -42,10 +45,16 @@ public class MultiRouteWindow extends Window implements RouteWindow {
     private final TextView timeInfo;
     private final TextView distanceInfo;
     private final ImageView expendButton;
+    private final SegmentedGroup waySegment;
 
     // 下方地点列表
     private final View multiSpotBox;
     private final MultiSpotAdapter adapter;
+    private boolean boxOpened;
+
+    public interface WayChangeListener {
+        void onWayChange(RadioGroup group, int checkedId);
+    }
 
     private MultiRouteWindow(Context context, ViewGroup parent) {
         super(R.layout.window_multi_route, context, parent);
@@ -54,9 +63,14 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         timeInfo = multiRouteContainer.findViewById(R.id.multi_route_time_info);
         distanceInfo = multiRouteContainer.findViewById(R.id.multi_route_distance_info);
         expendButton = multiRouteContainer.findViewById(R.id.expend_button);
+        waySegment = multiRouteContainer.findViewById(R.id.segment_group);
+        waySegment.check(R.id.segment_footway);
 
         multiSpotBox = LayoutInflater.from(context).inflate(R.layout.box_multi_route_spot, parent, false);
+        multiRouteContainer.addView(multiSpotBox);
+        boxOpened = true;
 
+        // 设置box中的列表
         RecyclerView multiSpotList = multiSpotBox.findViewById(R.id.multi_route_spot_list);
         adapter = new MultiSpotAdapter();
         multiSpotList.setAdapter(adapter);
@@ -66,37 +80,8 @@ public class MultiRouteWindow extends Window implements RouteWindow {
 
     public static MultiRouteWindow newInstance(Context context, ViewGroup parent) {
         MultiRouteWindow window = new MultiRouteWindow(context, parent);
-        M.M_ROUTE_OPEN.setWindow(window);
-        M.M_ROUTE_CLOSE.setWindow(window);
+        M.M_ROUTE.setWindow(window);
         return window;
-    }
-
-    public void startExpendListener(Mode mode) {
-        expendButton.setOnClickListener(v -> {
-            if (mode.is(M.M_ROUTE_OPEN)) {
-                closeBox();
-                mode.changeTo(M.M_ROUTE_CLOSE);
-            } else if (mode.is(M.M_ROUTE_CLOSE)) {
-                openBox();
-                mode.changeTo(M.M_ROUTE_OPEN);
-            }
-        });
-    }
-
-    @Override
-    public void autoGestureControl(@NonNull MotionEvent latLng, AMap map, Mode mode) {
-        float touchY = latLng.getRawY();
-        int windowY = getWindowY();
-        // 触摸起始点位于弹窗外侧，关闭弹窗
-        if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < windowY) {
-            closeBox();
-            map.getUiSettings().setAllGesturesEnabled(true);
-            mode.changeTo(M.M_ROUTE_CLOSE);
-
-        } else if (touchY >= windowY) { // 触摸点位于弹窗内侧
-            // 轨迹位于外侧时，由于起始点必定不在外侧，所以保持false状态
-            map.getUiSettings().setAllGesturesEnabled(false);
-        }
     }
 
     public void set(List<Route> results, Stack<Position> destBuffer) {
@@ -109,8 +94,26 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         setInfo(destBuffer, times, distances);
         // 展示路线
         displayRoute(route);
-
+        // 开启窗口监听
+        startExpendListener();
     }
+
+    private void startExpendListener() {
+        expendButton.setOnClickListener(v -> {
+            if (boxOpened) {
+                closeBox();
+            } else {
+                openBox();
+            }
+        });
+    }
+
+    public void setWayChangeListener(MultiRouteWindow.WayChangeListener listener) {
+        waySegment.setOnCheckedChangeListener((group, checkedId) -> {
+            listener.onWayChange(group, checkedId);
+        });
+    }
+
 
     private void setInfo(@NonNull Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
         List<Position> dests = destBuffer.toList(true);
@@ -165,6 +168,7 @@ public class MultiRouteWindow extends Window implements RouteWindow {
             multiRouteContainer.addView(multiSpotBox);
         }
         expendButton.setImageResource(R.drawable.expend_arrow_down);
+        boxOpened = true;
     }
 
     @Override
@@ -173,6 +177,7 @@ public class MultiRouteWindow extends Window implements RouteWindow {
             multiRouteContainer.removeView(multiSpotBox);
         }
         expendButton.setImageResource(R.drawable.expend_arrow_up);
+        boxOpened = false;
     }
 
 }

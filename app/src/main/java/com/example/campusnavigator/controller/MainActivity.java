@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 DialogHelper.showSpotSearchDialog(this, mode, provider, this, spot);
 
             } else if (mode.is(M.M_SELECT)) {
-                List<Position> spotAttachList = manager.getSpotAttached(spot);
+                List<Position> spotAttachList = manager.getSpotAttached(spot, Map.FOOT_PASS);
                 // 检查地点连接点空指针，不进行处理
                 if (spotAttachList == null) {
                     return false;
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             } else if (mode.isRouteOpen()) {
                 Window w = mode.getState().getWindow();
                 RouteWindow routeWindow = (RouteWindow) w;
-                routeWindow.autoGestureControl(latLng, map, mode);
+                routeWindow.autoGestureControl(latLng, map, w);
 
             } else {
                 int windowY = mode.getState().getWindow().getWindowY();
@@ -204,8 +204,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
 
-        // 多点路径弹窗监听绑定
-        multiRouteWindow.startExpendListener(mode);
 
         selectClickWindow.setButtonListener(selected -> {
             if (selected != null) {
@@ -214,8 +212,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         // 单点路径结果弹窗监听绑定
-        singleRouteWindow.startExpendListener();
-
         singleRouteWindow.setWayChangeListener((dest, group, checkedId) -> {
             if (mode.is(M.S_ROUTE)) {
                 if (checkedId == R.id.segment_footway) {
@@ -276,11 +272,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 throw new Exception("定位点未找到");
             }
 
-            // 计算距定位点最近的连接点，定位点邻接点表attachPos
+            // 计算距定位点最近的连接点
             Position attach = manager.attachToMap(myLocation, destPosition, pass);
             // 获取目的地邻接点，目的地邻接点表spotAttached
-            List<Position> spotAttached = manager.getSpotAttached(destPosition);
-            if (spotAttached == null || spotAttached.isEmpty()) {
+            List<Position> spotAttached = manager.getSpotAttached(destPosition, pass);
+            if (spotAttached == null) {
                 throw new Exception("连接点错误");
             }
 
@@ -336,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         Window current = mode.getState().getWindow();
         Window.transition(current, multiRouteWindow);
         multiRouteWindow.openBox();
-        mode.changeTo(M.M_ROUTE_OPEN);
+        mode.changeTo(M.M_ROUTE);
     }
 
     @Override
@@ -346,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         } else {
             if (mode.is(M.S_ROUTE)) {
                 OverlayHelper.removeAllLines();
-            } else if (mode.isMultiRoute()) {
+            } else if (mode.is(M.M_ROUTE)) {
                 OverlayHelper.removeAllLines();
                 OverlayHelper.initAllMarkers();
             } else if (mode.is(M.M_SELECT)) {

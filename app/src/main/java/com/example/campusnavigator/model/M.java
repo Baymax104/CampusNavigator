@@ -24,8 +24,7 @@ public enum M {
     S_SELECT_CLICK,
     S_ROUTE,
     M_SELECT,
-    M_ROUTE_OPEN,
-    M_ROUTE_CLOSE;
+    M_ROUTE;
 
     private Window window;
 

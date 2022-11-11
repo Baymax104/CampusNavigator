@@ -288,8 +288,18 @@ public class MapManager extends Map {
         return angle >= 0;
     }
 
-    public List<Position> getSpotAttached(@NonNull Position spot) {
-        return spotAttached.get(spot);
+    public List<Position> getSpotAttached(@NonNull Position spot, int pass) {
+        List<Position> spotAttachList = spotAttached.get(spot);
+        if (spotAttachList == null || spotAttachList.isEmpty()) {
+            return null;
+        }
+        List<Position> result = new List<>();
+        for (Position p : spotAttachList) {
+            if (pass >= p.getPass()) {
+                result.push(p);
+            }
+        }
+        return result;
     }
 
     public void pushBuffer(Position position) {
