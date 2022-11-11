@@ -306,14 +306,19 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         if (mode.is(M.DEFAULT)) {
             super.onBackPressed();
         } else {
-            if (mode.is(M.S_ROUTE)) {
+            M last = mode.getState();
+            mode.changeTo(M.DEFAULT);
+            // 关闭采用饿汉式，防止状态的相关方法再次触发
+            if (last == M.S_ROUTE) {
                 OverlayHelper.removeAllLines();
-            } else if (mode.is(M.M_ROUTE)) {
+                singleRouteWindow.initChecked();
+            } else if (last == M.M_ROUTE) {
                 OverlayHelper.removeAllLines();
                 OverlayHelper.initAllMarkers();
+                multiRouteWindow.initChecked();
                 multiSelectWindow.removeAllPosition();
                 provider.popBufferAll();
-            } else if (mode.is(M.M_SELECT)) {
+            } else if (last == M.M_SELECT) {
                 provider.popBufferAll();
                 multiSelectWindow.removeAllPosition();
             }

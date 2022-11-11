@@ -43,7 +43,7 @@ public class Map {
     public static final int FOOT_PASS = 2;
 
     public static final double SPEED_WALK = 4.0 * 50 / 3; // 4km/h
-    public static final double SPEED_DRIVE = 15.0 * 50 / 3; // 15km/h
+    public static final double SPEED_DRIVE = 12.0 * 50 / 3; // 12km/h
 
     protected Map() {
     }

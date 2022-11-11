@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import com.amap.api.maps.AMap;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.M;
+import com.example.campusnavigator.model.Map;
 import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.Route;
@@ -192,6 +193,10 @@ public class SingleRouteWindow extends Window implements RouteWindow {
             expendButton.setImageResource(R.drawable.expend_arrow_up);
             boxOpened = false;
         }
+    }
+
+    public void initChecked() {
+        waySegment.check(R.id.segment_footway);
     }
 
 }

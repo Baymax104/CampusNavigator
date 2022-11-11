@@ -174,4 +174,7 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         }
     }
 
+    public void initChecked() {
+        waySegment.check(R.id.segment_footway);
+    }
 }
