@@ -313,16 +313,4 @@ public class MapManager extends Map {
     public void popBufferAll() {
         positionBuffer.popAll();
     }
-
-    public boolean isBufferEmpty() {
-        return positionBuffer.isEmpty();
-    }
-
-    public Position bufferTop() {
-        return positionBuffer.top();
-    }
-
-    public int bufferSize() {
-        return positionBuffer.size();
-    }
 }

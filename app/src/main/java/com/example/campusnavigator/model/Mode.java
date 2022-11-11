@@ -22,8 +22,10 @@ public class Mode {
     }
 
     public void changeTo(M mode) {
-        Window.transition(this.mode.getWindow(), mode.getWindow());
-        this.mode = mode;
+        if (this.mode != mode) {
+            Window.transition(this.mode.getWindow(), mode.getWindow());
+            this.mode = mode;
+        }
         log();
     }
 

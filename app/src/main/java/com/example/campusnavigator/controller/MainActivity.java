@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     private OnLocationChangedListener locationListener; // 定位改变回调接口
     private AMapLocationClient locationClient; // 定位启动和销毁类
 
-    // 路径计算结果
+    // 单点路径计算结果
     private final List<Route> routeResults = new List<>();
 
 
@@ -114,22 +114,12 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 DialogHelper.showSpotSearchDialog(this, mode, provider, this, spot);
 
             } else if (mode.is(M.M_SELECT)) {
-                List<Position> spotAttachList = manager.getSpotAttached(spot, Map.FOOT_PASS);
-                // 检查地点连接点空指针，不进行处理
-                if (spotAttachList == null) {
-                    return false;
-                }
-
-                //TODO 选择点不能确定
-                Position spotAttach = spotAttachList.get(0);
                 // 检查重复输入
-                if (!manager.isBufferEmpty() && spotAttach.equals(manager.bufferTop())) {
+                if (!provider.isBufferEmpty() && spot.equals(provider.bufferTop())) {
                     Toast.makeText(this, "选择重复", Toast.LENGTH_SHORT).show();
                     return false;
                 }
-
-                // 检查通过，将入口和目的地压入栈中
-                manager.pushBuffer(spotAttach);
+                // 压入栈中，视图相应变化
                 provider.pushBuffer(spot);
                 multiSelectWindow.addPosition(spot);
                 OverlayHelper.onMarkerClicked(marker);
@@ -176,16 +166,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // 多点选择地点监听
         multiSelectWindow.setButtonListener(view -> {
             if (mode.is(M.M_SELECT)) {
-                if (manager.bufferSize() < 2) {
+                if (provider.bufferSize() < 2) {
                     Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
                 } else {
-                    try {
-                        manager.calculate(true, Map.FOOT_PASS, this);
-                    } catch (Exception e) {
-                        String msg = "计算错误：" + e.getMessage();
-                        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-                        Log.e("CamNav-CalculateError", msg);
-                    }
+                    List<Position> dests = provider.getBuffer().toList(true);
+                    calculateMultiRoute(dests, Map.FOOT_PASS);
                 }
             }
         });
@@ -202,14 +187,13 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
 
-
         selectClickWindow.setButtonListener(selected -> {
             if (selected != null) {
                 calculateSingleRoute(selected, Map.FOOT_PASS);
             }
         });
 
-        // 单点路径结果弹窗监听绑定
+        // 单点路径窗口监听
         singleRouteWindow.setWayChangeListener((dest, group, checkedId) -> {
             if (mode.is(M.S_ROUTE)) {
                 if (checkedId == R.id.segment_footway) {
@@ -219,35 +203,17 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 }
             }
         });
-    }
 
-    private void privacyCompliance() {
-        MapsInitializer.updatePrivacyShow(MainActivity.this,true,true);
-        MapsInitializer.updatePrivacyAgree(this, true);
-//        DialogHelper.showPrivacyConfirmDialog(this);
-    }
-
-    private void initView() {
-        AMapOptions options = new AMapOptions();
-        LatLng defaultPosition = new LatLng(39.8751, 116.48134);
-        options.camera(CameraPosition.fromLatLngZoom(defaultPosition, 18));
-        mapView = new MapView(this, options);
-
-        FrameLayout layout = findViewById(R.id.map_view_container);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-        layout.addView(mapView, params);
-
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-
-        CoordinatorLayout container = findViewById(R.id.view_container);
-        searchWindow = SearchWindow.newInstance(this, container);
-        multiSelectWindow = MultiSelectWindow.newInstance(this, container);
-        multiRouteWindow = MultiRouteWindow.newInstance(this, container);
-        singleRouteWindow = SingleRouteWindow.newInstance(this, container);
-        singleSelectWindow = SingleSelectWindow.newInstance(this, container);
-        selectClickWindow = SelectClickWindow.newInstance(this, container);
-
-        searchWindow.open();
+        // 多点路径窗口监听
+        multiRouteWindow.setWayChangeListener((dests, group, checkedId) -> {
+            if (mode.is(M.M_ROUTE)) {
+                if (checkedId == R.id.segment_footway) {
+                    calculateMultiRoute(dests, Map.FOOT_PASS);
+                } else if (checkedId == R.id.segment_driveway) {
+                    calculateMultiRoute(dests, Map.DRIVE_PASS);
+                }
+            }
+        });
     }
 
     @Override
@@ -278,7 +244,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
             // 清空先前的结果
             routeResults.clear();
-
             for (Position dest : spotAttached) {
                 if (pass >= dest.getPass()) {
                     manager.pushBuffer(attach);
@@ -286,16 +251,36 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     manager.calculate(false, pass, this);
                 }
             }
-
             // 筛选最优方案
             manager.filter(routeResults);
+
             // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
             singleRouteWindow.set(routeResults, destPosition, myLocation);
             mode.changeTo(M.S_ROUTE);
 
         } catch (Exception e) {
             mode.changeTo(M.DEFAULT);
-            String msg = "计算错误：" + e.getMessage();
+            String msg = "单点计算错误：" + e.getMessage();
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            Log.e("CamNav-CalculateError", msg);
+        }
+    }
+
+    private void calculateMultiRoute(List<Position> dests, int pass) {
+        try {
+            for (Position dest : dests) {
+                List<Position> spotAttach = manager.getSpotAttached(dest, pass);
+                if (spotAttach == null) {
+                    throw new Exception("连接点错误");
+                }
+                // 此处邻接点的选取还是有点欠妥
+                manager.pushBuffer(spotAttach.get(0));
+            }
+            manager.calculate(true, pass, this);
+
+        } catch (Exception e) {
+            mode.changeTo(M.DEFAULT);
+            String msg = "多点计算错误：" + e.getMessage();
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
             Log.e("CamNav-CalculateError", msg);
         }
@@ -311,12 +296,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onMultiRouteReceive(List<Route> results) {
-        // 多地点只有一种方案，包含到多个地点的路径
-        Stack<Position> buffer = provider.getBuffer();
-        multiRouteWindow.set(results, buffer);
-        // 清空展示之前的临时数据
-        multiSelectWindow.removeAllPosition();
-        provider.popBufferAll();
+        // 多点只有一种方案，直接展示
+        List<Position> dests = provider.getBuffer().toList(true);
+        multiRouteWindow.set(results, dests);
         mode.changeTo(M.M_ROUTE);
     }
 
@@ -330,12 +312,43 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             } else if (mode.is(M.M_ROUTE)) {
                 OverlayHelper.removeAllLines();
                 OverlayHelper.initAllMarkers();
+                multiSelectWindow.removeAllPosition();
+                provider.popBufferAll();
             } else if (mode.is(M.M_SELECT)) {
-                manager.popBufferAll();
+                provider.popBufferAll();
                 multiSelectWindow.removeAllPosition();
             }
             mode.changeTo(M.DEFAULT);
         }
+    }
+
+    private void privacyCompliance() {
+        MapsInitializer.updatePrivacyShow(MainActivity.this,true,true);
+        MapsInitializer.updatePrivacyAgree(this, true);
+//        DialogHelper.showPrivacyConfirmDialog(this);
+    }
+
+    private void initView() {
+        AMapOptions options = new AMapOptions();
+        LatLng defaultPosition = new LatLng(39.8751, 116.48134);
+        options.camera(CameraPosition.fromLatLngZoom(defaultPosition, 18));
+        mapView = new MapView(this, options);
+
+        FrameLayout layout = findViewById(R.id.map_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+        layout.addView(mapView, params);
+
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+        CoordinatorLayout container = findViewById(R.id.view_container);
+        searchWindow = SearchWindow.newInstance(this, container);
+        multiSelectWindow = MultiSelectWindow.newInstance(this, container);
+        multiRouteWindow = MultiRouteWindow.newInstance(this, container);
+        singleRouteWindow = SingleRouteWindow.newInstance(this, container);
+        singleSelectWindow = SingleSelectWindow.newInstance(this, container);
+        selectClickWindow = SelectClickWindow.newInstance(this, container);
+
+        searchWindow.open();
     }
 
     private void setMap() {

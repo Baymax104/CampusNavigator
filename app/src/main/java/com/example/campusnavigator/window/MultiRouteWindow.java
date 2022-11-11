@@ -3,7 +3,6 @@ package com.example.campusnavigator.window;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,10 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.amap.api.maps.AMap;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.M;
-import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.Route;
 import com.example.campusnavigator.utility.adapters.MultiSpotAdapter;
@@ -52,8 +49,11 @@ public class MultiRouteWindow extends Window implements RouteWindow {
     private final MultiSpotAdapter adapter;
     private boolean boxOpened;
 
+    // 缓存结果
+    private List<Position> dests;
+
     public interface WayChangeListener {
-        void onWayChange(RadioGroup group, int checkedId);
+        void onWayChange(List<Position> dests, RadioGroup group, int checkedId);
     }
 
     private MultiRouteWindow(Context context, ViewGroup parent) {
@@ -84,14 +84,18 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         return window;
     }
 
-    public void set(List<Route> results, Stack<Position> destBuffer) {
+    public void set(List<Route> results, List<Position> dests) {
         // 提取结果
         List<Position> route = Route.combineRoute(results);
         List<Double> times = Route.extractTime(results);
         List<Double> distances = Route.extractDist(results);
+        this.dests = dests;
+        List.reverse(times);
+        List.reverse(distances);
 
         // 设置文字信息
-        setInfo(destBuffer, times, distances);
+        setRouteInfo(times, distances);
+        setSpotInfo(times, distances);
         // 展示路线
         displayRoute(route);
         // 开启窗口监听
@@ -110,17 +114,11 @@ public class MultiRouteWindow extends Window implements RouteWindow {
 
     public void setWayChangeListener(MultiRouteWindow.WayChangeListener listener) {
         waySegment.setOnCheckedChangeListener((group, checkedId) -> {
-            listener.onWayChange(group, checkedId);
+            listener.onWayChange(dests, group, checkedId);
         });
     }
 
-
-    private void setInfo(@NonNull Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
-        List<Position> dests = destBuffer.toList(true);
-        List.reverse(times);
-        List.reverse(dists);
-        setRouteInfo(times, dists);
-        setSpotInfo(dests, times, dists);
+    private void setInfo(List<Double> times, List<Double> dists) {
     }
 
     private void setRouteInfo(List<Double> times, List<Double> dists) {
@@ -141,7 +139,7 @@ public class MultiRouteWindow extends Window implements RouteWindow {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void setSpotInfo(List<Position> dests, List<Double> times, List<Double> dists) {
+    private void setSpotInfo(List<Double> times, List<Double> dists) {
         List<MultiSpotAdapter.Item> data = new List<>();
         for (int i = 0; i < dests.length(); i++) {
             MultiSpotAdapter.Item item = new MultiSpotAdapter.Item(
@@ -166,18 +164,18 @@ public class MultiRouteWindow extends Window implements RouteWindow {
     public void openBox() {
         if (multiSpotBox != null && multiRouteContainer.findViewById(R.id.multi_route_spot_box) == null) {
             multiRouteContainer.addView(multiSpotBox);
+            expendButton.setImageResource(R.drawable.expend_arrow_down);
+            boxOpened = true;
         }
-        expendButton.setImageResource(R.drawable.expend_arrow_down);
-        boxOpened = true;
     }
 
     @Override
     public void closeBox() {
         if (multiSpotBox != null && multiRouteContainer.findViewById(R.id.multi_route_spot_box) != null) {
             multiRouteContainer.removeView(multiSpotBox);
+            expendButton.setImageResource(R.drawable.expend_arrow_up);
+            boxOpened = false;
         }
-        expendButton.setImageResource(R.drawable.expend_arrow_up);
-        boxOpened = false;
     }
 
 }

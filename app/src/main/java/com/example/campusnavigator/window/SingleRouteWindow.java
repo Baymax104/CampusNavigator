@@ -1,6 +1,7 @@
 package com.example.campusnavigator.window;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -179,18 +180,18 @@ public class SingleRouteWindow extends Window implements RouteWindow {
     public void openBox() {
         if (routePlanBox != null && routeContainer.findViewById(R.id.route_plan_box) == null) {
             routeContainer.addView(routePlanBox);
+            expendButton.setImageResource(R.drawable.expend_arrow_down);
+            boxOpened = true;
         }
-        expendButton.setImageResource(R.drawable.expend_arrow_down);
-        boxOpened = true;
     }
 
     @Override
     public void closeBox() {
         if (routePlanBox != null && routeContainer.findViewById(R.id.route_plan_box) != null) {
             routeContainer.removeView(routePlanBox);
+            expendButton.setImageResource(R.drawable.expend_arrow_up);
+            boxOpened = false;
         }
-        expendButton.setImageResource(R.drawable.expend_arrow_up);
-        boxOpened = false;
     }
 
 }

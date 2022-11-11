@@ -23,7 +23,7 @@ public interface RouteWindow {
         int windowY = window.getWindowY();
         // 触摸起始点位于弹窗外侧，关闭弹窗
         if (latLng.getAction() == MotionEvent.ACTION_DOWN && touchY < windowY) {
-            this.closeBox();
+            closeBox();
             map.getUiSettings().setAllGesturesEnabled(true);
 
         } else if (touchY >= windowY) { // 触摸点位于弹窗内侧

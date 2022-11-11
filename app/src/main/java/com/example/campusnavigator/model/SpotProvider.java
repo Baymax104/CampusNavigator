@@ -100,11 +100,19 @@ public class SpotProvider extends Map {
         return spotBuffer.top();
     }
 
+    public boolean isBufferEmpty() {
+        return spotBuffer.isEmpty();
+    }
+
     public void popBuffer() {
         spotBuffer.pop();
     }
 
     public void popBufferAll() {
         spotBuffer.popAll();
+    }
+
+    public int bufferSize() {
+        return spotBuffer.size();
     }
 }
