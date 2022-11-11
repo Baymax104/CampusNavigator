@@ -12,6 +12,7 @@ import com.amap.api.maps.model.LatLng;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.M;
 import com.example.campusnavigator.model.Map;
+import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
 
 import java.util.Locale;
@@ -35,7 +36,7 @@ public class SelectClickWindow extends Window {
     }
 
     private SelectClickWindow(Context context, ViewGroup parent) {
-        super(R.layout.window_select_click, context, parent);
+        super(R.layout.window_select_click, M.S_SELECT_CLICK, context, parent);
         nameTxt = rootView.findViewById(R.id.select_click_name);
         infoTxt = rootView.findViewById(R.id.select_click_info);
         button = rootView.findViewById(R.id.select_click_button);
@@ -47,8 +48,12 @@ public class SelectClickWindow extends Window {
         return window;
     }
 
-    public void setButtonListener(ButtonClickListener listener) {
-        button.setOnClickListener(v -> listener.onClick(selected));
+    public void setButtonListener(Mode mode, ButtonClickListener listener) {
+        button.setOnClickListener(v -> {
+            if (mode.is(this.mode)) {
+                listener.onClick(selected);
+            }
+        });
     }
 
     public void setMarkerInfo(@NonNull Position position, @NonNull Position myPosition) {

@@ -310,7 +310,4 @@ public class MapManager extends Map {
         positionBuffer.pop();
     }
 
-    public void popBufferAll() {
-        positionBuffer.popAll();
-    }
 }

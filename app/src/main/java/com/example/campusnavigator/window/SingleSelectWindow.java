@@ -16,7 +16,7 @@ import com.example.campusnavigator.model.M;
 public class SingleSelectWindow extends Window {
 
     private SingleSelectWindow(Context context, ViewGroup parent) {
-        super(R.layout.window_single_select, context, parent);
+        super(R.layout.window_single_select, M.S_SELECT, context, parent);
     }
 
     public static SingleSelectWindow newInstance(Context context, ViewGroup parent) {

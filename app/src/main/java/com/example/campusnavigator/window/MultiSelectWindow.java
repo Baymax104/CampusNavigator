@@ -1,7 +1,6 @@
 package com.example.campusnavigator.window;
 
 import android.content.Context;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -12,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.M;
+import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.adapters.MultiSelectAdapter;
 
@@ -32,7 +32,7 @@ public class MultiSelectWindow extends Window {
     private final MultiSelectAdapter adapter;
 
     private MultiSelectWindow(Context context, ViewGroup parent) {
-        super(R.layout.window_multi_select, context, parent);
+        super(R.layout.window_multi_select, M.M_SELECT, context, parent);
         routeButton = rootView.findViewById(R.id.multi_select_button);
         selectNumber = rootView.findViewById(R.id.multi_select_number);
         spotRecyclerView = rootView.findViewById(R.id.multi_select_list);
@@ -53,12 +53,12 @@ public class MultiSelectWindow extends Window {
         return window;
     }
 
-    public void setButtonListener(View.OnClickListener listener) {
-        routeButton.setOnClickListener(listener);
+    public void setButtonListener(Mode mode, OnClickListener listener) {
+        registerListener(routeButton, mode, listener);
     }
 
-    public void setRemoveListener(View.OnClickListener listener) {
-        removeButton.setOnClickListener(listener);
+    public void setRemoveListener(Mode mode, OnClickListener listener) {
+        registerListener(removeButton, mode, listener);
     }
 
     public void addPosition(Position position) {

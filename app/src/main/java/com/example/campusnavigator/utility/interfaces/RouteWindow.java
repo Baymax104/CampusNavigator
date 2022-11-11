@@ -1,10 +1,8 @@
 package com.example.campusnavigator.utility.interfaces;
 
 import android.view.MotionEvent;
-import android.widget.ImageView;
 
 import com.amap.api.maps.AMap;
-import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.window.Window;
 
 /**

@@ -149,38 +149,26 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         });
 
         // searchWindow对象监听
-        searchWindow.setSearchListener(view -> {
-            if (mode.is(M.DEFAULT)) {
-                searchDialog.show();
-                searchDialog.setSelected(null);
-            }
+        searchWindow.setSearchListener(mode, v -> {
+            searchDialog.show();
+            searchDialog.setSelected(null);
         });
 
-        searchWindow.setEntryListener(view -> {
-            if (mode.is(M.DEFAULT)) { // 由初始状态切换到多点选择状态
-                mode.changeTo(M.M_SELECT);
-            }
-        });
+        searchWindow.setEntryListener(mode, v -> mode.changeTo(M.M_SELECT));
 
-        searchWindow.setBuildingListener(view -> {
-            if (mode.is(M.DEFAULT)) {
-                DialogHelper.showBuildingDialog(this, view);
-            }
-        });
+        searchWindow.setBuildingListener(mode, v -> DialogHelper.showBuildingDialog(this, v));
 
         // 多点选择地点监听
-        multiSelectWindow.setButtonListener(view -> {
-            if (mode.is(M.M_SELECT)) {
-                if (provider.bufferSize() < 2) {
-                    Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
-                } else {
-                    List<Position> dests = provider.getBuffer().toList(true);
-                    calculateMultiRoute(dests, Map.FOOT_PASS);
-                }
+        multiSelectWindow.setButtonListener(mode, view -> {
+            if (provider.bufferSize() < 2) {
+                Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
+            } else {
+                List<Position> dests = provider.getBuffer().toList(true);
+                calculateMultiRoute(dests, Map.FOOT_PASS);
             }
         });
 
-        multiSelectWindow.setRemoveListener(v -> {
+        multiSelectWindow.setRemoveListener(mode, v -> {
             boolean isCompleted = multiSelectWindow.removePosition();
             if (isCompleted) {
                 Position removedSpot = provider.bufferTop();
@@ -192,31 +180,27 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
 
-        selectClickWindow.setButtonListener(selected -> {
+        selectClickWindow.setButtonListener(mode, selected -> {
             if (selected != null) {
                 calculateSingleRoute(selected, Map.FOOT_PASS);
             }
         });
 
         // 单点路径窗口监听
-        singleRouteWindow.setWayChangeListener((dest, group, checkedId) -> {
-            if (mode.is(M.S_ROUTE)) {
-                if (checkedId == R.id.segment_footway) {
-                    calculateSingleRoute(dest, Map.FOOT_PASS);
-                } else if (checkedId == R.id.segment_driveway) {
-                    calculateSingleRoute(dest, Map.DRIVE_PASS);
-                }
+        singleRouteWindow.setWayChangeListener(mode, (dest, group, checkedId) -> {
+            if (checkedId == R.id.segment_footway) {
+                calculateSingleRoute(dest, Map.FOOT_PASS);
+            } else if (checkedId == R.id.segment_driveway) {
+                calculateSingleRoute(dest, Map.DRIVE_PASS);
             }
         });
 
         // 多点路径窗口监听
-        multiRouteWindow.setWayChangeListener((dests, group, checkedId) -> {
-            if (mode.is(M.M_ROUTE)) {
-                if (checkedId == R.id.segment_footway) {
-                    calculateMultiRoute(dests, Map.FOOT_PASS);
-                } else if (checkedId == R.id.segment_driveway) {
-                    calculateMultiRoute(dests, Map.DRIVE_PASS);
-                }
+        multiRouteWindow.setWayChangeListener(mode, (dests, group, checkedId) -> {
+            if (checkedId == R.id.segment_footway) {
+                calculateMultiRoute(dests, Map.FOOT_PASS);
+            } else if (checkedId == R.id.segment_driveway) {
+                calculateMultiRoute(dests, Map.DRIVE_PASS);
             }
         });
     }

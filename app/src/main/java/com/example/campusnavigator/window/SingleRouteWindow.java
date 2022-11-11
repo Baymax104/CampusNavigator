@@ -1,9 +1,7 @@
 package com.example.campusnavigator.window;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
@@ -14,10 +12,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.amap.api.maps.AMap;
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.M;
-import com.example.campusnavigator.model.Map;
 import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.Route;
@@ -61,7 +57,7 @@ public class SingleRouteWindow extends Window implements RouteWindow {
 
 
     private SingleRouteWindow(Context context, ViewGroup parent) {
-        super(R.layout.window_single_route, context, parent);
+        super(R.layout.window_single_route, M.S_ROUTE, context, parent);
         routeContainer = rootView.findViewById(R.id.route_container);
         // 获取布局对象
         expendButton = routeContainer.findViewById(R.id.expend_button);
@@ -85,9 +81,11 @@ public class SingleRouteWindow extends Window implements RouteWindow {
         return window;
     }
 
-    public void setWayChangeListener(WayChangeListener listener) {
+    public void setWayChangeListener(Mode mode, WayChangeListener listener) {
         waySegment.setOnCheckedChangeListener((group, checkedId) -> {
-            listener.onWayChange(destPosition, group, checkedId);
+            if (mode.is(this.mode)) {
+                listener.onWayChange(destPosition, group, checkedId);
+            }
         });
     }
 

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
 import com.example.campusnavigator.model.M;
+import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.Route;
 import com.example.campusnavigator.utility.adapters.MultiRouteAdapter;
@@ -56,7 +57,7 @@ public class MultiRouteWindow extends Window implements RouteWindow {
     }
 
     private MultiRouteWindow(Context context, ViewGroup parent) {
-        super(R.layout.window_multi_route, context, parent);
+        super(R.layout.window_multi_route, M.M_ROUTE, context, parent);
         multiRouteContainer = rootView.findViewById(R.id.multi_route_container);
 
         timeInfo = multiRouteContainer.findViewById(R.id.multi_route_time_info);
@@ -111,9 +112,11 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         });
     }
 
-    public void setWayChangeListener(MultiRouteWindow.WayChangeListener listener) {
+    public void setWayChangeListener(Mode mode, WayChangeListener listener) {
         waySegment.setOnCheckedChangeListener((group, checkedId) -> {
-            listener.onWayChange(dests, group, checkedId);
+            if (mode.is(this.mode)) {
+                listener.onWayChange(dests, group, checkedId);
+            }
         });
     }
 
