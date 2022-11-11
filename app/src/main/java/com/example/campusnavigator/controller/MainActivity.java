@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     // 窗口对象
     private SearchWindow searchWindow;
+    private SpotSearchDialog searchDialog;
     private MultiSelectWindow multiSelectWindow;
     private MultiRouteWindow multiRouteWindow;
     private SingleRouteWindow singleRouteWindow;
@@ -92,6 +93,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         manager = MapManager.getInstance();
         OverlayHelper.bind(map, mapView, this);
 
+        // 初始化窗口
+        initWindow();
+
         // 设置地图属性
         setMap();
 
@@ -110,7 +114,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 selectClickWindow.setMarkerInfo(spot, myLocation);
 
             } else if (mode.is(M.S_SELECT)) {
-                DialogHelper.showSpotSearchDialog(this, mode, provider, this, spot);
+                searchDialog.show();
+                searchDialog.setSelected(spot);
 
             } else if (mode.is(M.M_SELECT)) {
                 // 检查重复输入
@@ -146,7 +151,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         // searchWindow对象监听
         searchWindow.setSearchListener(view -> {
             if (mode.is(M.DEFAULT)) {
-                DialogHelper.showSpotSearchDialog(this, mode, provider, this);
+                searchDialog.show();
+                searchDialog.setSelected(null);
             }
         });
 
@@ -308,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         } else {
             M last = mode.getState();
             mode.changeTo(M.DEFAULT);
-            // 关闭采用饿汉式，防止状态的相关方法再次触发
+            // 关闭采用饿汉式，防止前一状态的相关方法再次触发
             if (last == M.S_ROUTE) {
                 OverlayHelper.removeAllLines();
                 singleRouteWindow.initChecked();
@@ -322,7 +328,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 provider.popBufferAll();
                 multiSelectWindow.removeAllPosition();
             }
-            mode.changeTo(M.DEFAULT);
         }
     }
 
@@ -343,7 +348,9 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         layout.addView(mapView, params);
 
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+    }
 
+    private void initWindow() {
         CoordinatorLayout container = findViewById(R.id.view_container);
         searchWindow = SearchWindow.newInstance(this, container);
         multiSelectWindow = MultiSelectWindow.newInstance(this, container);
@@ -351,6 +358,8 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         singleRouteWindow = SingleRouteWindow.newInstance(this, container);
         singleSelectWindow = SingleSelectWindow.newInstance(this, container);
         selectClickWindow = SelectClickWindow.newInstance(this, container);
+
+        searchDialog = DialogHelper.buildSpotSearchDialog(this, mode, provider, this);
 
         searchWindow.open();
     }

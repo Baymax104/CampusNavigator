@@ -35,8 +35,8 @@ public class SpotSearchDialog extends BottomPopupView {
     private final Context context;
     private SpotProvider provider;
     private SearchAdapter adapter;
+    private EditText editText;
     private SingleSelectListener listener;
-    private String selectResult;
     private Mode modeContext;
 
     public SpotSearchDialog(@NonNull Context context) {
@@ -44,20 +44,12 @@ public class SpotSearchDialog extends BottomPopupView {
         this.context = context;
     }
 
-    public SpotSearchDialog(
-            @NonNull Context context,
-            @NonNull Mode mode,
-            @NonNull SpotProvider provider,
-            SingleSelectListener listener,
-            Position... selectedSpot) {
+    public SpotSearchDialog(@NonNull Context context, @NonNull Mode mode, @NonNull SpotProvider provider, SingleSelectListener listener) {
         super(context);
         this.context = context;
         this.listener = listener;
         this.provider = provider;
         this.modeContext = mode;
-        if (selectedSpot != null && selectedSpot.length > 0) {
-            this.selectResult = selectedSpot[0].getName();
-        }
     }
 
     @Override
@@ -65,10 +57,14 @@ public class SpotSearchDialog extends BottomPopupView {
         return R.layout.dialog_spot_search;
     }
 
+    public void setSelected(Position position) {
+        editText.setText((position == null) ? "" : position.getName());
+    }
+
     @Override
     protected void onCreate() {
         super.onCreate();
-        EditText editText = findViewById(R.id.dialog_search_spot_edit);
+        editText = findViewById(R.id.dialog_search_spot_edit);
         RecyclerView spotsRecyclerView = findViewById(R.id.dialog_search_spot_list);
         Button routeButton = findViewById(R.id.dialog_search_route_button);
         MaterialCardView mapSelectButton = findViewById(R.id.dialog_search_select_spot);
@@ -107,11 +103,6 @@ public class SpotSearchDialog extends BottomPopupView {
                 }
             }
         });
-
-        // 若地图选点返回了选点结果，则填充地点名称
-        if (selectResult != null) {
-            editText.setText(selectResult);
-        }
 
         // 列表item点击监听
         adapter.setItemClickListener(name -> {
