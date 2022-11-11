@@ -26,8 +26,10 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.example.campusnavigator.R;
+import com.example.campusnavigator.model.M;
 import com.example.campusnavigator.model.Map;
 import com.example.campusnavigator.model.MapManager;
+import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.Route;
 import com.example.campusnavigator.model.SpotProvider;
@@ -101,41 +103,37 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             if (spot == null) {
                 return false;
             }
-            switch (mode.getState()) {
-                case DEFAULT:
-                    selectClickWindow.setMarkerInfo(spot, myLocation);
-                    Window.transition(searchWindow, selectClickWindow);
-                    mode.changeTo(M.S_SELECT_CLICK);
-                    break;
-                case S_SELECT_CLICK:
-                    selectClickWindow.setMarkerInfo(spot, myLocation);
-                    break;
-                case S_SELECT:
-                    // 选择点后唤起对话框
-                    DialogHelper.showSpotSearchDialog(this, mode, provider, this, spot);
-                    break;
-                case M_SELECT:
-                    List<Position> spotAttachList = manager.getSpotAttached(spot);
-                    // 检查地点连接点空指针，不进行处理
-                    if (spotAttachList == null) {
-                        return false;
-                    }
+            if (mode.is(M.DEFAULT)) {
+                selectClickWindow.setMarkerInfo(spot, myLocation);
+                Window.transition(searchWindow, selectClickWindow);
+                mode.changeTo(M.S_SELECT_CLICK);
 
-                    Position spotAttach = spotAttachList.get(0);
-                    // 检查重复输入
-                    if (!manager.isBufferEmpty() && spotAttach.equals(manager.bufferTop())) {
-                        Toast.makeText(this, "选择重复", Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
+            } else if (mode.is(M.S_SELECT_CLICK)) {
+                selectClickWindow.setMarkerInfo(spot, myLocation);
 
-                    // 检查通过，将入口和目的地压入栈中
-                    manager.pushBuffer(spotAttach);
-                    provider.pushBuffer(spot);
-                    multiSelectWindow.addPosition(spot);
-                    OverlayHelper.onMarkerClicked(marker);
-                    break;
-                default:
-                    break;
+            } else if (mode.is(M.S_SELECT)) {
+                DialogHelper.showSpotSearchDialog(this, mode, provider, this, spot);
+
+            } else if (mode.is(M.M_SELECT)) {
+                List<Position> spotAttachList = manager.getSpotAttached(spot);
+                // 检查地点连接点空指针，不进行处理
+                if (spotAttachList == null) {
+                    return false;
+                }
+
+                //TODO 选择点不能确定
+                Position spotAttach = spotAttachList.get(0);
+                // 检查重复输入
+                if (!manager.isBufferEmpty() && spotAttach.equals(manager.bufferTop())) {
+                    Toast.makeText(this, "选择重复", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+
+                // 检查通过，将入口和目的地压入栈中
+                manager.pushBuffer(spotAttach);
+                provider.pushBuffer(spot);
+                multiSelectWindow.addPosition(spot);
+                OverlayHelper.onMarkerClicked(marker);
             }
             return true;
         });
@@ -171,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
 
-        searchWindow.setSpotTypeListener(view -> {
+        searchWindow.setBuildingListener(view -> {
             if (mode.is(M.DEFAULT)) {
                 DialogHelper.showBuildingDialog(this, view);
             }
@@ -184,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                     Toast.makeText(this, "地点数不足2个", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        manager.calculate(true, this);
+                        manager.calculate(true, Map.FOOT_PASS, this);
                     } catch (Exception e) {
                         String msg = "计算错误：" + e.getMessage();
                         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
@@ -206,26 +204,27 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
         });
 
+        // 多点路径弹窗监听绑定
+        multiRouteWindow.startExpendListener(mode);
+
         selectClickWindow.setButtonListener(selected -> {
             if (selected != null) {
-                calculateSingleRoute(selected);
+                calculateSingleRoute(selected, Map.FOOT_PASS);
             }
         });
 
         // 单点路径结果弹窗监听绑定
-        singleRouteWindow.bindExpendMode(mode);
+        singleRouteWindow.startExpendListener(mode);
 
-        int count = singleRouteWindow.getPlanCount();
-        for (int i = 0; i < count; i++) {
-            singleRouteWindow.setPlanListener(i, selected -> {
-                singleRouteWindow.refreshSelected();
-                List<List<Position>> route = Route.extractRoute(routeResults);
-                singleRouteWindow.displayPlan(route, selected, myLocation);
-            });
-        }
-
-        // 多点路径弹窗监听绑定
-        multiRouteWindow.bindExpendMode(mode);
+        singleRouteWindow.setWayChangeListener((dest, group, checkedId) -> {
+            if (mode.isSingleRoute()) {
+                if (checkedId == R.id.segment_footway) {
+                    calculateSingleRoute(dest, Map.FOOT_PASS);
+                } else if (checkedId == R.id.segment_driveway) {
+                    calculateSingleRoute(dest, Map.DRIVE_PASS);
+                }
+            }
+        });
     }
 
     private void privacyCompliance() {
@@ -257,32 +256,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         searchWindow.open();
     }
 
-    private void setMap() {
-        LatLng northeast = new LatLng(39.880384,116.488162);
-        LatLng southwest = new LatLng(39.869582,116.477077);
-
-        MyLocationStyle locationStyle = new MyLocationStyle()
-                .interval(1200)
-                .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER)
-                .strokeColor(Color.TRANSPARENT)
-                .radiusFillColor(Color.TRANSPARENT)
-                .showMyLocation(true);
-
-        map.showMapText(false);
-        map.setMapStatusLimits(new LatLngBounds(southwest, northeast));
-        map.setLocationSource(this);
-        map.setMyLocationStyle(locationStyle);
-        map.setMyLocationEnabled(true);
-        map.getUiSettings().setZoomControlsEnabled(false);
-
-        List<String> spotNames = provider.allNames();
-        for (String n : spotNames) {
-            runOnUiThread(() -> {
-                OverlayHelper.drawMarker(provider.getPosition(n));
-                OverlayHelper.drawText(provider.getPosition(n), n);
-            });
-        }
-    }
 
     @Override
     public void onSingleSelect() {
@@ -293,10 +266,10 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
     @Override
     public void onDestReceive(Position dest) {
-        calculateSingleRoute(dest);
+        calculateSingleRoute(dest, Map.FOOT_PASS);
     }
 
-    private void calculateSingleRoute(@NonNull Position destPosition) {
+    private void calculateSingleRoute(@NonNull Position destPosition, int pass) {
         try {
             // 判断当前定位点是否存在
             if (myLocation == null) {
@@ -304,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             }
 
             // 计算距定位点最近的连接点，定位点邻接点表attachPos
-            Position attach = manager.attachToMap(myLocation, destPosition);
+            Position attach = manager.attachToMap(myLocation, destPosition, pass);
             // 获取目的地邻接点，目的地邻接点表spotAttached
             List<Position> spotAttached = manager.getSpotAttached(destPosition);
             if (spotAttached == null || spotAttached.isEmpty()) {
@@ -315,26 +288,18 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             routeResults.clear();
 
             for (Position dest : spotAttached) {
-                manager.pushBuffer(attach);
-                manager.pushBuffer(dest);
-                manager.calculate(false, this);
+                if (pass >= dest.getPass()) {
+                    manager.pushBuffer(attach);
+                    manager.pushBuffer(dest);
+                    manager.calculate(false, pass, this);
+                }
             }
 
             // 筛选最优方案
             manager.filter(routeResults);
 
             // 在循环中经过onSingleRouteSuccess生成规划结果数据，解析结果
-            List<List<Position>> routes = Route.extractRoute(routeResults);
-            List<Double> times = Route.extractTime(routeResults);
-            List<Double> distances = Route.extractDist(routeResults);
-
-            // 初始化数据
-            singleRouteWindow.setDestName(destPosition.getName());
-            singleRouteWindow.setRouteInfo(times, distances);
-            singleRouteWindow.refreshSelected();
-
-            // 展示
-            singleRouteWindow.displayPlan(routes, 0, myLocation);
+            singleRouteWindow.set(routeResults, destPosition, myLocation);
 
             // 更换布局
             Window current = mode.getState().getWindow();
@@ -363,19 +328,14 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     @Override
     public void onMultiRouteReceive(List<Route> results) {
         // 多地点只有一种方案，包含到多个地点的路径
-        List<Position> route = Route.combineRoute(results);
-        List<Double> times = Route.extractTime(results);
-        List<Double> distances = Route.extractDist(results);
-        // 初始化数据
         Stack<Position> buffer = provider.getBuffer();
-        multiRouteWindow.setRouteInfo(buffer, times, distances);
-        // 展示
-        multiRouteWindow.displayRoute(route);
+        multiRouteWindow.set(results, buffer);
         // 清空展示之前的临时数据
         multiSelectWindow.removeAllPosition();
         provider.popBufferAll();
         // 更换布局
-        Window.transition(multiSelectWindow, multiRouteWindow);
+        Window current = mode.getState().getWindow();
+        Window.transition(current, multiRouteWindow);
         multiRouteWindow.openBox();
         mode.changeTo(M.M_ROUTE_OPEN);
     }
@@ -397,6 +357,33 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
             Window current = mode.getState().getWindow();
             Window.transition(current, M.DEFAULT.getWindow());
             mode.changeTo(M.DEFAULT);
+        }
+    }
+
+    private void setMap() {
+        LatLng northeast = new LatLng(39.880384,116.488162);
+        LatLng southwest = new LatLng(39.869273,116.477091);
+
+        MyLocationStyle locationStyle = new MyLocationStyle()
+                .interval(1200)
+                .myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER)
+                .strokeColor(Color.TRANSPARENT)
+                .radiusFillColor(Color.TRANSPARENT)
+                .showMyLocation(true);
+
+        map.showMapText(false);
+        map.setMapStatusLimits(new LatLngBounds(southwest, northeast));
+        map.setLocationSource(this);
+        map.setMyLocationStyle(locationStyle);
+        map.setMyLocationEnabled(true);
+        map.getUiSettings().setZoomControlsEnabled(false);
+
+        List<String> spotNames = provider.allNames();
+        for (String n : spotNames) {
+            runOnUiThread(() -> {
+                OverlayHelper.drawMarker(provider.getPosition(n));
+                OverlayHelper.drawText(provider.getPosition(n), n);
+            });
         }
     }
 

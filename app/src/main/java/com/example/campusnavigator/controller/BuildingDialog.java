@@ -22,6 +22,6 @@ public class BuildingDialog extends AttachPopupView {
 
     @Override
     protected int getImplLayoutId() {
-        return R.layout.layout_search_building;
+        return R.layout.dialog_search_building;
     }
 }

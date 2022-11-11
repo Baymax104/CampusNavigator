@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="280dp"
                 android:id="@+id/dialog_search_spot_list"
-                tools:listitem="@layout/layout_search_spot_item"/>
+                tools:listitem="@layout/item_search_spot"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -48,7 +48,7 @@ public class SpotSearchAdapter extends RecyclerView.Adapter<SpotSearchAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_search_spot_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_search_spot, parent, false);
         return new ViewHolder(view);
     }
 

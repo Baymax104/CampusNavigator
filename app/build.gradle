@@ -49,4 +49,5 @@ dependencies {
     implementation 'com.amap.api:search:latest.integration'
     implementation 'com.github.li-xiaojun:XPopup:2.7.7'
     implementation 'jp.wasabeef:recyclerview-animators:4.0.2'
+    implementation 'info.hoang8f:android-segmented:1.0.6'
 }

@@ -3,7 +3,7 @@ package com.example.campusnavigator.utility.interfaces;
 import android.view.MotionEvent;
 
 import com.amap.api.maps.AMap;
-import com.example.campusnavigator.controller.Mode;
+import com.example.campusnavigator.model.Mode;
 
 /**
  * @Description

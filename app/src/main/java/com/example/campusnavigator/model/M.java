@@ -1,4 +1,4 @@
-package com.example.campusnavigator.controller;
+package com.example.campusnavigator.model;
 
 import com.example.campusnavigator.window.Window;
 

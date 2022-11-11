@@ -3,7 +3,7 @@ package com.example.campusnavigator.utility.helpers;
 import android.content.Context;
 import android.view.View;
 
-import com.example.campusnavigator.controller.Mode;
+import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.controller.PrivacyConfirmDialog;
 import com.example.campusnavigator.controller.SpotSearchDialog;
 import com.example.campusnavigator.controller.BuildingDialog;
@@ -24,12 +24,11 @@ public class DialogHelper {
     private DialogHelper() {
     }
 
-    public static void showSpotSearchDialog(
-            Context context,
-            Mode mode,
-            SpotProvider provider,
-            SingleSelectListener listener,
-            Position... selectedSpot) {
+    public static void showSpotSearchDialog(Context context,
+                                            Mode mode,
+                                            SpotProvider provider,
+                                            SingleSelectListener listener,
+                                            Position... selectedSpot) {
         new XPopup.Builder(context)
                 .asCustom(new SpotSearchDialog(context, mode, provider, listener, selectedSpot))
                 .show();

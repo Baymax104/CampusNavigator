@@ -18,6 +18,7 @@ public class Position {
     private String name;
     private String markerId;
     private BuildingType type = null;
+    private int pass;
 
     public Position() {
     }
@@ -53,6 +54,14 @@ public class Position {
 
     public BuildingType getType() {
         return type;
+    }
+
+    public int getPass() {
+        return pass;
+    }
+
+    public void setPass(int pass) {
+        this.pass = pass;
     }
 
     public String getName() {

@@ -66,7 +66,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:id="@+id/multi_select_list"
-                    tools:listitem="@layout/layout_multi_select_spot_item" />
+                    tools:listitem="@layout/item_multi_select_spot" />
 
             <ImageView
                     android:layout_width="23dp"

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
-import com.example.campusnavigator.controller.M;
+import com.example.campusnavigator.model.M;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.utility.adapters.MultiSelectAdapter;
 
@@ -32,7 +32,7 @@ public class MultiSelectWindow extends Window {
     private final MultiSelectAdapter adapter;
 
     private MultiSelectWindow(Context context, ViewGroup parent) {
-        super(R.layout.layout_multi_select_window, context, parent);
+        super(R.layout.window_multi_select, context, parent);
         routeButton = rootView.findViewById(R.id.multi_select_button);
         selectNumber = rootView.findViewById(R.id.multi_select_number);
         spotRecyclerView = rootView.findViewById(R.id.multi_select_list);

@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.campusnavigator.R;
-import com.example.campusnavigator.controller.M;
+import com.example.campusnavigator.model.M;
 import com.google.android.material.card.MaterialCardView;
 
 /**
@@ -25,7 +25,7 @@ public class SearchWindow extends Window {
 
 
     private SearchWindow(@NonNull Context context, @NonNull ViewGroup parent) {
-        super(R.layout.layout_search_window, context, parent);
+        super(R.layout.window_search, context, parent);
         searchField = rootView.findViewById(R.id.search_field);
         multiSelectEntry = rootView.findViewById(R.id.search_multi_select_entry);
         buildingEntry = rootView.findViewById(R.id.search_building_entry);
@@ -46,7 +46,7 @@ public class SearchWindow extends Window {
         multiSelectEntry.setOnClickListener(listener);
     }
 
-    public void setSpotTypeListener(View.OnClickListener listener) {
+    public void setBuildingListener(View.OnClickListener listener) {
         buildingEntry.setOnClickListener(listener);
     }
 }

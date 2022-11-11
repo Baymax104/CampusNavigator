@@ -18,7 +18,7 @@
             android:background="#eeeeee">
         <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="110dp"
                 android:orientation="horizontal"
                 tools:ignore="UselessParent"
                 android:background="@drawable/shape_multi_route_info_bg"
@@ -26,25 +26,35 @@
             <LinearLayout
                     android:layout_width="250dp"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginStart="12dp"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:gravity="center_vertical"
                     android:orientation="vertical">
                 <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
                         android:id="@+id/multi_route_time_info"
                         android:textColor="@color/black"
                         android:textSize="17sp"
                         android:gravity="center"/>
                 <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
                         android:background="@color/white"
                         android:id="@+id/multi_route_distance_info"
                         android:textColor="@color/black"
                         android:textSize="17sp"
                         android:gravity="center"/>
+
+                <include
+                        layout="@layout/box_travel_way_segment"
+                        android:layout_width="250dp"
+                        android:layout_height="27dp"
+                        android:layout_marginTop="8dp"/>
 
             </LinearLayout>
 

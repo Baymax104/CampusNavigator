@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.campusnavigator.R;
+import com.example.campusnavigator.model.M;
+import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
 import com.example.campusnavigator.model.SpotProvider;
 import com.example.campusnavigator.utility.adapters.SpotSearchAdapter;

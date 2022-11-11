@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<info.hoang8f.android.segmented.SegmentedGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="horizontal"
+        app:sc_border_width="1dp"
+        app:sc_tint_color="@color/main_color"
+        app:sc_checked_text_color="@color/white"
+        app:sc_corner_radius="12dp"
+        android:id="@+id/segment_group">
+    <RadioButton
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:id="@+id/segment_footway"
+            android:text="@string/walk"
+            style="@style/RadioButton"/>
+    <RadioButton
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:id="@+id/segment_driveway"
+            android:text="@string/drive"
+            style="@style/RadioButton"/>
+</info.hoang8f.android.segmented.SegmentedGroup>

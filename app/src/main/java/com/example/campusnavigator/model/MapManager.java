@@ -78,9 +78,9 @@ public class MapManager extends Map {
                 result.getDist() != null && !result.getDist().equals(INF);
     }
 
-    public void calculate(boolean isMultiSpot, @NonNull RouteResultReceiver receiver) throws Exception {
+    public void calculate(boolean isMultiSpot, int pass, @NonNull RouteResultReceiver receiver) throws Exception {
         if (isMultiSpot) {
-            List<Route> results = multiDestRoute();
+            List<Route> results = multiDestRoute(pass);
             for (Route result : results) {
                 if (!isResultValid(result)) {
                     throw new Exception("多点结果错误");
@@ -97,7 +97,7 @@ public class MapManager extends Map {
         positionBuffer.pop();
 
         for (int i = 0, k = 1; i < 3; i++, k++) {
-            Route result = singleDestRoute(from, to, k);
+            Route result = singleDestRoute(from, to, k, pass);
             if (!isResultValid(result)) {
                 throw new Exception("单点结果错误");
             }
@@ -108,7 +108,7 @@ public class MapManager extends Map {
     }
 
     @NonNull
-    public List<Route> multiDestRoute() {
+    public List<Route> multiDestRoute(int pass) {
         List<Route> results = new List<>();
         Position to = positionBuffer.top();
         positionBuffer.pop();
@@ -116,7 +116,7 @@ public class MapManager extends Map {
         while (!positionBuffer.isEmpty()) {
             Position from = positionBuffer.top();
             positionBuffer.pop();
-            Route singleDestRoute = singleDestRoute(from, to, 1);
+            Route singleDestRoute = singleDestRoute(from, to, 1, pass);
             results.push(singleDestRoute);
             to = from;
         }
@@ -125,26 +125,27 @@ public class MapManager extends Map {
     }
 
     @NonNull
-    public Route singleDestRoute(@NonNull Position from, @NonNull Position to, int k) {
+    public Route singleDestRoute(@NonNull Position from, @NonNull Position to, int k, int pass) {
 
         int fromId = from.getId();
         int toId = to.getId();
 
-        Tuple<List<Position>, Double> result = Astar(fromId, toId, k);
+        Tuple<List<Position>, Double> result = Astar(fromId, toId, k, pass);
 
         List<Position> route = result.first;
         double dist = result.second;
-        double time = dist / SPEED_WALK;
+        double speed = (pass == FOOT_PASS) ? SPEED_WALK : SPEED_DRIVE;
+        double time = dist / speed;
 
         return new Route(route, time, dist);
     }
 
     @NonNull
-    public Tuple<List<Position>, Double> Astar(int source, int dest, int k) {
+    public Tuple<List<Position>, Double> Astar(int source, int dest, int k, int pass) {
 
         // 通过Dijkstra计算dest到source的最短路径树
         // 其中dist[i]表示从dest到i的距离，将该距离作为A*的估计代价
-        Dijkstra(dest, source);
+        Dijkstra(dest, source, pass);
 
         List<Position> route = new List<>();
         MinHeap<State> heap = new MinHeap<>();
@@ -172,7 +173,7 @@ public class MapManager extends Map {
 
             for (int i = 0; i < size; i++) {
                 // 遍历v的邻接点
-                if (vi != i &&map[vi][i] != INF) {
+                if (vi != i && map[vi][i] != INF && pass >= positions[i].getPass()) {
                     // 无向图中需要假定 v.pre 到 v 为单向的，即 v.pre -> v
                     // 则下一个选择的 i != v.pre，防止算法困在 v 和 v.pre 之间
                     if (v.pre == null || v.pre.v != i) {
@@ -200,7 +201,7 @@ public class MapManager extends Map {
         return new Tuple<>(route, dist);
     }
 
-    private void Dijkstra(int s, int t) {
+    private void Dijkstra(int s, int t, int pass) {
         boolean[] vis = new boolean[size];
         dist = new double[size];
         Arrays.fill(dist, INF);
@@ -218,7 +219,7 @@ public class MapManager extends Map {
                 break;
             }
             for (int i = 0; i < size; i++) {
-                if (map[v][i] != INF && !vis[i]) {
+                if (map[v][i] != INF && !vis[i] && pass >= positions[i].getPass()) {
                     if (dist[v] + map[v][i] < dist[i]) {
                         dist[i] = dist[v] + map[v][i];
                         Entry e = new Entry(i, dist[i]);
@@ -230,13 +231,15 @@ public class MapManager extends Map {
     }
 
     @NonNull
-    public Position attachToMap(@NonNull Position myPosition, Position destPosition) {
+    public Position attachToMap(@NonNull Position myPosition, Position destPosition, int pass) {
         // 使用最小堆取距离最小的点
         MinHeap<Entry> minDist = new MinHeap<>();
         for (int i = 0; i < size; i++) {
-            if (checkDirection(myPosition, positions[i], destPosition)) {
-                double dist = getDistance(myPosition, positions[i]);
-                minDist.push(new Entry(i, dist));
+            if (pass >= positions[i].getPass()) {
+                if (pass == DRIVE_PASS || checkDirection(myPosition, positions[i], destPosition)) {
+                    double dist = getDistance(myPosition, positions[i]);
+                    minDist.push(new Entry(i, dist));
+                }
             }
         }
         int min = minDist.top().v;

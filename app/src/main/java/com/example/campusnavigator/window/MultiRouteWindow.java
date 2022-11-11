@@ -16,9 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amap.api.maps.AMap;
 import com.example.campusnavigator.R;
-import com.example.campusnavigator.controller.M;
-import com.example.campusnavigator.controller.Mode;
+import com.example.campusnavigator.model.M;
+import com.example.campusnavigator.model.Mode;
 import com.example.campusnavigator.model.Position;
+import com.example.campusnavigator.model.Route;
 import com.example.campusnavigator.utility.adapters.MultiSpotAdapter;
 import com.example.campusnavigator.utility.helpers.OverlayHelper;
 import com.example.campusnavigator.utility.interfaces.RouteWindow;
@@ -47,14 +48,14 @@ public class MultiRouteWindow extends Window implements RouteWindow {
     private final MultiSpotAdapter adapter;
 
     private MultiRouteWindow(Context context, ViewGroup parent) {
-        super(R.layout.layout_multi_route_window, context, parent);
+        super(R.layout.window_multi_route, context, parent);
         multiRouteContainer = rootView.findViewById(R.id.multi_route_container);
 
         timeInfo = multiRouteContainer.findViewById(R.id.multi_route_time_info);
         distanceInfo = multiRouteContainer.findViewById(R.id.multi_route_distance_info);
         expendButton = multiRouteContainer.findViewById(R.id.expend_button);
 
-        multiSpotBox = LayoutInflater.from(context).inflate(R.layout.layout_multi_route_spot_box, parent, false);
+        multiSpotBox = LayoutInflater.from(context).inflate(R.layout.box_multi_route_spot, parent, false);
 
         RecyclerView multiSpotList = multiSpotBox.findViewById(R.id.multi_route_spot_list);
         adapter = new MultiSpotAdapter();
@@ -70,7 +71,7 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         return window;
     }
 
-    public void bindExpendMode(Mode mode) {
+    public void startExpendListener(Mode mode) {
         expendButton.setOnClickListener(v -> {
             if (mode.is(M.M_ROUTE_OPEN)) {
                 closeBox();
@@ -98,7 +99,20 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         }
     }
 
-    public void setRouteInfo(@NonNull Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
+    public void set(List<Route> results, Stack<Position> destBuffer) {
+        // 提取结果
+        List<Position> route = Route.combineRoute(results);
+        List<Double> times = Route.extractTime(results);
+        List<Double> distances = Route.extractDist(results);
+
+        // 设置文字信息
+        setInfo(destBuffer, times, distances);
+        // 展示路线
+        displayRoute(route);
+
+    }
+
+    private void setInfo(@NonNull Stack<Position> destBuffer, List<Double> times, List<Double> dists) {
         List<Position> dests = destBuffer.toList(true);
         List.reverse(times);
         List.reverse(dists);
@@ -138,6 +152,13 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         adapter.notifyDataSetChanged();
     }
 
+    private void displayRoute(@NonNull List<Position> route) {
+        OverlayHelper.removeAllLines();
+        for (Position p : route) {
+            OverlayHelper.drawLine(p);
+        }
+    }
+
     @Override
     public void openBox() {
         if (multiSpotBox != null && multiRouteContainer.findViewById(R.id.multi_route_spot_box) == null) {
@@ -154,11 +175,4 @@ public class MultiRouteWindow extends Window implements RouteWindow {
         expendButton.setImageResource(R.drawable.expend_arrow_up);
     }
 
-
-    public void displayRoute(@NonNull List<Position> route) {
-        OverlayHelper.removeAllLines();
-        for (Position p : route) {
-            OverlayHelper.drawLine(p);
-        }
-    }
 }
