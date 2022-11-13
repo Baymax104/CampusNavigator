@@ -156,8 +156,6 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
 
         searchWindow.setEntryListener(mode, v -> mode.changeTo(M.M_SELECT));
 
-        searchWindow.setBuildingListener(mode, v -> DialogHelper.showBuildingDialog(this, v));
-
         // 多点选择地点监听
         multiSelectWindow.setButtonListener(mode, view -> {
             if (provider.bufferSize() < 2) {

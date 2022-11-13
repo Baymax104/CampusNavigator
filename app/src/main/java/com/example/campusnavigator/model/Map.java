@@ -73,9 +73,6 @@ public class Map {
             // 获取crossings
             generateCrossing(jsonObject);
 
-            // 设置spot类型
-            setBuildingType(jsonObject);
-
             // 设置通行权限
             setPositionPass(jsonObject);
 
@@ -148,22 +145,6 @@ public class Map {
                 attachList.push(positions[positionIndex]);
             }
             spotAttached.put(spot, attachList);
-        }
-    }
-
-    private static void setBuildingType(JSONObject jsonObject) throws JSONException {
-        Class<?> cl = BuildingType.class;
-        Object[] instances = cl.getEnumConstants();
-        if (instances != null) {
-            JSONObject spotType = jsonObject.getJSONObject("spotType");
-            for (Object instance : instances) {
-                BuildingType type = (BuildingType) instance;
-                JSONArray posArray = spotType.getJSONArray(type.name());
-                for (int i = 0; i < posArray.length(); i++) {
-                    int pos = posArray.getInt(i);
-                    spots[pos].setType(type);
-                }
-            }
         }
     }
 
